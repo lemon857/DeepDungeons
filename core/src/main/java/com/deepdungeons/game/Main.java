@@ -1,7 +1,6 @@
 package com.deepdungeons.game;
 
-import java.util.Dictionary;
-import java.util.Hashtable;
+import java.util.HashMap;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
@@ -24,9 +23,9 @@ public class Main extends ApplicationAdapter {
   private Stage stage;
   private Label room_id_label;
 
-  private Dictionary<Integer, Room> rooms;
+  private HashMap<Point, Room> rooms;
 
-  private int current_room_id;
+  private Point current_room_pos;
 
   @Override
   public void create() {
@@ -60,18 +59,18 @@ public class Main extends ApplicationAdapter {
 
     Skin skin = new Skin(Gdx.files.internal("ui/uiskin.json"));
 
-    room_id_label = new Label("1", skin);
+    room_id_label = new Label("X: 0 Y: 0", skin);
     room_id_label.setPosition(10, 10);
     stage.addActor(room_id_label);
 
-    rooms = new Hashtable<>();
+    rooms = new HashMap<>();
 
-    Room new_room = new Room(2);
+    Room new_room = new Room(new Point(0, 0), new int[]{1, 0, 0, 0});
 
-    current_room_id = new_room.GetID();
-    rooms.put(current_room_id, new_room);
+    current_room_pos = new_room.GetPos();
+    rooms.put(current_room_pos, new_room);
 
-    image = new Texture(rooms.get(current_room_id).GenerateImage());
+    image = new Texture(rooms.get(current_room_pos).GenerateImage());
   }
 
   @Override
@@ -99,24 +98,42 @@ public class Main extends ApplicationAdapter {
   }
 
   private void GoToNextRoom(int door_id) {
-    int next_id = rooms.get(current_room_id).GetNextRoomID(door_id);
-    if (next_id == 0) {
-      System.out.printf("Current id: %d\n", current_room_id);
-      Room new_room = new Room(-1, (door_id + 2) % 4, current_room_id);
+    if (!rooms.get(current_room_pos).CanGoNextRoom(door_id)) return;
 
-      rooms.get(current_room_id).SetNextRoomID(door_id, new_room.GetID());
+    Point new_pos = Point.Sum(current_room_pos, Room.GetDeltaFromDoor(door_id));
+    System.out.printf("----------------------\nNext pos: x: %d y: %d\nContains: %b\n", new_pos.x, new_pos.y, rooms.containsKey(new_pos));
 
-      rooms.put(new_room.GetID(), new_room);
+    if (!rooms.containsKey(new_pos)) {
+      System.out.printf("Create room from: x: %d y: %d\n", current_room_pos.x, current_room_pos.y);
 
-      current_room_id = new_room.GetID();
-      image = new Texture(rooms.get(current_room_id).GenerateImage());
+      current_room_pos = Point.Sub(current_room_pos, Room.GetDeltaFromDoor((door_id + 2) % 4));
+      
+      int[] must_doors = new int[4];
+      for (int i = 0; i < 4; ++i) {
+        Point cur_room = Point.Sum(current_room_pos, Room.GetDeltaFromDoor(i));
+        if (rooms.containsKey(cur_room)) {
+          System.out.println("Check pos: X: " + cur_room.x + " Y: " + cur_room.y + " Check door: " + ((i + 2) % 4) + " from: " + i + " res: " + rooms.get(cur_room).CanGoNextRoom((i + 2) % 4));
 
-      System.out.printf("New Current id: %d\n", current_room_id);
+          if (rooms.get(cur_room).CanGoNextRoom((i + 2) % 4)) {
+            must_doors[i] = 1;
+          } else {
+            must_doors[i] = -1;
+          }
+        } else {
+          must_doors[i] = 0;
+        }
+      }
 
-    } else if (next_id != -1) {
-      current_room_id = next_id;
-      image = new Texture(rooms.get(current_room_id).GenerateImage());
+      Room new_room = new Room(current_room_pos, must_doors);
+
+      rooms.put(current_room_pos, new_room);
+      image = new Texture(rooms.get(current_room_pos).GenerateImage());
+
+    } else {
+      current_room_pos = new_pos;
+      image = new Texture(rooms.get(current_room_pos).GenerateImage());
     }
-    room_id_label.setText(current_room_id);
+    rooms.get(current_room_pos).PrintDoors();
+    room_id_label.setText("X: " + current_room_pos.x + " Y: " + current_room_pos.y);
   }
 }
