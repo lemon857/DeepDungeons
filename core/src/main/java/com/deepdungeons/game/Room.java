@@ -79,11 +79,7 @@ public class Room {
 
   public Pixmap GenerateImage() {
     Pixmap map = new Pixmap(50, 50, Pixmap.Format.RGB888);
-  
-    map.setColor(1, 1, 1, 1);
-
-    map.drawPixel(10 + id, 10);
-
+    
     map.setColor(1, 0, 0, 1);
 
     map.drawLine(START_BORDER, START_BORDER, START_BORDER, END_BORDER);

@@ -6,16 +6,23 @@ import java.util.Hashtable;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
-public class Main extends ApplicationAdapter implements InputProcessor {
+public class Main extends ApplicationAdapter {
   private SpriteBatch batch;
   private FitViewport viewport;
   private Texture image;
+
+  private Stage stage;
+  private Label room_id_label;
 
   private Dictionary<Integer, Room> rooms;
 
@@ -25,8 +32,37 @@ public class Main extends ApplicationAdapter implements InputProcessor {
   public void create() {
     batch = new SpriteBatch();
     viewport = new FitViewport(50, 50);
+    stage = new Stage();
+    Gdx.input.setInputProcessor(stage);
 
-    Gdx.input.setInputProcessor(this);
+    stage.addListener(new InputListener() {
+      @Override
+      public boolean keyUp(InputEvent event, int keycode) {
+        switch (keycode) {
+          case Input.Keys.UP:
+            GoToNextRoom(0);  
+            break;
+          case Input.Keys.RIGHT:
+            GoToNextRoom(1);
+            break;
+          case Input.Keys.DOWN:
+            GoToNextRoom(2);
+            break;
+          case Input.Keys.LEFT:
+            GoToNextRoom(3);
+            break;
+    
+          default: return false;
+        }
+        return true;
+      }
+    });
+
+    Skin skin = new Skin(Gdx.files.internal("ui/uiskin.json"));
+
+    room_id_label = new Label("1", skin);
+    room_id_label.setPosition(10, 10);
+    stage.addActor(room_id_label);
 
     rooms = new Hashtable<>();
 
@@ -46,6 +82,9 @@ public class Main extends ApplicationAdapter implements InputProcessor {
     batch.begin();
     batch.draw(image, 0, 0, 50, 50);
     batch.end();
+
+    stage.act(Gdx.graphics.getDeltaTime());
+	  stage.draw();
   }
 
   @Override
@@ -78,66 +117,6 @@ public class Main extends ApplicationAdapter implements InputProcessor {
       current_room_id = next_id;
       image = new Texture(rooms.get(current_room_id).GenerateImage());
     }
-  }
-
-  @Override
-  public boolean mouseMoved (int screenX, int screenY) {
-		return false;
-	}
-
-	@Override
-  public boolean touchDown (int screenX, int screenY, int pointer, int button) {
-		return false;
-	}
-
-	@Override
-  public boolean touchDragged (int screenX, int screenY, int pointer) {
-		return false;
-	}
-
-	@Override
-  public boolean touchUp (int screenX, int screenY, int pointer, int button) {
-		return false;
-	}
-
-	@Override
-  public boolean keyDown (int keycode) {
-		return false;
-	}
-
-	@Override
-  public boolean keyUp (int keycode) {
-    switch (keycode) {
-      case Input.Keys.UP:
-        GoToNextRoom(0);  
-        break;
-      case Input.Keys.RIGHT:
-        GoToNextRoom(1);
-        break;
-      case Input.Keys.DOWN:
-        GoToNextRoom(2);
-        break;
-      case Input.Keys.LEFT:
-        GoToNextRoom(3);
-        break;
-
-      default: return false;
-    }
-		return true;
-	}
-
-	@Override
-  public boolean keyTyped (char character) {
-		return false;
-	}
-
-	@Override
-  public boolean scrolled (float x, float y) {
-		return false;
-	}
-
-  @Override
-  public boolean touchCancelled(int screenX, int screenY, int pointer, int button) {
-    return false;
+    room_id_label.setText(current_room_id);
   }
 }
