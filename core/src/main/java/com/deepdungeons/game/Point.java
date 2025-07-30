@@ -19,10 +19,15 @@ public class Point {
     this.y = point.y;
   }
 
-  public static Point Sum(Point a, Point b) {
+  public Point(DoublePoint point) {
+    this.x = (int)point.x;
+    this.y = (int)point.y;
+  }
+
+  public static Point sum(Point a, Point b) {
     return new Point(a.x + b.x, a.y + b.y);
   }
-  public static Point Sub(Point a, Point b) {
+  public static Point sub(Point a, Point b) {
     return new Point(a.x - b.x, a.y - b.y);
   }
 

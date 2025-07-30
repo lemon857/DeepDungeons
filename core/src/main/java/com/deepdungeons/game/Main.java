@@ -5,6 +5,7 @@ import java.util.HashMap;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -27,6 +28,9 @@ public class Main extends ApplicationAdapter {
 
   private Point current_room_pos;
 
+  private Player player;
+  private Label player_pos_label;
+
   @Override
   public void create() {
     batch = new SpriteBatch();
@@ -39,16 +43,16 @@ public class Main extends ApplicationAdapter {
       public boolean keyUp(InputEvent event, int keycode) {
         switch (keycode) {
           case Input.Keys.UP:
-            GoToNextRoom(0);  
+            goToNextRoom(0);  
             break;
           case Input.Keys.RIGHT:
-            GoToNextRoom(1);
+            goToNextRoom(1);
             break;
           case Input.Keys.DOWN:
-            GoToNextRoom(2);
+            goToNextRoom(2);
             break;
           case Input.Keys.LEFT:
-            GoToNextRoom(3);
+            goToNextRoom(3);
             break;
     
           default: return false;
@@ -59,27 +63,90 @@ public class Main extends ApplicationAdapter {
 
     Skin skin = new Skin(Gdx.files.internal("ui/uiskin.json"));
 
-    room_id_label = new Label("X: 0 Y: 0", skin);
+    room_id_label = new Label("Room X: 0 Y: 0", skin);
     room_id_label.setPosition(10, 10);
     stage.addActor(room_id_label);
+
+    player_pos_label = new Label("Player X: 0 Y: 0", skin);
+    player_pos_label.setPosition(370, 10);
+    stage.addActor(player_pos_label);
 
     rooms = new HashMap<>();
 
     Room new_room = new Room(new Point(0, 0), new int[]{1, 0, 0, 0});
 
-    current_room_pos = new_room.GetPos();
+    current_room_pos = new_room.getPos();
     rooms.put(current_room_pos, new_room);
 
-    image = new Texture(rooms.get(current_room_pos).GenerateImage());
+    player = new Player(24, 24);
+
+    Pixmap tmp = rooms.get(current_room_pos).generateImage();
+
+    image = new Texture(tmp);
   }
 
   @Override
   public void render() {
+    input();
+    logic();
+    draw();
+  }
+
+  private void input() {
+    float speed = 20f;
+    float delta = Gdx.graphics.getDeltaTime();
+
+    if (Gdx.input.isKeyPressed(Input.Keys.W)) {
+      player.translate(0, -speed * delta);
+    } else if (Gdx.input.isKeyPressed(Input.Keys.S)) {
+      player.translate(0, speed * delta);
+    }
+    
+    if (Gdx.input.isKeyPressed(Input.Keys.D)) {
+      player.translate(speed * delta, 0);
+    } else if (Gdx.input.isKeyPressed(Input.Keys.A)) {
+      player.translate(-speed * delta, 0);
+    }
+  }
+
+  private void logic() {
+    player.update();
+    Point pos = new Point(player.getPos());
+
+    player_pos_label.setText("Player X: " + pos.x + " Y: " + pos.y);
+
+    if (pos.x >= 19 && pos.x <= 30) {
+      // Top door
+      if (pos.y < 15) {
+        goToNextRoom(0);
+        player.setY(48);
+      // Bottom dor
+      } else if (pos.y > 48) {
+        goToNextRoom(2);
+        player.setY(15);
+      }
+    }
+
+    if (pos.y >= 26 && pos.y <= 37) {
+      // Left door
+      if (pos.x < 8) {
+        goToNextRoom(3);
+        player.setX(41);
+      // Right door
+      } else if (pos.x > 41) {
+        goToNextRoom(1);
+        player.setX(8);
+      }
+    }
+  }
+
+  private void draw() {
     ScreenUtils.clear(0f, 0f, 0f, 1f);
     viewport.apply();
     batch.setProjectionMatrix(viewport.getCamera().combined);
     batch.begin();
     batch.draw(image, 0, 0, 50, 50);
+    player.draw(batch);
     batch.end();
 
     stage.act(Gdx.graphics.getDeltaTime());
@@ -97,24 +164,24 @@ public class Main extends ApplicationAdapter {
     viewport.update(width, height, true);
   }
 
-  private void GoToNextRoom(int door_id) {
-    if (!rooms.get(current_room_pos).CanGoNextRoom(door_id)) return;
+  private void goToNextRoom(int door_id) {
+    if (!rooms.get(current_room_pos).canGoNextRoom(door_id)) return;
 
-    Point new_pos = Point.Sum(current_room_pos, Room.GetDeltaFromDoor(door_id));
+    Point new_pos = Point.sum(current_room_pos, Room.GetDeltaFromDoor(door_id));
     System.out.printf("----------------------\nNext pos: x: %d y: %d\nContains: %b\n", new_pos.x, new_pos.y, rooms.containsKey(new_pos));
 
     if (!rooms.containsKey(new_pos)) {
       System.out.printf("Create room from: x: %d y: %d\n", current_room_pos.x, current_room_pos.y);
 
-      current_room_pos = Point.Sub(current_room_pos, Room.GetDeltaFromDoor((door_id + 2) % 4));
-      
+      current_room_pos = Point.sub(current_room_pos, Room.GetDeltaFromDoor((door_id + 2) % 4));
+
       int[] must_doors = new int[4];
       for (int i = 0; i < 4; ++i) {
-        Point cur_room = Point.Sum(current_room_pos, Room.GetDeltaFromDoor(i));
+        Point cur_room = Point.sum(current_room_pos, Room.GetDeltaFromDoor(i));
         if (rooms.containsKey(cur_room)) {
-          System.out.println("Check pos: X: " + cur_room.x + " Y: " + cur_room.y + " Check door: " + ((i + 2) % 4) + " from: " + i + " res: " + rooms.get(cur_room).CanGoNextRoom((i + 2) % 4));
+          System.out.println("Check pos: X: " + cur_room.x + " Y: " + cur_room.y + " Check door: " + ((i + 2) % 4) + " from: " + i + " res: " + rooms.get(cur_room).canGoNextRoom((i + 2) % 4));
 
-          if (rooms.get(cur_room).CanGoNextRoom((i + 2) % 4)) {
+          if (rooms.get(cur_room).canGoNextRoom((i + 2) % 4)) {
             must_doors[i] = 1;
           } else {
             must_doors[i] = -1;
@@ -127,13 +194,13 @@ public class Main extends ApplicationAdapter {
       Room new_room = new Room(current_room_pos, must_doors);
 
       rooms.put(current_room_pos, new_room);
-      image = new Texture(rooms.get(current_room_pos).GenerateImage());
+      image = new Texture(rooms.get(current_room_pos).generateImage());
 
     } else {
       current_room_pos = new_pos;
-      image = new Texture(rooms.get(current_room_pos).GenerateImage());
+      image = new Texture(rooms.get(current_room_pos).generateImage());
     }
-    rooms.get(current_room_pos).PrintDoors();
-    room_id_label.setText("X: " + current_room_pos.x + " Y: " + current_room_pos.y);
+    rooms.get(current_room_pos).printDoors();
+    room_id_label.setText("Room X: " + current_room_pos.x + " Y: " + current_room_pos.y);
   }
 }

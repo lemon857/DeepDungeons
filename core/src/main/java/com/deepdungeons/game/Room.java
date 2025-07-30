@@ -38,18 +38,18 @@ public class Room {
 
     this.doors = new boolean[] {false, false, false, false};
 
-    GenerateNewDoors(must_doors);
+    generateNewDoors(must_doors);
   }
 
-  public Point GetPos() {
+  public Point getPos() {
     return pos;
   }
 
-  public boolean CanGoNextRoom(int door_id) {
+  public boolean canGoNextRoom(int door_id) {
     return doors[door_id];
   }
 
-  public Pixmap GenerateImage() {
+  public Pixmap generateImage() {
     Pixmap map = new Pixmap(50, 50, Pixmap.Format.RGB888);
 
     map.setColor(1, 0, 0, 1);
@@ -86,14 +86,14 @@ public class Room {
     return map;
   }
 
-  public void PrintDoors() {
+  public void printDoors() {
     for (int i = 0; i < 4; ++i) {
       System.out.print(doors[i] + " ");
     }
     System.out.print("\n");
   }
 
-  private void GenerateNewDoors(int[] must_doors) {
+  private void generateNewDoors(int[] must_doors) {
     Random r = new Random(System.currentTimeMillis());
 
     for (int i = 0; i < 4; ++i) {
