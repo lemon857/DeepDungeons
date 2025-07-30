@@ -21,12 +21,17 @@ public class Room {
   // 1+ - door to exist room
   public int[] doors;
 
-  // Room with random doors
+  // Room with random doors (-1 for random count)
   public Room(int count_new_doors) {
     this.id = current_id;
     current_id++;
 
     this.doors = new int[] {-1, -1, -1, -1};
+
+    if (count_new_doors < 0) {
+      Random r = new Random(System.currentTimeMillis());
+      count_new_doors = r.nextInt(1, 5);
+    }
 
     GenerateNewDoors(count_new_doors);
   }
@@ -38,24 +43,23 @@ public class Room {
 
     this.doors = new int[] {-1, -1, -1, -1};
 
-    if (from_door >= 0 && from_door <= 3) {
-      doors[from_door] = from_id;
-    }
+    doors[from_door] = from_id;
+    System.out.printf("Link door: %d id: %d\n", from_door, from_id);
   }
 
-  // Room with input door and random doors
+  // Room with input door and random doors (-1 for random count)
   public Room(int count_new_doors, int from_door, int from_id) {
     this.id = current_id;
     ++current_id;
 
     this.doors = new int[] {-1, -1, -1, -1};
 
-    if (from_door >= 0 && from_door <= 3) {
-      doors[from_door] = from_id;
-    }
+    doors[from_door] = from_id;
+    System.out.printf("Link door: %d id: %d\n", from_door, from_id);
 
-    if (count_new_doors > 3) {
-      count_new_doors = 3;
+    if (count_new_doors < 0) {
+      Random r = new Random(System.currentTimeMillis());
+      count_new_doors = r.nextInt(4);
     }
 
     GenerateNewDoors(count_new_doors);
@@ -70,18 +74,16 @@ public class Room {
   }
 
   public void SetNextRoomID(int door_id, int id) {
-    if (door_id < 0 && door_id > 3) {
-      // invalid door id
-    }
-    if (id < 1) {
-      // invalid id
-    }
     doors[door_id] = id;
   }
 
   public Pixmap GenerateImage() {
     Pixmap map = new Pixmap(50, 50, Pixmap.Format.RGB888);
   
+    map.setColor(1, 1, 1, 1);
+
+    map.drawPixel(10 + id, 10);
+
     map.setColor(1, 0, 0, 1);
 
     map.drawLine(START_BORDER, START_BORDER, START_BORDER, END_BORDER);
@@ -119,6 +121,7 @@ public class Room {
   private void GenerateNewDoors(int count) {
     Random r = new Random(System.currentTimeMillis());
 
+    System.out.printf("Gen count: %d\n",count);
     for (int i = 0; i < count; ++i) {
       int new_index = r.nextInt(4);
       while (doors[new_index] != -1) {
@@ -127,6 +130,7 @@ public class Room {
           new_index = 0;
         }
       }
+      System.out.printf("Gen index: %d\n", new_index);
       doors[new_index] = 0;
     }
   }
