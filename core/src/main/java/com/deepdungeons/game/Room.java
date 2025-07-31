@@ -18,16 +18,16 @@ public class Room {
   // for horizontal position
   public static final int DOOR_WIDTH = 10;
   public static final int DOOR_KEY_WIDTH = DOOR_WIDTH - 8;
-  public static final int DOOR_HEIGHT = 2;
+  public static final int DOOR_HEIGHT = 1;
 
   public static final int DOOR_OFFSET = (SCREEN_WIDTH - DOOR_WIDTH) / 2;
   public static final int DOOR_KEY_OFFSET = (SCREEN_WIDTH - DOOR_KEY_WIDTH) / 2;
 
   public static final int MAX_DOORS_COUNT = 4;
 
-  private static final Color BORDER_COLOR = new Color(1, 0, 0, 1);
-  private static final Color OPENED_DOOR_COLOR = new Color(0, 1, 0, 1);
-  private static final Color CLOSED_DOOR_COLOR = new Color(1, 0, 1, 1);
+  private static final Color BORDER_COLOR = new Color(1, 0, 0, 0.25f);
+  private static final Color OPENED_DOOR_COLOR = new Color(0.5f, 0.3f, 0.13f, 1);
+  private static final Color CLOSED_DOOR_COLOR = new Color(1, 0.3f, 0.3f, 0.5f);
 
   private final Point pos;
 
@@ -38,14 +38,15 @@ public class Room {
 
   private final ArrayList<Item> items;
 
-  // -1 - door doesn't exist
-  // 0 - door to ungeneratet room
-  // 1+ - door to exist room
+  private Item can_grab_item;
+
   private final boolean[] doors;
   private final int[] lock_doors;
   private final Color[] lock_doors_color;
 
-  public static Point GetDeltaFromDoor(int door_id) {
+  private final Random rand;
+
+  public static Point GetRoomDeltaFromDoor(int door_id) {
     Point delta = new Point();
     switch (door_id) {
       case 0: delta.y = -1; break; // top
@@ -57,9 +58,20 @@ public class Room {
     return delta;
   }
 
+  public static Point GetDoorPosition(int door_id) {
+    switch (door_id) {
+      case 0: return new Point(DOOR_OFFSET, 1);
+      case 1: return new Point(SCREEN_WIDTH - DOOR_WIDTH, DOOR_OFFSET);
+      case 2: return new Point(DOOR_OFFSET, SCREEN_HEIGHT - DOOR_WIDTH);
+      case 3: return new Point(1, DOOR_OFFSET);
+      default: return new Point(-1, -1);
+    }
+  }
+
   // Room
   // must_doors: -1 - door must empty, 0 - nevermind, 1 - doors must be
   public Room(Point pos, int[] must_doors) {
+    this.rand = new Random(System.currentTimeMillis());
     this.pos = pos;
 
     this.doors = new boolean[] {false, false, false, false};
@@ -90,23 +102,31 @@ public class Room {
   }
 
   public Key lockDoor(int door_id) {
-    Random r = new Random(System.currentTimeMillis());
-    lock_doors[door_id] = r.nextInt();
-    lock_doors_color[door_id] = new Color(r.nextFloat(1), r.nextFloat(1), r.nextFloat(1), 1);
-    return new Key(lock_doors[door_id], lock_doors_color[door_id], new Point(15, 15));
+    lock_doors[door_id] = rand.nextInt();
+    lock_doors_color[door_id] = new Color(rand.nextFloat(1), rand.nextFloat(1), rand.nextFloat(1), 1);
+    Point new_pos = new Point();
+    do {
+    new_pos.x = rand.nextInt(Key.KEY_WIDTH + 1, SCREEN_WIDTH - Key.KEY_WIDTH - 1);
+    new_pos.y = rand.nextInt(Key.KEY_HEIGHT + 1, SCREEN_HEIGHT - Key.KEY_HEIGHT - 1);
+    } while(distanceToNearestItem(new_pos) < 7);
+
+    non_actual = true;
+  
+    return new Key(lock_doors[door_id], lock_doors_color[door_id], new_pos);
   }
 
   public void lockAllDoors() {
-    Random r = new Random(System.currentTimeMillis());
     for (int i = 0; i < MAX_DOORS_COUNT; ++i) {
-      lock_doors[i] = r.nextInt();
-      lock_doors_color[i] = new Color(r.nextFloat(1), r.nextFloat(1), r.nextFloat(1), 1);
+      lock_doors[i] = rand.nextInt();
+      lock_doors_color[i] = new Color(rand.nextFloat(1), rand.nextFloat(1), rand.nextFloat(1), 1);
     }
+    non_actual = true;
   }
 
   public boolean tryUnlockDoor(int door_id, int key) {
     if (key == lock_doors[door_id]) {
       lock_doors[door_id] = 0;
+      non_actual = true;
       return true;
     }
     return false;
@@ -116,6 +136,7 @@ public class Room {
     for (int i = 0; i < MAX_DOORS_COUNT; ++i) {
       lock_doors[i] = 0;
     }
+    non_actual = true;
   }
 
   public void update() {
@@ -125,6 +146,38 @@ public class Room {
       updateTexture();
       non_actual = false;
     }
+  }
+
+  public Item grabItem() {
+    items.remove(can_grab_item);
+    non_actual = true;
+    return can_grab_item;
+  }
+
+  public boolean canGrabItem(DoublePoint cur_pos) {
+    for (Item item : items) {
+      if (Point.distance(cur_pos, item.getPos()) < 4) {
+        can_grab_item = item;
+        return true;
+      }
+    }
+    return false;
+  }
+
+  public double distanceToNearestItem(Point cur_pos) {
+    double res = 50;
+    for (Item item : items) {
+      res = Math.min(res, Point.distance(cur_pos, item.getPos()));
+    }
+    return res;
+  }
+
+  public double distanceToNearestItem(DoublePoint cur_pos) {
+    double res = 50;
+    for (Item item : items) {
+      res = Math.min(res, Point.distance(cur_pos, item.getPos()));
+    }
+    return res;
   }
 
   public void draw(SpriteBatch batch) {
@@ -225,8 +278,6 @@ public class Room {
   }
 
   private void generateNewDoors(int[] must_doors) {
-    Random r = new Random(System.currentTimeMillis());
-
     for (int i = 0; i < MAX_DOORS_COUNT; ++i) {
       System.out.print(must_doors[i] + " ");
       if (must_doors[i] == 1) {
@@ -234,7 +285,7 @@ public class Room {
       } else if (must_doors[i] == -1) {
         doors[i] = false;
       } else if (!doors[i]) {
-        doors[i] = (r.nextInt(100) > 70);
+        doors[i] = (rand.nextInt(100) > 70);
       }
     }
     System.out.print("\n");

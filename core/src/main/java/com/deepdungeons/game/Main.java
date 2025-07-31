@@ -5,7 +5,6 @@ import java.util.HashMap;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
@@ -18,7 +17,6 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 public class Main extends ApplicationAdapter {
   private SpriteBatch batch;
   private FitViewport viewport;
-  private Texture image;
 
   private Stage stage;
   private Label room_id_label;
@@ -86,11 +84,13 @@ public class Main extends ApplicationAdapter {
 
     rooms = new HashMap<>();
 
-    Room new_room = new Room(new Point(0, 0), new int[]{1, 0, 0, 0});
+    Room new_room = new Room(new Point(0, 0), new int[]{1, 1, 1, 1});
 
     Key key = new_room.lockDoor(0);
+    Key key2 = new_room.lockDoor(2);
 
     new_room.addItem(key);
+    new_room.addItem(key2);
 
     current_room_pos = new_room.getPos();
     rooms.put(current_room_pos, new_room);
@@ -113,66 +113,78 @@ public class Main extends ApplicationAdapter {
     float speed = 20f;
     float delta = Gdx.graphics.getDeltaTime();
 
+    Point pos = new Point(player.getPos());
+
     if (Gdx.input.isKeyPressed(Input.Keys.W)) {
       player.translate(0, -speed * delta);
+      pos.y -= 1;
+      // Top door
+      if (pos.x >= Room.DOOR_OFFSET - 5 && pos.x <= Room.DOOR_OFFSET + 6 && pos.y < Room.DOOR_HEIGHT) {
+        if (tryGoToNextRoom(0)) player.setY(Room.SCREEN_HEIGHT - Player.PLAYER_HEIGHT - Room.DOOR_HEIGHT - 1);
+      }
+
     } else if (Gdx.input.isKeyPressed(Input.Keys.S)) {
       player.translate(0, speed * delta);
+      
+      pos.y += 1;
+      // Bottom door
+      if (pos.x >= Room.DOOR_OFFSET - 5 && pos.x <= Room.DOOR_OFFSET + 6 && pos.y > Room.SCREEN_HEIGHT - Player.PLAYER_HEIGHT - Room.DOOR_HEIGHT - 1) {
+        if (tryGoToNextRoom(2)) player.setY(Room.DOOR_HEIGHT);
+      }
     }
     
     if (Gdx.input.isKeyPressed(Input.Keys.D)) {
       player.translate(speed * delta, 0);
+
+      pos.x += 1;
+      // Right door
+      if (pos.y >= Room.DOOR_OFFSET - 5 && pos.y <= Room.DOOR_OFFSET + 6 && pos.x > Room.SCREEN_WIDTH - Player.PLAYER_WIDTH - Room.DOOR_HEIGHT - 1) {
+        if (tryGoToNextRoom(1)) player.setX(Room.DOOR_HEIGHT);
+      }
+      
     } else if (Gdx.input.isKeyPressed(Input.Keys.A)) {
       player.translate(-speed * delta, 0);
+
+      pos.x -= 1;
+      // Left door
+      if (pos.y >= Room.DOOR_OFFSET - 5 && pos.y <= Room.DOOR_OFFSET + 6 && pos.x < Room.DOOR_HEIGHT) {
+        if (tryGoToNextRoom(3)) player.setX(Room.SCREEN_WIDTH - Player.PLAYER_WIDTH - Room.DOOR_HEIGHT - 1);
+      }
     }
 
     if (Gdx.input.isKeyPressed(Input.Keys.E)) {
       if (req_door_id != -1) {
-        Room current = rooms.get(current_room_pos);
-        for (final int cur_key : player.getKeys()) {
-          if (current.tryUnlockDoor(req_door_id, cur_key)) {
-            current_room.generateBackground();
-            req_door_id = -1;
-            break;
+        if (Point.distance(player.getPos(), Room.GetDoorPosition(req_door_id)) < 4) {
+          for (final Key cur_key : player.getKeys()) {
+            if (current_room.tryUnlockDoor(req_door_id, cur_key.getKey())) {
+              current_room.generateBackground();
+              req_door_id = -1;
+              break;
+            }
           }
+        } else {
+          req_door_id = -1;
+        }
+      } else {
+        if (current_room.canGrabItem(player.getPos())) {
+          if (player.grabItem(current_room.grabItem())) {
+            key_require_label.setText("Can grab!");
+          }
+        } else {
+          key_require_label.setText("Can't grab!");
         }
       }
-
-      // if (Point.distance(player.getPos(), key.getCenterPos()) < 3) {
-      //   if (player.grabKey(key.getKey())) {
-      //     key_require_label.setText("Key grabed");
-      //   }
-      // }
     }
   }
 
   private void logic() {
     player.update();
     current_room.update();
-    //info_label.setText("Dis: " + Point.distance(player.getPos(), key.getCenterPos()));
+    info_label.setText("Dis: " + current_room.distanceToNearestItem(player.getPos()));
+    //info_label.setText("To door: " + Point.distance(player.getPos(), Room.GetDoorPosition(req_door_id)));
     Point pos = new Point(player.getPos());
 
     player_pos_label.setText("Player X: " + pos.x + " Y: " + pos.y);
-    
-
-    if (pos.x >= Room.DOOR_OFFSET - 5 && pos.x <= Room.DOOR_OFFSET + 6) {
-      // Top door
-      if (pos.y < Room.DOOR_HEIGHT) {
-        if (tryGoToNextRoom(0)) player.setY(Room.SCREEN_HEIGHT - Player.PLAYER_HEIGHT - Room.DOOR_HEIGHT - 1);
-      // Bottom dor
-      } else if (pos.y > Room.SCREEN_HEIGHT - Player.PLAYER_HEIGHT - Room.DOOR_HEIGHT - 1) {
-        if (tryGoToNextRoom(2)) player.setY(Room.DOOR_HEIGHT);
-      }
-    }
-
-    if (pos.y >= Room.DOOR_OFFSET - 5 && pos.y <= Room.DOOR_OFFSET + 6) {
-      // Left door
-      if (pos.x < Room.DOOR_HEIGHT) {
-        if (tryGoToNextRoom(3)) player.setX(Room.SCREEN_WIDTH - Player.PLAYER_WIDTH - Room.DOOR_HEIGHT - 1);
-      // Right door
-      } else if (pos.x > Room.SCREEN_WIDTH - Player.PLAYER_WIDTH - Room.DOOR_HEIGHT - 1) {
-        if (tryGoToNextRoom(1)) player.setX(Room.DOOR_HEIGHT);
-      }
-    }
   }
 
   private void draw() {
@@ -191,7 +203,6 @@ public class Main extends ApplicationAdapter {
   @Override
   public void dispose() {
     batch.dispose();
-    image.dispose();
   }
 
   @Override
@@ -209,17 +220,17 @@ public class Main extends ApplicationAdapter {
       return false;
     }
 
-    Point new_pos = Point.sum(current_room_pos, Room.GetDeltaFromDoor(door_id));
+    Point new_pos = Point.sum(current_room_pos, Room.GetRoomDeltaFromDoor(door_id));
     System.out.printf("----------------------\nNext pos: x: %d y: %d\nContains: %b\n", new_pos.x, new_pos.y, rooms.containsKey(new_pos));
 
     if (!rooms.containsKey(new_pos)) {
       System.out.printf("Create room from: x: %d y: %d\n", current_room_pos.x, current_room_pos.y);
 
-      current_room_pos = Point.sub(current_room_pos, Room.GetDeltaFromDoor((door_id + 2) % 4));
+      current_room_pos = Point.sub(current_room_pos, Room.GetRoomDeltaFromDoor((door_id + 2) % 4));
 
       int[] must_doors = new int[4];
       for (int i = 0; i < 4; ++i) {
-        Point cur_room = Point.sum(current_room_pos, Room.GetDeltaFromDoor(i));
+        Point cur_room = Point.sum(current_room_pos, Room.GetRoomDeltaFromDoor(i));
         if (rooms.containsKey(cur_room)) {
           System.out.println("Check pos: X: " + cur_room.x + " Y: " + cur_room.y + " Check door: " + ((i + 2) % 4) + " from: " + i + " res: " + rooms.get(cur_room).canGoNextRoom((i + 2) % 4));
 

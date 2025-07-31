@@ -19,6 +19,11 @@ public class DoublePoint {
     this.y = point.y;
   }
 
+  public DoublePoint(Point point) {
+    this.x = point.x;
+    this.y = point.y;
+  }
+
   public static DoublePoint sum(DoublePoint a, DoublePoint b) {
     return new DoublePoint(a.x + b.x, a.y + b.y);
   }

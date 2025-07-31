@@ -22,13 +22,13 @@ public class Player {
 
   private boolean non_actual;
 
-  private HashSet<Integer> keys;
+  private final HashSet<Item> items;
 
   public Player(int x, int y) {
     this.pos = new DoublePoint(x, y);
     this.dir = Direction.Up;
     this.non_actual = true;
-    this.keys = new HashSet<>();
+    this.items = new HashSet<>();
   }
 
   private void generateImage() {
@@ -60,13 +60,21 @@ public class Player {
     image = new Texture(map);
   }
 
-  public boolean grabKey(int key) {
-    if (keys.contains(key)) return false;
-    keys.add(key);
+  public boolean grabItem(Item item) {
+    if (items.contains(item)) return false;
+    items.add(item);
     return true;
   }
 
-  public HashSet<Integer> getKeys() {
+  public HashSet<Key> getKeys() {
+    HashSet<Key> keys = new HashSet<>();
+
+    for (Item item : items) {
+      if (item.getType() == ItemType.Key) {
+        keys.add((Key)item);
+      }
+    }
+
     return keys;
   }
 

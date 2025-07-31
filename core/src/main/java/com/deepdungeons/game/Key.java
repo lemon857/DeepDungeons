@@ -4,8 +4,8 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 
 public class Key extends Item {
-  private static final int KEY_WIDTH = 8;
-  private static final int KEY_HEIGHT = 4;
+  public static final int KEY_WIDTH = 8;
+  public static final int KEY_HEIGHT = 4;
 
   private  static final Point POS_OFFSET = new Point(-KEY_WIDTH / 2, -KEY_HEIGHT / 2);
 
@@ -13,6 +13,7 @@ public class Key extends Item {
   private final Color color;
 
   public Key(int key, Color color, Point pos) {
+    super(ItemType.Key);
     this.key = key;
     this.color = color;
     this.pos = pos;
@@ -51,5 +52,17 @@ public class Key extends Item {
 
     image.drawPixel(5, 2);
     image.drawPixel(6, 2);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) return true;
+    if (!(obj instanceof Key)) return false;
+    Key other = (Key) obj;
+    return getId() == other.getId() && key == other.key;
+  }
+  @Override
+  public int hashCode() {
+    return getId() * key;
   }
 }
