@@ -67,7 +67,7 @@ public class Main extends ApplicationAdapter {
     Skin skin = new Skin(Gdx.files.internal("ui/uiskin.json"));
 
     room_id_label = new Label("Room X: 0 Y: 0", skin);
-    room_id_label.setPosition(10, 10);
+    room_id_label.setPosition(370, 30);
     stage.addActor(room_id_label);
 
     player_pos_label = new Label("Player X: 0 Y: 0", skin);
@@ -152,25 +152,34 @@ public class Main extends ApplicationAdapter {
       }
     }
 
-    if (Gdx.input.isKeyPressed(Input.Keys.E)) {
+    if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
       if (req_door_id != -1) {
-        if (Point.distance(player.getPos(), Room.GetDoorPosition(req_door_id)) < 4) {
-          for (final Key cur_key : player.getKeys()) {
-            if (current_room.tryUnlockDoor(req_door_id, cur_key.getKey())) {
-              current_room.generateBackground();
-              req_door_id = -1;
-              break;
-            }
+        if (Point.distance(player.getPos(), Room.GetDoorPosition(req_door_id)) < 4 && player.getItem() instanceof Key) {
+          if (current_room.tryUnlockDoor(req_door_id, ((Key)player.getItem()).getKey())) {
+            current_room.generateBackground();
+            req_door_id = -1;
           }
         } else {
           req_door_id = -1;
         }
       } else {
         if (current_room.canGrabItem(player.getPos())) {
-          if (player.grabItem(current_room.grabItem())) {
-            key_require_label.setText("Can grab!");
+          if (player.isDropAvailable()) {
+            Item item = player.dropItem();
+
+            item.setPos(new Point(player.getPos()));
+            current_room.addItem(item);
           }
+          player.grabItem(current_room.grabItem());
+          key_require_label.setText("Grabbed!");
+          
         } else {
+          if (player.isDropAvailable()) {
+          Item item = player.dropItem();
+
+          item.setPos(new Point(player.getPos()));
+          current_room.addItem(item);
+          }
           key_require_label.setText("Can't grab!");
         }
       }
@@ -232,9 +241,9 @@ public class Main extends ApplicationAdapter {
       for (int i = 0; i < 4; ++i) {
         Point cur_room = Point.sum(current_room_pos, Room.GetRoomDeltaFromDoor(i));
         if (rooms.containsKey(cur_room)) {
-          System.out.println("Check pos: X: " + cur_room.x + " Y: " + cur_room.y + " Check door: " + ((i + 2) % 4) + " from: " + i + " res: " + rooms.get(cur_room).canGoNextRoom((i + 2) % 4));
+          System.out.println("Check pos: X: " + cur_room.x + " Y: " + cur_room.y + " Check door: " + ((i + 2) % 4) + " from: " + i + " res: " + rooms.get(cur_room).isDoorExist((i + 2) % 4));
 
-          if (rooms.get(cur_room).canGoNextRoom((i + 2) % 4)) {
+          if (rooms.get(cur_room).isDoorExist((i + 2) % 4)) {
             must_doors[i] = 1;
           } else {
             must_doors[i] = -1;

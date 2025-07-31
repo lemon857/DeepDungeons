@@ -85,16 +85,16 @@ public class Room {
     generateNewDoors(must_doors);
   }
 
-  public void addItem(Item item) {
-    items.add(item);
-  }
-
   public Point getPos() {
     return pos;
   }
 
   public boolean canGoNextRoom(int door_id) {
     return doors[door_id] && (lock_doors[door_id] == 0);
+  }
+
+  public boolean isDoorExist(int door_id) {
+    return doors[door_id];
   }
 
   public int getLockedDoorKey(int door_id) {
@@ -148,6 +148,11 @@ public class Room {
     }
   }
 
+  public void addItem(Item item) {
+    items.add(item);
+    non_actual = true;
+  }
+
   public Item grabItem() {
     items.remove(can_grab_item);
     non_actual = true;
@@ -156,7 +161,7 @@ public class Room {
 
   public boolean canGrabItem(DoublePoint cur_pos) {
     for (Item item : items) {
-      if (Point.distance(cur_pos, item.getPos()) < 4) {
+      if (Point.distance(cur_pos, item.getPos()) < 4.2) {
         can_grab_item = item;
         return true;
       }

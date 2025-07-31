@@ -1,7 +1,5 @@
 package com.deepdungeons.game;
 
-import java.util.HashSet;
-
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -18,22 +16,25 @@ public class Player {
   private final DoublePoint pos;
   private Texture image;
 
+  private Texture inventory_image;
+
   private Direction dir;
 
   private boolean non_actual;
 
-  private final HashSet<Item> items;
+  private Item inventory;
 
   public Player(int x, int y) {
     this.pos = new DoublePoint(x, y);
     this.dir = Direction.Up;
     this.non_actual = true;
-    this.items = new HashSet<>();
+    Pixmap map = new Pixmap(18, 6, Pixmap.Format.RGBA8888);
+    inventory_image = new Texture(map);
   }
 
-  private void generateImage() {
+  private void generatePlayerImage() {
     Pixmap map = new Pixmap(PLAYER_WIDTH, PLAYER_HEIGHT, Pixmap.Format.RGBA8888);
-    map.setColor(1f, 1f, 1f, 1f);
+    map.setColor(0.7f, 0.7f, 0.7f, 0.7f);
     map.fillCircle(PLAYER_WIDTH / 2, PLAYER_HEIGHT / 2, (PLAYER_WIDTH / 2) - 1);
 
     map.setColor(0f, 0f, 0f, 1f);
@@ -60,22 +61,33 @@ public class Player {
     image = new Texture(map);
   }
 
-  public boolean grabItem(Item item) {
-    if (items.contains(item)) return false;
-    items.add(item);
-    return true;
+  private void generateInventoryImage() {
+    if (inventory != null) {
+      inventory_image = new Texture(inventory.getImage());
+    } else {
+      Pixmap map = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
+      inventory_image = new Texture(map);
+    }
   }
 
-  public HashSet<Key> getKeys() {
-    HashSet<Key> keys = new HashSet<>();
+  public Item getItem() {
+    return inventory; 
+  }
 
-    for (Item item : items) {
-      if (item.getType() == ItemType.Key) {
-        keys.add((Key)item);
-      }
-    }
+  public void grabItem(Item item) {
+    inventory = item;
+    non_actual = true;
+  }
 
-    return keys;
+  public boolean isDropAvailable() {
+    return inventory != null;
+  }
+
+  public Item dropItem() {
+    Item res = inventory;
+    inventory = null;
+    non_actual = true;
+    return res;
   }
 
   public void translate(double x, double y) {
@@ -115,13 +127,16 @@ public class Player {
 
   public void update() {
     if (non_actual) {
-      generateImage();
+      generatePlayerImage();
+      generateInventoryImage();
       non_actual = false;
     }
   }
 
   public void draw(SpriteBatch batch) {
-    batch.draw(image, (float)Math.floor(pos.x), (float)Room.SCREEN_HEIGHT - (float)PLAYER_HEIGHT - (float)Math.floor(pos.y), (float)PLAYER_WIDTH, (float)PLAYER_HEIGHT);
+    batch.draw(image, (float)Math.floor(pos.x), (float)Room.SCREEN_HEIGHT - (float)PLAYER_HEIGHT - (float)Math.floor(pos.y),
+    (float)PLAYER_WIDTH, (float)PLAYER_HEIGHT);
+    batch.draw(inventory_image, (float)Math.floor(pos.x) + 5.5f, (float)Room.SCREEN_HEIGHT - (float)PLAYER_HEIGHT - (float)Math.floor(pos.y) + 4.5f, 6, 3);
   }
 
   public DoublePoint getPos() {

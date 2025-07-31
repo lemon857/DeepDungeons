@@ -2,10 +2,6 @@ package com.deepdungeons.game;
 
 import com.badlogic.gdx.graphics.Pixmap;
 
-enum ItemType {
-  None, Key
-}
-
 public class Item {
   protected Pixmap image;
 
@@ -16,9 +12,13 @@ public class Item {
 
   private static int current_id = 1;
 
-  private final ItemType type;
+  private final Type type;
 
-  protected Item(ItemType type) {
+  public enum Type {
+    None, Key
+  }
+
+  protected Item(Type type) {
     this.type = type;
     this.id = current_id;
     ++current_id;
@@ -30,16 +30,30 @@ public class Item {
     dest.drawPixmap(image, pos.x, pos.y);
   }
 
+  public final Pixmap getImage() {
+    return image;
+  }
+
   public final int getId() {
     return id;
   }
 
-  public final ItemType getType() {
+  public final Type getType() {
     return type;
   }
 
   public final Point getPos() {
     return pos;
+  }
+
+  public final void setPos(Point new_pos) {
+    pos = Point.sum(new_pos, Point.div(size, 2));
+    if (pos.x + size.x > Room.END_BORDER) {
+      pos.x = Room.END_BORDER - size.x - 1;
+    }
+    if (pos.y + size.y > Room.END_BORDER) {
+      pos.y = Room.END_BORDER - size.y - 1;
+    }
   }
 
   @Override

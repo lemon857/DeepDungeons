@@ -30,6 +30,12 @@ public class Point {
   public static Point sub(Point a, Point b) {
     return new Point(a.x - b.x, a.y - b.y);
   }
+  public static Point mul(Point a, int b) {
+    return new Point(a.x * b, a.y * b);
+  }
+  public static Point div(Point a, int b) {
+    return new Point(a.x / b, a.y / b);
+  }
   public static double distance(Point a, Point b) {
     return Math.sqrt((b.x - a.x) * (b.x - a.x) + (b.y - a.y) * (b.y - a.y));
   }
