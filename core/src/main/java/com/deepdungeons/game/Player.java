@@ -1,5 +1,7 @@
 package com.deepdungeons.game;
 
+import java.util.HashSet;
+
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -11,6 +13,8 @@ public class Player {
   private static final int START_BORDER = Room.START_BORDER;
   private static final int END_BORDER = Room.END_BORDER - PLAYER_WIDTH;
 
+  private  static final Point POS_OFFSET = new Point(PLAYER_WIDTH / 2, PLAYER_HEIGHT / 2);
+
   private final DoublePoint pos;
   private Texture image;
 
@@ -18,13 +22,16 @@ public class Player {
 
   private boolean non_actual;
 
+  private HashSet<Integer> keys;
+
   public Player(int x, int y) {
     this.pos = new DoublePoint(x, y);
     this.dir = Direction.Up;
     this.non_actual = true;
+    this.keys = new HashSet<>();
   }
 
-  private void GenerateImage() {
+  private void generateImage() {
     Pixmap map = new Pixmap(PLAYER_WIDTH, PLAYER_HEIGHT, Pixmap.Format.RGBA8888);
     map.setColor(1f, 1f, 1f, 1f);
     map.fillCircle(PLAYER_WIDTH / 2, PLAYER_HEIGHT / 2, (PLAYER_WIDTH / 2) - 1);
@@ -51,6 +58,16 @@ public class Player {
     }
 
     image = new Texture(map);
+  }
+
+  public boolean grabKey(int key) {
+    if (keys.contains(key)) return false;
+    keys.add(key);
+    return true;
+  }
+
+  public HashSet<Integer> getKeys() {
+    return keys;
   }
 
   public void translate(double x, double y) {
@@ -90,16 +107,20 @@ public class Player {
 
   public void update() {
     if (non_actual) {
-      GenerateImage();
+      generateImage();
       non_actual = false;
     }
   }
 
   public void draw(SpriteBatch batch) {
-    batch.draw(image, (int)Math.floor(pos.x), Room.SCREEN_HEIGHT - PLAYER_HEIGHT - (int)Math.floor(pos.y), 8, 8);
+    batch.draw(image, (float)Math.floor(pos.x), (float)Room.SCREEN_HEIGHT - (float)PLAYER_HEIGHT - (float)Math.floor(pos.y), (float)PLAYER_WIDTH, (float)PLAYER_HEIGHT);
   }
 
   public DoublePoint getPos() {
     return pos;
+  }
+
+  public DoublePoint getCenterPos() {
+    return DoublePoint.sum(pos, POS_OFFSET);
   }
 }

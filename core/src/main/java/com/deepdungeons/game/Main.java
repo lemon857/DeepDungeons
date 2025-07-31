@@ -5,7 +5,6 @@ import java.util.HashMap;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -27,11 +26,15 @@ public class Main extends ApplicationAdapter {
   private HashMap<Point, Room> rooms;
 
   private Point current_room_pos;
+  private Room current_room;
 
   private Player player;
   private Label player_pos_label;
 
   private Label key_require_label;
+  private Label info_label;
+
+  private int req_door_id;
 
   @Override
   public void create() {
@@ -77,20 +80,26 @@ public class Main extends ApplicationAdapter {
     key_require_label.setPosition(10, 480);
     stage.addActor(key_require_label);
 
+    info_label = new Label("-", skin);
+    info_label.setPosition(370, 480);
+    stage.addActor(info_label);
+
     rooms = new HashMap<>();
 
-    Room new_room = new Room(new Point(0, 0), new int[]{1, 1, 1, 1});
+    Room new_room = new Room(new Point(0, 0), new int[]{1, 0, 0, 0});
 
-    new_room.lockAllDoors();
+    Key key = new_room.lockDoor(0);
+
+    new_room.addItem(key);
 
     current_room_pos = new_room.getPos();
     rooms.put(current_room_pos, new_room);
 
     player = new Player(24, 24);
 
-    Pixmap tmp = rooms.get(current_room_pos).generateImage();
+    current_room = rooms.get(current_room_pos);
 
-    image = new Texture(tmp);
+    req_door_id = -1;
   }
 
   @Override
@@ -115,13 +124,35 @@ public class Main extends ApplicationAdapter {
     } else if (Gdx.input.isKeyPressed(Input.Keys.A)) {
       player.translate(-speed * delta, 0);
     }
+
+    if (Gdx.input.isKeyPressed(Input.Keys.E)) {
+      if (req_door_id != -1) {
+        Room current = rooms.get(current_room_pos);
+        for (final int cur_key : player.getKeys()) {
+          if (current.tryUnlockDoor(req_door_id, cur_key)) {
+            current_room.generateBackground();
+            req_door_id = -1;
+            break;
+          }
+        }
+      }
+
+      // if (Point.distance(player.getPos(), key.getCenterPos()) < 3) {
+      //   if (player.grabKey(key.getKey())) {
+      //     key_require_label.setText("Key grabed");
+      //   }
+      // }
+    }
   }
 
   private void logic() {
     player.update();
+    current_room.update();
+    //info_label.setText("Dis: " + Point.distance(player.getPos(), key.getCenterPos()));
     Point pos = new Point(player.getPos());
 
     player_pos_label.setText("Player X: " + pos.x + " Y: " + pos.y);
+    
 
     if (pos.x >= Room.DOOR_OFFSET - 5 && pos.x <= Room.DOOR_OFFSET + 6) {
       // Top door
@@ -149,7 +180,7 @@ public class Main extends ApplicationAdapter {
     viewport.apply();
     batch.setProjectionMatrix(viewport.getCamera().combined);
     batch.begin();
-    batch.draw(image, 0, 0, 50, 50);
+    current_room.draw(batch);
     player.draw(batch);
     batch.end();
 
@@ -173,6 +204,7 @@ public class Main extends ApplicationAdapter {
       int req = rooms.get(current_room_pos).getLockedDoorKey(door_id);
       if (req != 0) {
         key_require_label.setText("Require key: " + req);
+        req_door_id = door_id;
       }
       return false;
     }
@@ -204,12 +236,13 @@ public class Main extends ApplicationAdapter {
       Room new_room = new Room(current_room_pos, must_doors);
 
       rooms.put(current_room_pos, new_room);
-      image = new Texture(rooms.get(current_room_pos).generateImage());
 
     } else {
       current_room_pos = new_pos;
-      image = new Texture(rooms.get(current_room_pos).generateImage());
     }
+
+    current_room = rooms.get(current_room_pos);
+
     rooms.get(current_room_pos).printDoors();
     room_id_label.setText("Room X: " + current_room_pos.x + " Y: " + current_room_pos.y);
     return true;

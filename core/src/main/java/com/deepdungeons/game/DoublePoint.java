@@ -22,6 +22,12 @@ public class DoublePoint {
   public static DoublePoint sum(DoublePoint a, DoublePoint b) {
     return new DoublePoint(a.x + b.x, a.y + b.y);
   }
+  public static DoublePoint sum(Point a, DoublePoint b) {
+    return new DoublePoint(a.x + b.x, a.y + b.y);
+  }
+  public static DoublePoint sum(DoublePoint a, Point b) {
+    return new DoublePoint(a.x + b.x, a.y + b.y);
+  }
   public static DoublePoint sub(DoublePoint a, DoublePoint b) {
     return new DoublePoint(a.x - b.x, a.y - b.y);
   }

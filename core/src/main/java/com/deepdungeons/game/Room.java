@@ -1,10 +1,12 @@
 package com.deepdungeons.game;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
-import com.deepdungeons.Key;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 public class Room {
   public static final int SCREEN_WIDTH = 50;
@@ -29,12 +31,19 @@ public class Room {
 
   private final Point pos;
 
+  private final Pixmap image;
+  private Texture texture;
+
+  private boolean non_actual;
+
+  private final ArrayList<Item> items;
+
   // -1 - door doesn't exist
   // 0 - door to ungeneratet room
   // 1+ - door to exist room
   private final boolean[] doors;
   private final int[] lock_doors;
-  private Color[] lock_doors_color;
+  private final Color[] lock_doors_color;
 
   public static Point GetDeltaFromDoor(int door_id) {
     Point delta = new Point();
@@ -56,8 +65,16 @@ public class Room {
     this.doors = new boolean[] {false, false, false, false};
     this.lock_doors = new int[] {0, 0, 0, 0};
     this.lock_doors_color = new Color[4];
+    this.non_actual = true;
+    this.items = new ArrayList<>();
+    this.image = new Pixmap(SCREEN_WIDTH, SCREEN_HEIGHT, Pixmap.Format.RGBA8888);
+    this.texture = new Texture(this.image);
 
     generateNewDoors(must_doors);
+  }
+
+  public void addItem(Item item) {
+    items.add(item);
   }
 
   public Point getPos() {
@@ -76,7 +93,7 @@ public class Room {
     Random r = new Random(System.currentTimeMillis());
     lock_doors[door_id] = r.nextInt();
     lock_doors_color[door_id] = new Color(r.nextFloat(1), r.nextFloat(1), r.nextFloat(1), 1);
-    return new Key(lock_doors[door_id], lock_doors_color[door_id]);
+    return new Key(lock_doors[door_id], lock_doors_color[door_id], new Point(15, 15));
   }
 
   public void lockAllDoors() {
@@ -87,10 +104,12 @@ public class Room {
     }
   }
 
-  public void unlockDoor(int door_id, Key key) {
-    if (key.getKey() == lock_doors[door_id]) {
+  public boolean tryUnlockDoor(int door_id, int key) {
+    if (key == lock_doors[door_id]) {
       lock_doors[door_id] = 0;
+      return true;
     }
+    return false;
   }
 
   public void unlockAllDoors() {
@@ -99,7 +118,20 @@ public class Room {
     }
   }
 
-  public Pixmap generateImage() {
+  public void update() {
+    if (non_actual) {
+      generateBackground();
+      generateItems();
+      updateTexture();
+      non_actual = false;
+    }
+  }
+
+  public void draw(SpriteBatch batch) {
+    batch.draw(texture, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+  }
+
+  public void generateBackground() {
     Pixmap map = new Pixmap(SCREEN_WIDTH, SCREEN_HEIGHT, Pixmap.Format.RGB888);
 
     map.setColor(BORDER_COLOR);
@@ -167,7 +199,22 @@ public class Room {
       }
     }
 
-    return map;
+    image.drawPixmap(map, 0, 0);
+    non_actual = true;
+  }
+
+  public void generateItems() {
+    Pixmap map = new Pixmap(SCREEN_WIDTH, SCREEN_HEIGHT, Pixmap.Format.RGBA8888);
+
+    for (int i = 0; i < items.size(); ++i) {
+      items.get(i).draw(map);
+    }
+
+    image.drawPixmap(map, 0, 0);
+  }
+
+  private void updateTexture() {
+    texture = new Texture(image);
   }
 
   public void printDoors() {

@@ -30,6 +30,12 @@ public class Point {
   public static Point sub(Point a, Point b) {
     return new Point(a.x - b.x, a.y - b.y);
   }
+  public static double distance(Point a, Point b) {
+    return Math.sqrt((b.x - a.x) * (b.x - a.x) + (b.y - a.y) * (b.y - a.y));
+  }
+  public static double distance(DoublePoint a, Point b) {
+    return Math.sqrt((b.x - a.x) * (b.x - a.x) + (b.y - a.y) * (b.y - a.y));
+  }
 
   @Override
   public boolean equals(Object obj) {
