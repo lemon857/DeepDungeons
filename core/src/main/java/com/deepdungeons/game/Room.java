@@ -5,12 +5,19 @@ import java.util.Random;
 import com.badlogic.gdx.graphics.Pixmap;
 
 public class Room {
-  private static final int START_BORDER = 1;
-  private static final int END_BORDER = 48;
+  public static final int SCREEN_WIDTH = 50;
+  public static final int SCREEN_HEIGHT = 50;
+
+  public  static final int START_BORDER = 1;
+  public static final int END_BORDER = SCREEN_WIDTH - 2;
 
   // for horizontal position
-  private static final int DOOR_WIDTH = 10;
-  private static final int DOOR_HEIGHT = 4;
+  public static final int DOOR_WIDTH = 10;
+  public static final int DOOR_HEIGHT = 2;
+
+  public static final int DOOR_OFFSET = (SCREEN_WIDTH - DOOR_WIDTH) / 2;
+
+  public static final int MAX_DOORS_COUNT = 4;
 
   private final Point pos;
 
@@ -50,7 +57,7 @@ public class Room {
   }
 
   public Pixmap generateImage() {
-    Pixmap map = new Pixmap(50, 50, Pixmap.Format.RGB888);
+    Pixmap map = new Pixmap(SCREEN_WIDTH, SCREEN_HEIGHT, Pixmap.Format.RGB888);
 
     map.setColor(1, 0, 0, 1);
 
@@ -65,29 +72,29 @@ public class Room {
 
     if (doors[0]) {
       // Top door
-      map.drawRectangle(20, 1, DOOR_WIDTH, DOOR_HEIGHT);
+      map.drawRectangle(DOOR_OFFSET, 1, DOOR_WIDTH, DOOR_HEIGHT);
     }
 
     if (doors[1]) {
       // Right door
-      map.drawRectangle(45, 20, DOOR_HEIGHT, DOOR_WIDTH);
+      map.drawRectangle(SCREEN_HEIGHT - DOOR_HEIGHT - 1, DOOR_OFFSET, DOOR_HEIGHT, DOOR_WIDTH);
     }
 
     if (doors[2]) {
       // Bottom door
-      map.drawRectangle(20, 45, DOOR_WIDTH, DOOR_HEIGHT);
+      map.drawRectangle(DOOR_OFFSET, SCREEN_HEIGHT - DOOR_HEIGHT - 1, DOOR_WIDTH, DOOR_HEIGHT);
     }
 
     if (doors[3]) {
       // Left door
-      map.drawRectangle(1, 20, DOOR_HEIGHT, DOOR_WIDTH);
+      map.drawRectangle(1, DOOR_OFFSET, DOOR_HEIGHT, DOOR_WIDTH);
     }
 
     return map;
   }
 
   public void printDoors() {
-    for (int i = 0; i < 4; ++i) {
+    for (int i = 0; i < MAX_DOORS_COUNT; ++i) {
       System.out.print(doors[i] + " ");
     }
     System.out.print("\n");
@@ -96,7 +103,7 @@ public class Room {
   private void generateNewDoors(int[] must_doors) {
     Random r = new Random(System.currentTimeMillis());
 
-    for (int i = 0; i < 4; ++i) {
+    for (int i = 0; i < MAX_DOORS_COUNT; ++i) {
       System.out.print(must_doors[i] + " ");
       if (must_doors[i] == 1) {
         doors[i] = true;

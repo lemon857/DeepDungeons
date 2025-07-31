@@ -5,6 +5,11 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 public class Player {
+  public static final int PLAYER_WIDTH = 8;
+  public static final int PLAYER_HEIGHT = 8;
+
+  private static final int START_BORDER = Room.START_BORDER;
+  private static final int END_BORDER = Room.END_BORDER - PLAYER_WIDTH;
 
   private final DoublePoint pos;
   private Texture image;
@@ -20,9 +25,9 @@ public class Player {
   }
 
   private void GenerateImage() {
-    Pixmap map = new Pixmap(8, 8, Pixmap.Format.RGBA8888);
+    Pixmap map = new Pixmap(PLAYER_WIDTH, PLAYER_HEIGHT, Pixmap.Format.RGBA8888);
     map.setColor(1f, 1f, 1f, 1f);
-    map.fillCircle(4, 4, 3);
+    map.fillCircle(PLAYER_WIDTH / 2, PLAYER_HEIGHT / 2, (PLAYER_WIDTH / 2) - 1);
 
     map.setColor(0f, 0f, 0f, 1f);
     switch (dir) {
@@ -52,6 +57,12 @@ public class Player {
     pos.x += x;
     pos.y += y;
 
+    if (pos.x < START_BORDER) pos.x = START_BORDER;
+    else if (pos.x > END_BORDER) pos.x = END_BORDER;
+
+    if (pos.y < START_BORDER) pos.y = START_BORDER;
+    else if (pos.y > END_BORDER) pos.y = END_BORDER;
+
     if (x > 0) {
       dir = Direction.Right;
     } else if (x < 0) {
@@ -68,9 +79,13 @@ public class Player {
 
   public void setX(int x) {
     pos.x = x;
+    if (pos.x < START_BORDER) pos.x = START_BORDER;
+    else if (pos.x > END_BORDER) pos.x = END_BORDER;
   }
   public void setY(int y) {
     pos.y = y;
+    if (pos.y < START_BORDER) pos.y = START_BORDER;
+    else if (pos.y > END_BORDER) pos.y = END_BORDER;
   }
 
   public void update() {
@@ -81,7 +96,7 @@ public class Player {
   }
 
   public void draw(SpriteBatch batch) {
-    batch.draw(image, (int)Math.floor(pos.x - 4), (int)Math.floor(50 - (pos.y - 4)), 8, 8);
+    batch.draw(image, (int)Math.floor(pos.x), Room.SCREEN_HEIGHT - PLAYER_HEIGHT - (int)Math.floor(pos.y), 8, 8);
   }
 
   public DoublePoint getPos() {

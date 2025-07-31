@@ -43,16 +43,16 @@ public class Main extends ApplicationAdapter {
       public boolean keyUp(InputEvent event, int keycode) {
         switch (keycode) {
           case Input.Keys.UP:
-            goToNextRoom(0);  
+            tryGoToNextRoom(0);  
             break;
           case Input.Keys.RIGHT:
-            goToNextRoom(1);
+            tryGoToNextRoom(1);
             break;
           case Input.Keys.DOWN:
-            goToNextRoom(2);
+            tryGoToNextRoom(2);
             break;
           case Input.Keys.LEFT:
-            goToNextRoom(3);
+            tryGoToNextRoom(3);
             break;
     
           default: return false;
@@ -115,27 +115,23 @@ public class Main extends ApplicationAdapter {
 
     player_pos_label.setText("Player X: " + pos.x + " Y: " + pos.y);
 
-    if (pos.x >= 19 && pos.x <= 30) {
+    if (pos.x >= Room.DOOR_OFFSET - 5 && pos.x <= Room.DOOR_OFFSET + 6) {
       // Top door
-      if (pos.y < 15) {
-        goToNextRoom(0);
-        player.setY(48);
+      if (pos.y < Room.DOOR_HEIGHT) {
+        if (tryGoToNextRoom(0)) player.setY(Room.SCREEN_HEIGHT - Player.PLAYER_HEIGHT - Room.DOOR_HEIGHT - 1);
       // Bottom dor
-      } else if (pos.y > 48) {
-        goToNextRoom(2);
-        player.setY(15);
+      } else if (pos.y > Room.SCREEN_HEIGHT - Player.PLAYER_HEIGHT - Room.DOOR_HEIGHT - 1) {
+        if (tryGoToNextRoom(2)) player.setY(Room.DOOR_HEIGHT);
       }
     }
 
-    if (pos.y >= 26 && pos.y <= 37) {
+    if (pos.y >= Room.DOOR_OFFSET - 5 && pos.y <= Room.DOOR_OFFSET + 6) {
       // Left door
-      if (pos.x < 8) {
-        goToNextRoom(3);
-        player.setX(41);
+      if (pos.x < Room.DOOR_HEIGHT) {
+        if (tryGoToNextRoom(3)) player.setX(Room.SCREEN_WIDTH - Player.PLAYER_WIDTH - Room.DOOR_HEIGHT - 1);
       // Right door
-      } else if (pos.x > 41) {
-        goToNextRoom(1);
-        player.setX(8);
+      } else if (pos.x > Room.SCREEN_WIDTH - Player.PLAYER_WIDTH - Room.DOOR_HEIGHT - 1) {
+        if (tryGoToNextRoom(1)) player.setX(Room.DOOR_HEIGHT);
       }
     }
   }
@@ -164,8 +160,8 @@ public class Main extends ApplicationAdapter {
     viewport.update(width, height, true);
   }
 
-  private void goToNextRoom(int door_id) {
-    if (!rooms.get(current_room_pos).canGoNextRoom(door_id)) return;
+  private boolean  tryGoToNextRoom(int door_id) {
+    if (!rooms.get(current_room_pos).canGoNextRoom(door_id)) return false;
 
     Point new_pos = Point.sum(current_room_pos, Room.GetDeltaFromDoor(door_id));
     System.out.printf("----------------------\nNext pos: x: %d y: %d\nContains: %b\n", new_pos.x, new_pos.y, rooms.containsKey(new_pos));
@@ -202,5 +198,6 @@ public class Main extends ApplicationAdapter {
     }
     rooms.get(current_room_pos).printDoors();
     room_id_label.setText("Room X: " + current_room_pos.x + " Y: " + current_room_pos.y);
+    return true;
   }
 }
