@@ -1,6 +1,7 @@
 package com.deepdungeons.game;
 
 import java.util.HashMap;
+import java.util.Random;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
@@ -34,8 +35,14 @@ public class Main extends ApplicationAdapter {
 
   private int req_door_id;
 
+  private Key generate_key_require;
+  private int generate_key_chance;
+
+  private Random rand;
+
   @Override
   public void create() {
+    rand = new Random(System.currentTimeMillis());
     batch = new SpriteBatch();
     viewport = new FitViewport(50, 50);
     stage = new Stage();
@@ -87,10 +94,10 @@ public class Main extends ApplicationAdapter {
     Room new_room = new Room(new Point(0, 0), new int[]{1, 1, 1, 1});
 
     Key key = new_room.lockDoor(0);
-    Key key2 = new_room.lockDoor(2);
+    generate_key_require = new_room.lockDoor(2);
+    generate_key_chance = 10;
 
     new_room.addItem(key);
-    new_room.addItem(key2);
 
     current_room_pos = new_room.getPos();
     rooms.put(current_room_pos, new_room);
@@ -119,7 +126,7 @@ public class Main extends ApplicationAdapter {
       player.translate(0, -speed * delta);
       pos.y -= 1;
       // Top door
-      if (pos.x >= Room.DOOR_OFFSET - 5 && pos.x <= Room.DOOR_OFFSET + 6 && pos.y < Room.DOOR_HEIGHT) {
+      if (pos.x >= Room.DOOR_OFFSET - 3 && pos.x <= Room.DOOR_OFFSET + 4 && pos.y < Room.DOOR_HEIGHT) {
         if (tryGoToNextRoom(0)) player.setY(Room.SCREEN_HEIGHT - Player.PLAYER_HEIGHT - Room.DOOR_HEIGHT - 1);
       }
 
@@ -128,7 +135,7 @@ public class Main extends ApplicationAdapter {
       
       pos.y += 1;
       // Bottom door
-      if (pos.x >= Room.DOOR_OFFSET - 5 && pos.x <= Room.DOOR_OFFSET + 6 && pos.y > Room.SCREEN_HEIGHT - Player.PLAYER_HEIGHT - Room.DOOR_HEIGHT - 1) {
+      if (pos.x >= Room.DOOR_OFFSET - 3 && pos.x <= Room.DOOR_OFFSET + 4 && pos.y > Room.SCREEN_HEIGHT - Player.PLAYER_HEIGHT - Room.DOOR_HEIGHT - 1) {
         if (tryGoToNextRoom(2)) player.setY(Room.DOOR_HEIGHT);
       }
     }
@@ -138,7 +145,7 @@ public class Main extends ApplicationAdapter {
 
       pos.x += 1;
       // Right door
-      if (pos.y >= Room.DOOR_OFFSET - 5 && pos.y <= Room.DOOR_OFFSET + 6 && pos.x > Room.SCREEN_WIDTH - Player.PLAYER_WIDTH - Room.DOOR_HEIGHT - 1) {
+      if (pos.y >= Room.DOOR_OFFSET - 3 && pos.y <= Room.DOOR_OFFSET + 4 && pos.x > Room.SCREEN_WIDTH - Player.PLAYER_WIDTH - Room.DOOR_HEIGHT - 1) {
         if (tryGoToNextRoom(1)) player.setX(Room.DOOR_HEIGHT);
       }
       
@@ -147,7 +154,7 @@ public class Main extends ApplicationAdapter {
 
       pos.x -= 1;
       // Left door
-      if (pos.y >= Room.DOOR_OFFSET - 5 && pos.y <= Room.DOOR_OFFSET + 6 && pos.x < Room.DOOR_HEIGHT) {
+      if (pos.y >= Room.DOOR_OFFSET - 3 && pos.y <= Room.DOOR_OFFSET + 4 && pos.x < Room.DOOR_HEIGHT) {
         if (tryGoToNextRoom(3)) player.setX(Room.SCREEN_WIDTH - Player.PLAYER_WIDTH - Room.DOOR_HEIGHT - 1);
       }
     }
@@ -254,6 +261,15 @@ public class Main extends ApplicationAdapter {
       }
 
       Room new_room = new Room(current_room_pos, must_doors);
+
+      if (generate_key_require != null) {
+        if (rand.nextInt(100) < generate_key_chance) {
+          new_room.addItem(generate_key_require);
+          generate_key_require = null;
+        } else {
+          ++generate_key_chance;
+        }
+      }
 
       rooms.put(current_room_pos, new_room);
 

@@ -24,6 +24,10 @@ public class Player {
 
   private Item inventory;
 
+  public enum Direction {
+    Up, Down, Right, Left
+  }
+
   public Player(int x, int y) {
     this.pos = new DoublePoint(x, y);
     this.dir = Direction.Up;
