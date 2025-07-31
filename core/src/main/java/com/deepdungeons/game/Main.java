@@ -31,6 +31,8 @@ public class Main extends ApplicationAdapter {
   private Player player;
   private Label player_pos_label;
 
+  private Label key_require_label;
+
   @Override
   public void create() {
     batch = new SpriteBatch();
@@ -71,9 +73,15 @@ public class Main extends ApplicationAdapter {
     player_pos_label.setPosition(370, 10);
     stage.addActor(player_pos_label);
 
+    key_require_label = new Label("-", skin);
+    key_require_label.setPosition(10, 480);
+    stage.addActor(key_require_label);
+
     rooms = new HashMap<>();
 
-    Room new_room = new Room(new Point(0, 0), new int[]{1, 0, 0, 0});
+    Room new_room = new Room(new Point(0, 0), new int[]{1, 1, 1, 1});
+
+    new_room.lockAllDoors();
 
     current_room_pos = new_room.getPos();
     rooms.put(current_room_pos, new_room);
@@ -161,7 +169,13 @@ public class Main extends ApplicationAdapter {
   }
 
   private boolean  tryGoToNextRoom(int door_id) {
-    if (!rooms.get(current_room_pos).canGoNextRoom(door_id)) return false;
+    if (!rooms.get(current_room_pos).canGoNextRoom(door_id)) {
+      int req = rooms.get(current_room_pos).getLockedDoorKey(door_id);
+      if (req != 0) {
+        key_require_label.setText("Require key: " + req);
+      }
+      return false;
+    }
 
     Point new_pos = Point.sum(current_room_pos, Room.GetDeltaFromDoor(door_id));
     System.out.printf("----------------------\nNext pos: x: %d y: %d\nContains: %b\n", new_pos.x, new_pos.y, rooms.containsKey(new_pos));
