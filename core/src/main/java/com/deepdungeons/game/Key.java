@@ -4,10 +4,10 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 
 public class Key extends Item {
-  public static final int KEY_WIDTH = 8;
-  public static final int KEY_HEIGHT = 4;
+  public static final int WIDTH = 8;
+  public static final int HEIGHT = 4;
 
-  private  static final Point POS_OFFSET = new Point(-KEY_WIDTH / 2, -KEY_HEIGHT / 2);
+  private  static final Point POS_OFFSET = new Point(-WIDTH / 2, -HEIGHT / 2);
 
   private final int key;
   private final Color color;
@@ -17,7 +17,7 @@ public class Key extends Item {
     this.key = key;
     this.color = color;
     this.pos = pos;
-    this.size = new Point(KEY_WIDTH, KEY_HEIGHT);
+    this.size = new Point(WIDTH, HEIGHT);
     generateImage();
   }
 
@@ -29,7 +29,8 @@ public class Key extends Item {
     return Point.sum(pos, POS_OFFSET);
   }
 
-  public final void generateImage() {
+  @Override
+  protected final void generateImage() {
     image = new Pixmap(size.x, size.y, Pixmap.Format.RGBA8888);
 
     image.setColor(1, 1, 1, 1);

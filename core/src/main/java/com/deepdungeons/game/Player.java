@@ -1,17 +1,21 @@
 package com.deepdungeons.game;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 public class Player {
-  public static final int PLAYER_WIDTH = 8;
-  public static final int PLAYER_HEIGHT = 8;
+  public static final int WIDTH = 8;
+  public static final int HEIGHT = 8;
 
   private static final int START_BORDER = Room.START_BORDER;
-  private static final int END_BORDER = Room.END_BORDER - PLAYER_WIDTH;
+  private static final int END_BORDER = Room.END_BORDER - WIDTH;
 
-  private  static final Point POS_OFFSET = new Point(PLAYER_WIDTH / 2, PLAYER_HEIGHT / 2);
+  private  static final Point POS_OFFSET = new Point(WIDTH / 2, HEIGHT / 2);
+
+  private static final Color COLOR = new Color(0.8f, 0.7f, 0.9f, 0.7f);
+  private static final Color EYE_COLOR = new Color(0, 0, 0, 1);
 
   private final DoublePoint pos;
   private Texture image;
@@ -37,11 +41,11 @@ public class Player {
   }
 
   private void generatePlayerImage() {
-    Pixmap map = new Pixmap(PLAYER_WIDTH, PLAYER_HEIGHT, Pixmap.Format.RGBA8888);
-    map.setColor(0.7f, 0.7f, 0.7f, 0.7f);
-    map.fillCircle(PLAYER_WIDTH / 2, PLAYER_HEIGHT / 2, (PLAYER_WIDTH / 2) - 1);
+    Pixmap map = new Pixmap(WIDTH, HEIGHT, Pixmap.Format.RGBA8888);
+    map.setColor(COLOR);
+    map.fillCircle(WIDTH / 2, HEIGHT / 2, (WIDTH / 2) - 1);
 
-    map.setColor(0f, 0f, 0f, 1f);
+    map.setColor(EYE_COLOR);
     switch (dir) {
     case Up:
     default:   
@@ -138,9 +142,9 @@ public class Player {
   }
 
   public void draw(SpriteBatch batch) {
-    batch.draw(image, (float)Math.floor(pos.x), (float)Room.SCREEN_HEIGHT - (float)PLAYER_HEIGHT - (float)Math.floor(pos.y),
-    (float)PLAYER_WIDTH, (float)PLAYER_HEIGHT);
-    batch.draw(inventory_image, (float)Math.floor(pos.x) + 5.5f, (float)Room.SCREEN_HEIGHT - (float)PLAYER_HEIGHT - (float)Math.floor(pos.y) + 4.5f, 6, 3);
+    batch.draw(image, (float)pos.x, (float)Room.SCREEN_HEIGHT - (float)HEIGHT - (float)pos.y,
+    (float)WIDTH, (float)HEIGHT);
+    batch.draw(inventory_image, (float)pos.x + 5.5f, (float)Room.SCREEN_HEIGHT - (float)HEIGHT - (float)pos.y + 4.5f, 6, 3);
   }
 
   public DoublePoint getPos() {

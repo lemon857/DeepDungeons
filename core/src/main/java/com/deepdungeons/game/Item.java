@@ -24,7 +24,8 @@ public class Item {
     ++current_id;
   }
 
-  public void update() {}
+  public void update(double delta) {}
+  protected void generateImage() {}
 
   public final void draw(Pixmap dest) {
     dest.drawPixmap(image, pos.x, pos.y);

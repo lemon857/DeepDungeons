@@ -31,12 +31,15 @@ public class Room {
 
   private final Point pos;
 
-  private final Pixmap image;
+  private Pixmap image;
+  private Texture background_texture;
   private Texture texture;
 
   private boolean non_actual;
 
   private final ArrayList<Item> items;
+
+  private final ArrayList<Mob> mobs;
 
   private Item can_grab_item;
 
@@ -79,6 +82,7 @@ public class Room {
     this.lock_doors_color = new Color[4];
     this.non_actual = true;
     this.items = new ArrayList<>();
+    this.mobs = new ArrayList<>();
     this.image = new Pixmap(SCREEN_WIDTH, SCREEN_HEIGHT, Pixmap.Format.RGBA8888);
     this.texture = new Texture(this.image);
 
@@ -106,8 +110,8 @@ public class Room {
     lock_doors_color[door_id] = new Color(rand.nextFloat(1), rand.nextFloat(1), rand.nextFloat(1), 1);
     Point new_pos = new Point();
     do {
-    new_pos.x = rand.nextInt(Key.KEY_WIDTH + 1, SCREEN_WIDTH - Key.KEY_WIDTH - 1);
-    new_pos.y = rand.nextInt(Key.KEY_HEIGHT + 1, SCREEN_HEIGHT - Key.KEY_HEIGHT - 1);
+    new_pos.x = rand.nextInt(Key.WIDTH + 1, SCREEN_WIDTH - Key.WIDTH - 1);
+    new_pos.y = rand.nextInt(Key.HEIGHT + 1, SCREEN_HEIGHT - Key.HEIGHT - 1);
     } while(distanceToNearestItem(new_pos) < 7);
 
     non_actual = true;
@@ -139,13 +143,26 @@ public class Room {
     non_actual = true;
   }
 
-  public void update() {
+  public void update(double delta) {
+    for (Mob mob : mobs) {
+      mob.update(delta);
+    }
+    for (Item item : items) {
+      item.update(delta);
+    }
+
     if (non_actual) {
       generateBackground();
+      image = new Pixmap(SCREEN_WIDTH, SCREEN_HEIGHT, Pixmap.Format.RGBA8888);
       generateItems();
       updateTexture();
       non_actual = false;
     }
+  }
+
+  public void addMob(Mob mob) {
+    mobs.add(mob);
+    non_actual = true;
   }
 
   public void addItem(Item item) {
@@ -186,7 +203,11 @@ public class Room {
   }
 
   public void draw(SpriteBatch batch) {
+    batch.draw(background_texture, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     batch.draw(texture, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+    for (Mob mob : mobs) {
+      mob.draw(batch);
+    }
   }
 
   public void generateBackground() {
@@ -257,15 +278,15 @@ public class Room {
       }
     }
 
-    image.drawPixmap(map, 0, 0);
-    non_actual = true;
+    //image.drawPixmap(map, 0, 0);
+    background_texture = new Texture(map);
   }
 
   public void generateItems() {
     Pixmap map = new Pixmap(SCREEN_WIDTH, SCREEN_HEIGHT, Pixmap.Format.RGBA8888);
 
-    for (int i = 0; i < items.size(); ++i) {
-      items.get(i).draw(map);
+    for (Item item : items) {
+      item.draw(map);
     }
 
     image.drawPixmap(map, 0, 0);
