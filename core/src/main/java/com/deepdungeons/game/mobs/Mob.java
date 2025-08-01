@@ -1,8 +1,9 @@
-package com.deepdungeons.game;
+package com.deepdungeons.game.mobs;
 
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.deepdungeons.game.DoublePoint;
 
 public class Mob {
   protected Pixmap image;

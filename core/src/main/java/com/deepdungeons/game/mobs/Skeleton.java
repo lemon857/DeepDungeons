@@ -1,10 +1,12 @@
-package com.deepdungeons.game;
+package com.deepdungeons.game.mobs;
 
 import java.util.Random;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
+import com.deepdungeons.game.DoublePoint;
+import com.deepdungeons.game.Room;
 
 public class Skeleton extends Mob {
 

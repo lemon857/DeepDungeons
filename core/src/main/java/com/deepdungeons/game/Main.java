@@ -16,6 +16,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.deepdungeons.game.items.Item;
 import com.deepdungeons.game.items.Key;
+import com.deepdungeons.game.mobs.Skeleton;
 
 public class Main extends ApplicationAdapter {
   private SpriteBatch batch;
