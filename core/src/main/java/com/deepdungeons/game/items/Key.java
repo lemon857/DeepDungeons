@@ -1,7 +1,8 @@
-package com.deepdungeons.game;
+package com.deepdungeons.game.items;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
+import com.deepdungeons.game.Point;
 
 public class Key extends Item {
   public static final int WIDTH = 8;
@@ -23,10 +24,6 @@ public class Key extends Item {
 
   public int getKey() {
     return key;
-  }
-
-  public Point getCenterPos() {
-    return Point.sum(pos, POS_OFFSET);
   }
 
   @Override

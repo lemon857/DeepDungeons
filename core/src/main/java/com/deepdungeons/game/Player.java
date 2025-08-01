@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.deepdungeons.game.items.Item;
 
 public class Player {
   public static final int WIDTH = 8;
@@ -144,7 +145,10 @@ public class Player {
   public void draw(SpriteBatch batch) {
     batch.draw(image, (float)pos.x, (float)Room.SCREEN_HEIGHT - (float)HEIGHT - (float)pos.y,
     (float)WIDTH, (float)HEIGHT);
-    batch.draw(inventory_image, (float)pos.x + 5.5f, (float)Room.SCREEN_HEIGHT - (float)HEIGHT - (float)pos.y + 4.5f, 6, 3);
+    if (inventory != null) {
+      batch.draw(inventory_image, (float)pos.x + 5.5f, (float)Room.SCREEN_HEIGHT - (float)HEIGHT - (float)pos.y + 4.5f, 
+      inventory.getSize().x * 0.6f, inventory.getSize().y * 0.6f);
+    }
   }
 
   public DoublePoint getPos() {

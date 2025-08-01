@@ -7,6 +7,8 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.deepdungeons.game.items.Item;
+import com.deepdungeons.game.items.Key;
 
 public class Room {
   public static final int SCREEN_WIDTH = 50;

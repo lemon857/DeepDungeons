@@ -1,6 +1,8 @@
-package com.deepdungeons.game;
+package com.deepdungeons.game.items;
 
 import com.badlogic.gdx.graphics.Pixmap;
+import com.deepdungeons.game.Point;
+import com.deepdungeons.game.Room;
 
 public class Item {
   protected Pixmap image;
@@ -15,7 +17,7 @@ public class Item {
   private final Type type;
 
   public enum Type {
-    None, Key
+    None, Key, CloseRangeWeapon
   }
 
   protected Item(Type type) {
@@ -45,6 +47,10 @@ public class Item {
 
   public final Point getPos() {
     return pos;
+  }
+
+  public final Point getSize() {
+    return size;
   }
 
   public final void setPos(Point new_pos) {
