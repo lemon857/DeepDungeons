@@ -100,7 +100,7 @@ public class Main extends ApplicationAdapter {
     generate_key_require = new_room.lockDoor(2);
     generate_key_chance = 10;
 
-    new_room.addMob(new Skeleton(new DoublePoint(20, 30)));
+    new_room.addMob(new Skeleton(new Vector2d(10, 40)));
 
     new_room.addItem(key);
 
@@ -128,7 +128,7 @@ public class Main extends ApplicationAdapter {
     Point pos = new Point(player.getPos());
 
     if (Gdx.input.isKeyPressed(Input.Keys.W)) {
-      player.translate(0, -speed * delta);
+      player.translate(0, speed * delta);
       pos.y -= 1;
       // Top door
       if (pos.x >= Room.DOOR_OFFSET - 3 && pos.x <= Room.DOOR_OFFSET + 4 && pos.y < Room.DOOR_HEIGHT) {
@@ -136,7 +136,7 @@ public class Main extends ApplicationAdapter {
       }
 
     } else if (Gdx.input.isKeyPressed(Input.Keys.S)) {
-      player.translate(0, speed * delta);
+      player.translate(0, -speed * delta);
       
       pos.y += 1;
       // Bottom door
@@ -182,7 +182,7 @@ public class Main extends ApplicationAdapter {
             item.setPos(new Point(player.getPos()));
             current_room.addItem(item);
           }
-          player.grabItem(current_room.grabItem());
+          player.pickupItem(current_room.grabItem());
           key_require_label.setText("Grabbed!");
           
         } else {

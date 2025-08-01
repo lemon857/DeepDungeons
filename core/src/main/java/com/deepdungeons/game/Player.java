@@ -7,10 +7,10 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.deepdungeons.game.items.Item;
 
 public class Player {
-  public static final int WIDTH = 8;
-  public static final int HEIGHT = 8;
+  public static final int WIDTH = 7;
+  public static final int HEIGHT = 7;
 
-  private static final int START_BORDER = Room.START_BORDER;
+  private static final int START_BORDER = Room.START_BORDER + 1;
   private static final int END_BORDER = Room.END_BORDER - WIDTH;
 
   private  static final Point POS_OFFSET = new Point(WIDTH / 2, HEIGHT / 2);
@@ -18,7 +18,7 @@ public class Player {
   private static final Color COLOR = new Color(0.8f, 0.7f, 0.9f, 0.7f);
   private static final Color EYE_COLOR = new Color(0, 0, 0, 1);
 
-  private final DoublePoint pos;
+  private final Vector2d pos;
   private Texture image;
 
   private Texture inventory_image;
@@ -33,8 +33,20 @@ public class Player {
     Up, Down, Right, Left
   }
 
+  public static Vector2d GetDirectionVector(Direction dir) {
+    Vector2d delta = new Vector2d();
+    switch (dir) {
+      case Up: delta.y = -1; break;
+      case Right: delta.x = 1; break;
+      case Down: delta.y = 1; break;
+      case Left: delta.x = -1; break;
+      default: break;
+    }
+    return delta;
+  }
+
   public Player(int x, int y) {
-    this.pos = new DoublePoint(x, y);
+    this.pos = new Vector2d(x, y);
     this.dir = Direction.Up;
     this.non_actual = true;
     Pixmap map = new Pixmap(18, 6, Pixmap.Format.RGBA8888);
@@ -44,27 +56,27 @@ public class Player {
   private void generatePlayerImage() {
     Pixmap map = new Pixmap(WIDTH, HEIGHT, Pixmap.Format.RGBA8888);
     map.setColor(COLOR);
-    map.fillCircle(WIDTH / 2, HEIGHT / 2, (WIDTH / 2) - 1);
+    map.fillCircle(WIDTH / 2, HEIGHT / 2, (WIDTH / 2));
 
     map.setColor(EYE_COLOR);
     switch (dir) {
     case Up:
-    default:   
+    default:
+      map.drawPixel(2, 2);
+      map.drawPixel(4, 2);   
+      break;
+    case Down:
+        map.drawPixel(2, 4);
+        map.drawPixel(4, 4);   
+        break;
+    case Right:
       map.drawPixel(3, 3);
       map.drawPixel(5, 3);   
       break;
-    case Down:  
-        map.drawPixel(3, 5);
-        map.drawPixel(5, 5);   
-        break;
-    case Right:  
-      map.drawPixel(5, 3);
-      map.drawPixel(5, 5);   
+    case Left:
+      map.drawPixel(1, 3);
+      map.drawPixel(3, 3); 
       break;
-    case Left:  
-        map.drawPixel(3, 3);
-        map.drawPixel(3, 5);   
-        break;
     }
 
     image = new Texture(map);
@@ -83,7 +95,7 @@ public class Player {
     return inventory; 
   }
 
-  public void grabItem(Item item) {
+  public void pickupItem(Item item) {
     inventory = item;
     non_actual = true;
   }
@@ -116,9 +128,9 @@ public class Player {
     }
 
     if (y > 0) {
-      dir = Direction.Down;
-    } else if (y < 0) {
       dir = Direction.Up;
+    } else if (y < 0) {
+      dir = Direction.Down;
     }
     non_actual = true;
   }
@@ -143,19 +155,19 @@ public class Player {
   }
 
   public void draw(SpriteBatch batch) {
-    batch.draw(image, (float)pos.x, (float)Room.SCREEN_HEIGHT - (float)HEIGHT - (float)pos.y,
+    batch.draw(image, (float)pos.x, (float)pos.y,
     (float)WIDTH, (float)HEIGHT);
     if (inventory != null) {
-      batch.draw(inventory_image, (float)pos.x + 5.5f, (float)Room.SCREEN_HEIGHT - (float)HEIGHT - (float)pos.y + 4.5f, 
+      batch.draw(inventory_image, (float)pos.x + 5.5f, (float)pos.y + 4.5f, 
       inventory.getSize().x * 0.6f, inventory.getSize().y * 0.6f);
     }
   }
 
-  public DoublePoint getPos() {
+  public Vector2d getPos() {
     return pos;
   }
 
-  public DoublePoint getCenterPos() {
-    return DoublePoint.sum(pos, POS_OFFSET);
+  public Vector2d getCenterPos() {
+    return Vector2d.sum(pos, POS_OFFSET);
   }
 }

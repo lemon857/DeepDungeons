@@ -5,7 +5,7 @@ import java.util.Random;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
-import com.deepdungeons.game.DoublePoint;
+import com.deepdungeons.game.Vector2d;
 import com.deepdungeons.game.Room;
 
 public class Skeleton extends Mob {
@@ -21,11 +21,11 @@ public class Skeleton extends Mob {
 
   private final Random rand;
 
-  public Skeleton(DoublePoint pos) {
+  public Skeleton(Vector2d pos) {
     super();
     this.pos = pos;
     this.rand = new Random(System.currentTimeMillis());
-    this.size = new DoublePoint(WIDTH, HEIGHT);
+    this.size = new Vector2d(WIDTH, HEIGHT);
     generateImage();
   }
 

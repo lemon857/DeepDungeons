@@ -179,7 +179,7 @@ public class Room {
     return can_grab_item;
   }
 
-  public boolean canGrabItem(DoublePoint cur_pos) {
+  public boolean canGrabItem(Vector2d cur_pos) {
     for (Item item : items) {
       if (Point.distance(cur_pos, item.getPos()) < 4.2) {
         can_grab_item = item;
@@ -197,7 +197,7 @@ public class Room {
     return res;
   }
 
-  public double distanceToNearestItem(DoublePoint cur_pos) {
+  public double distanceToNearestItem(Vector2d cur_pos) {
     double res = 50;
     for (Item item : items) {
       res = Math.min(res, Point.distance(cur_pos, item.getPos()));
@@ -281,7 +281,6 @@ public class Room {
       }
     }
 
-    //image.drawPixmap(map, 0, 0);
     background_texture = new Texture(map);
   }
 

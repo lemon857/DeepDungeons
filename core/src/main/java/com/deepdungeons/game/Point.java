@@ -19,7 +19,7 @@ public class Point {
     this.y = point.y;
   }
 
-  public Point(DoublePoint point) {
+  public Point(Vector2d point) {
     this.x = (int)point.x;
     this.y = (int)point.y;
   }
@@ -39,7 +39,7 @@ public class Point {
   public static double distance(Point a, Point b) {
     return Math.sqrt((b.x - a.x) * (b.x - a.x) + (b.y - a.y) * (b.y - a.y));
   }
-  public static double distance(DoublePoint a, Point b) {
+  public static double distance(Vector2d a, Point b) {
     return Math.sqrt((b.x - a.x) * (b.x - a.x) + (b.y - a.y) * (b.y - a.y));
   }
 

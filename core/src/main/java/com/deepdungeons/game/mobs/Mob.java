@@ -3,13 +3,14 @@ package com.deepdungeons.game.mobs;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.deepdungeons.game.DoublePoint;
+import com.deepdungeons.game.Room;
+import com.deepdungeons.game.Vector2d;
 
 public class Mob {
   protected Pixmap image;
 
-  protected DoublePoint pos;
-  protected DoublePoint size;
+  protected Vector2d pos;
+  protected Vector2d size;
 
   protected Texture texture;
 
@@ -33,8 +34,12 @@ public class Mob {
     return id;
   }
 
-  public final DoublePoint getPos() {
+  public final Vector2d getPos() {
     return pos;
+  }
+
+  public final Vector2d getCenterPos() {
+    return Vector2d.sum(pos, Vector2d.div(size, 2));
   }
 
   public final Pixmap getImage() {
