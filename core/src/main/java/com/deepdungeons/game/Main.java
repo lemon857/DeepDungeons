@@ -23,7 +23,6 @@ public class Main extends ApplicationAdapter {
   private FitViewport viewport;
 
   private Stage stage;
-  private Label room_id_label;
 
   private HashMap<Point, Room> rooms;
 
@@ -31,10 +30,6 @@ public class Main extends ApplicationAdapter {
   private Room current_room;
 
   private Player player;
-  private Label player_pos_label;
-
-  private Label key_require_label;
-  private Label info_label;
 
   private int req_door_id;
 
@@ -42,6 +37,17 @@ public class Main extends ApplicationAdapter {
   private int generate_key_chance;
 
   private Random rand;
+
+  private Label[] debug_info;
+  private static final Point DEBUG_START = new Point(10, 10);
+  private static final int DEBUG_Y_STEP = 15;
+
+  private static final int DEBUG_LINES = 4;
+
+  private static final int DEBUG_LINE_INFO = 0;
+  private static final int DEBUG_LINE_DISTANCE = 1;
+  private static final int DEBUG_LINE_PLAYER_POS = 2;
+  private static final int DEBUG_LINE_ROOM_POS = 3;
 
   @Override
   public void create() {
@@ -76,21 +82,14 @@ public class Main extends ApplicationAdapter {
 
     Skin skin = new Skin(Gdx.files.internal("ui/uiskin.json"));
 
-    room_id_label = new Label("Room X: 0 Y: 0", skin);
-    room_id_label.setPosition(370, 30);
-    stage.addActor(room_id_label);
-
-    player_pos_label = new Label("Player X: 0 Y: 0", skin);
-    player_pos_label.setPosition(370, 10);
-    stage.addActor(player_pos_label);
-
-    key_require_label = new Label("-", skin);
-    key_require_label.setPosition(10, 480);
-    stage.addActor(key_require_label);
-
-    info_label = new Label("-", skin);
-    info_label.setPosition(370, 480);
-    stage.addActor(info_label);
+    debug_info = new Label[DEBUG_LINES];
+    int current_y = DEBUG_START.y;
+    for (int i = 0; i < DEBUG_LINES; ++i) {
+      debug_info[i] = new Label("---", skin);
+      debug_info[i].setPosition(DEBUG_START.x, current_y);
+      stage.addActor(debug_info[i]);
+      current_y += DEBUG_Y_STEP;
+    }
 
     rooms = new HashMap<>();
 
@@ -110,6 +109,7 @@ public class Main extends ApplicationAdapter {
     player = new Player(20, 20);
 
     current_room = rooms.get(current_room_pos);
+    debug_info[DEBUG_LINE_ROOM_POS].setText("Room X: " + current_room_pos.x + " Y: " + current_room_pos.y);
 
     req_door_id = -1;
   }
@@ -183,7 +183,7 @@ public class Main extends ApplicationAdapter {
             current_room.addItem(item);
           }
           player.pickupItem(current_room.grabItem());
-          key_require_label.setText("Grabbed!");
+          debug_info[DEBUG_LINE_INFO].setText("Grabbed!");
           
         } else {
           if (player.isDropAvailable()) {
@@ -192,7 +192,7 @@ public class Main extends ApplicationAdapter {
           item.setPos(new Point(player.getPos()));
           current_room.addItem(item);
           }
-          key_require_label.setText("Can't grab!");
+          debug_info[DEBUG_LINE_INFO].setText("Can't grab!");
         }
       }
     }
@@ -201,11 +201,11 @@ public class Main extends ApplicationAdapter {
   private void logic() {
     player.update();
     current_room.update(Gdx.graphics.getDeltaTime());
-    info_label.setText("Dis: " + current_room.distanceToNearestItem(player.getPos()));
+    debug_info[DEBUG_LINE_DISTANCE].setText("Dis: " + current_room.distanceToNearestItem(player.getPos()));
     //info_label.setText("To door: " + Point.distance(player.getPos(), Room.GetDoorPosition(req_door_id)));
     Point pos = new Point(player.getPos());
 
-    player_pos_label.setText("Player X: " + pos.x + " Y: " + pos.y);
+    debug_info[DEBUG_LINE_PLAYER_POS].setText("Player X: " + pos.x + " Y: " + pos.y);
   }
 
   private void draw() {
@@ -235,7 +235,7 @@ public class Main extends ApplicationAdapter {
     if (!rooms.get(current_room_pos).canGoNextRoom(door_id)) {
       int req = rooms.get(current_room_pos).getLockedDoorKey(door_id);
       if (req != 0) {
-        key_require_label.setText("Require key: " + req);
+        debug_info[DEBUG_LINE_INFO].setText("Require key: " + req);
         req_door_id = door_id;
       }
       return false;
@@ -285,7 +285,7 @@ public class Main extends ApplicationAdapter {
     current_room = rooms.get(current_room_pos);
 
     rooms.get(current_room_pos).printDoors();
-    room_id_label.setText("Room X: " + current_room_pos.x + " Y: " + current_room_pos.y);
+    debug_info[DEBUG_LINE_ROOM_POS].setText("Room X: " + current_room_pos.x + " Y: " + current_room_pos.y);
     return true;
   }
 }
