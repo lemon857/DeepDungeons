@@ -30,7 +30,8 @@ public class Player {
   private Item inventory;
 
   public enum Direction {
-    Up, Down, Right, Left
+    Up, Down, Right, Left,
+    UpRight, UpLeft, DownRight, DownLeft
   }
 
   public static Vector2d GetDirectionVector(Direction dir) {
@@ -77,6 +78,22 @@ public class Player {
       map.drawPixel(1, 3);
       map.drawPixel(3, 3); 
       break;
+    case UpRight:
+      map.drawPixel(3, 2);
+      map.drawPixel(5, 2);   
+      break;
+    case UpLeft:
+      map.drawPixel(1, 2);
+      map.drawPixel(3, 2);   
+      break;
+    case DownRight:
+        map.drawPixel(3, 4);
+        map.drawPixel(5, 4);   
+        break;
+    case DownLeft:
+        map.drawPixel(1, 4);
+        map.drawPixel(3, 4);   
+        break;
     }
 
     image = new Texture(map);
@@ -110,7 +127,9 @@ public class Player {
     non_actual = true;
     return res;
   }
-
+  public void translate(Vector2d vector) {
+    translate(vector.x, vector.y);
+  }
   public void translate(double x, double y) {
     pos.x += x;
     pos.y += y;
@@ -122,16 +141,28 @@ public class Player {
     else if (pos.y > END_BORDER) pos.y = END_BORDER;
 
     if (x > 0) {
-      dir = Direction.Right;
+      if (y > 0) {
+        dir = Direction.UpRight;
+      } else if (y < 0) {
+        dir = Direction.DownRight;
+      } else {
+        dir = Direction.Right;
+      }
     } else if (x < 0) {
-      dir = Direction.Left;
-    }
-
-    if (y > 0) {
-      dir = Direction.Up;
-    } else if (y < 0) {
-      dir = Direction.Down;
-    }
+      if (y > 0) {
+        dir = Direction.UpLeft;
+      } else if (y < 0) {
+        dir = Direction.DownLeft;
+      } else {
+        dir = Direction.Left;
+      }
+    } else {
+      if (y > 0) {
+        dir = Direction.Up;
+      } else if (y < 0) {
+        dir = Direction.Down;
+      }
+    } 
     non_actual = true;
   }
 

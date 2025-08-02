@@ -3,7 +3,6 @@ package com.deepdungeons.game.mobs;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.deepdungeons.game.Room;
 import com.deepdungeons.game.Vector2d;
 
 public class Mob {

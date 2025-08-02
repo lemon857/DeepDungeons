@@ -38,6 +38,8 @@ public class Room {
   private Texture background_texture;
   private Texture texture;
 
+  private Texture debug_texture;
+
   private boolean non_actual;
 
   private final ArrayList<Item> items;
@@ -88,6 +90,12 @@ public class Room {
     this.mobs = new ArrayList<>();
     this.image = new Pixmap(SCREEN_WIDTH, SCREEN_HEIGHT, Pixmap.Format.RGBA8888);
     this.texture = new Texture(this.image);
+
+    Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGB888);
+    pixmap.setColor(1, 1, 1, 1);
+    pixmap.drawPixel(0, 0);
+    debug_texture = new Texture(pixmap);
+    last_pos = new Vector2d();
 
     generateNewDoors(must_doors);
   }
@@ -147,9 +155,9 @@ public class Room {
   }
 
   public void update(double delta) {
-    for (Mob mob : mobs) {
-      mob.update(delta);
-    }
+    //for (Mob mob : mobs) {
+      //mob.update(delta);
+    //}
     for (Item item : items) {
       item.update(delta);
     }
@@ -205,12 +213,34 @@ public class Room {
     return res;
   }
 
+  public double distanceToNearestMob(Vector2d pos) {
+    double res = 50;
+    for (Mob mob : mobs) {
+      res = Math.min(res, Vector2d.distance(pos, mob.getPos()));
+    }
+    return res;
+  }
+  Vector2d last_pos;
+  public void tryHitMob(Vector2d pos, double damage) {
+    last_pos = pos;
+    for (Mob mob : mobs) {
+      if (Vector2d.distance(mob.getCenterPos(), pos) < 3) {
+        // mob damage
+        //mobs.remove(mob);
+        break;
+      }
+    }
+  }
+
   public void draw(SpriteBatch batch) {
     batch.draw(background_texture, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     batch.draw(texture, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     for (Mob mob : mobs) {
       mob.draw(batch);
+      Vector2d p = mob.getCenterPos();
+      batch.draw(debug_texture, (float)p.x, (float)p.y, 1, 1);
     }
+    batch.draw(debug_texture, (float)last_pos.x, (float)last_pos.y, 1, 1);
   }
 
   public void generateBackground() {

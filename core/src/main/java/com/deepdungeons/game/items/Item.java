@@ -17,7 +17,7 @@ public class Item {
   private final Type type;
 
   public enum Type {
-    None, Key, CloseRangeWeapon
+    None, Key, Weapon
   }
 
   protected Item(Type type) {
