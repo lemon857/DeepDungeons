@@ -18,6 +18,15 @@ import com.deepdungeons.game.items.Item;
 import com.deepdungeons.game.items.Key;
 import com.deepdungeons.game.mobs.Skeleton;
 
+// ! WARNING ! 
+// IDK why, start coords on Pixmap located at Up-Left corner,
+// but start coords when draw texture located at Down-Left corner
+// for minimize misunderstanding I'll correct all of Pixmap drawing
+// with mirroring it
+// here always 
+// X from left to right
+// Y from down to up
+
 public class Main extends ApplicationAdapter {
   private SpriteBatch batch;
   private FitViewport viewport;

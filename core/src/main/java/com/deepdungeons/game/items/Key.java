@@ -42,12 +42,12 @@ public class Key extends Item {
     image.drawPixel(3, 1);
     image.drawPixel(3, 2);
 
-    image.drawLine(4, 1, 7, 1);
+    image.drawLine(4, 2, 7, 2);
 
     image.setColor(color);
 
-    image.drawPixel(5, 2);
-    image.drawPixel(6, 2);
+    image.drawPixel(5, 1);
+    image.drawPixel(6, 1);
   }
 
   @Override

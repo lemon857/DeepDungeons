@@ -233,8 +233,10 @@ public class Room {
   }
 
   public void draw(SpriteBatch batch) {
-    batch.draw(background_texture, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-    batch.draw(texture, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+    // correct coords for correct Pixmap drawing
+    batch.draw(background_texture, 0, SCREEN_HEIGHT, SCREEN_WIDTH, -SCREEN_HEIGHT);
+    batch.draw(texture, 0, SCREEN_HEIGHT, SCREEN_WIDTH, -SCREEN_HEIGHT);
+
     for (Mob mob : mobs) {
       mob.draw(batch);
       Vector2d p = mob.getCenterPos();

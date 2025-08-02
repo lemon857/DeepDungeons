@@ -46,7 +46,7 @@ public class Mob {
   }
 
   public final void draw(SpriteBatch batch) {
-    batch.draw(texture, (float)pos.x, (float)pos.y, (float)size.x, (float)size.y);
+    batch.draw(texture, (float)pos.x, (float)pos.y + (float)size.y, (float)size.x, -(float)size.y);
   }
 
   @Override

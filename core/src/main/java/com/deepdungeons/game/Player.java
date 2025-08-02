@@ -10,6 +10,13 @@ public class Player {
   public static final int WIDTH = 7;
   public static final int HEIGHT = 7;
 
+  public static final int EYE_DOWN = (HEIGHT / 2) - 1;
+  public static final int EYE_UP = HEIGHT - EYE_DOWN - 1;
+  public static final int EYE_MIDDLE = EYE_DOWN + (EYE_UP - EYE_DOWN) / 2;
+
+  public static final int EYE_LEFT = (WIDTH / 2) - 1;
+  public static final int EYE_RIGHT = WIDTH - EYE_LEFT - 1;
+
   private static final int START_BORDER = Room.START_BORDER + 1;
   private static final int END_BORDER = Room.END_BORDER - WIDTH;
 
@@ -63,36 +70,36 @@ public class Player {
     switch (dir) {
     case Up:
     default:
-      map.drawPixel(2, 2);
-      map.drawPixel(4, 2);   
+      map.drawPixel(EYE_LEFT, EYE_UP);
+      map.drawPixel(EYE_RIGHT, EYE_UP);   
       break;
     case Down:
-        map.drawPixel(2, 4);
-        map.drawPixel(4, 4);   
+        map.drawPixel(EYE_LEFT, EYE_DOWN);
+        map.drawPixel(EYE_RIGHT, EYE_DOWN);
         break;
     case Right:
-      map.drawPixel(3, 3);
-      map.drawPixel(5, 3);   
+      map.drawPixel(EYE_LEFT + 1, EYE_MIDDLE);
+      map.drawPixel(EYE_RIGHT + 1, EYE_MIDDLE);   
       break;
     case Left:
-      map.drawPixel(1, 3);
-      map.drawPixel(3, 3); 
+      map.drawPixel(EYE_LEFT - 1, EYE_MIDDLE);
+      map.drawPixel(EYE_RIGHT - 1, EYE_MIDDLE); 
       break;
     case UpRight:
-      map.drawPixel(3, 2);
-      map.drawPixel(5, 2);   
+      map.drawPixel(EYE_LEFT + 1, EYE_UP);
+      map.drawPixel(EYE_RIGHT + 1, EYE_UP);   
       break;
     case UpLeft:
-      map.drawPixel(1, 2);
-      map.drawPixel(3, 2);   
+      map.drawPixel(EYE_LEFT - 1, EYE_UP);
+      map.drawPixel(EYE_RIGHT - 1, EYE_UP);   
       break;
     case DownRight:
-        map.drawPixel(3, 4);
-        map.drawPixel(5, 4);   
+        map.drawPixel(EYE_LEFT + 1, EYE_DOWN);
+        map.drawPixel(EYE_RIGHT + 1, EYE_DOWN);   
         break;
     case DownLeft:
-        map.drawPixel(1, 4);
-        map.drawPixel(3, 4);   
+        map.drawPixel(EYE_LEFT - 1, EYE_DOWN);
+        map.drawPixel(EYE_RIGHT - 1, EYE_DOWN);   
         break;
     }
 
@@ -186,11 +193,12 @@ public class Player {
   }
 
   public void draw(SpriteBatch batch) {
-    batch.draw(image, (float)pos.x, (float)pos.y,
-    (float)WIDTH, (float)HEIGHT);
+    // correct coords for Pixmap
+    batch.draw(image, (float)pos.x, (float)pos.y + (float)HEIGHT,
+    (float)WIDTH, -(float)HEIGHT);
     if (inventory != null) {
-      batch.draw(inventory_image, (float)pos.x + 5.5f, (float)pos.y + 4.5f, 
-      inventory.getSize().x * 0.6f, inventory.getSize().y * 0.6f);
+      batch.draw(inventory_image, (float)pos.x + 5.5f, (float)pos.y + 4.5f + inventory.getSize().y * 0.6f, 
+      inventory.getSize().x * 0.6f, -inventory.getSize().y * 0.6f);
     }
   }
 
