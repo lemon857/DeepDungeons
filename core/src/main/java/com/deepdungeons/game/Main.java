@@ -17,6 +17,8 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.deepdungeons.game.items.Item;
 import com.deepdungeons.game.items.Key;
 import com.deepdungeons.game.mobs.Skeleton;
+import com.deepdungeons.game.weapons.CloseRangeWeapon;
+import com.deepdungeons.game.weapons.Knife;
 
 // ! WARNING ! 
 // IDK why, start coords on Pixmap located at Up-Left corner,
@@ -51,12 +53,13 @@ public class Main extends ApplicationAdapter {
   private static final Point DEBUG_START = new Point(10, 10);
   private static final int DEBUG_Y_STEP = 15;
 
-  private static final int DEBUG_LINES = 4;
+  private static final int DEBUG_LINES = 5;
 
   private static final int DEBUG_LINE_INFO = 0;
   private static final int DEBUG_LINE_DISTANCE = 1;
   private static final int DEBUG_LINE_PLAYER_POS = 2;
   private static final int DEBUG_LINE_ROOM_POS = 3;
+  private static final int DEBUG_LINE_ANGLE = 4;
 
   @Override
   public void create() {
@@ -108,9 +111,13 @@ public class Main extends ApplicationAdapter {
     generate_key_require = new_room.lockDoor(2);
     generate_key_chance = 10;
 
-    new_room.addMob(new Skeleton(new Vector2d(10, 40)));
+    new_room.addMob(new Skeleton(new Vector2d(15, 20)));
+    new_room.addMob(new Skeleton(new Vector2d(35, 23)));
+    new_room.addMob(new Skeleton(new Vector2d(23, 35)));
 
     new_room.addItem(key);
+
+    new_room.addItem(new Knife(new Point(10, 10)));
 
     current_room_pos = new_room.getPos();
     rooms.put(current_room_pos, new_room);
@@ -205,13 +212,27 @@ public class Main extends ApplicationAdapter {
         }
       }
     }
+
+    if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+      if (player.getItem() instanceof CloseRangeWeapon) {
+        CloseRangeWeapon weapon = (CloseRangeWeapon)player.getItem();
+        int count = current_room.tryHitMob(player.getCenterPos(), player.getDirection(), weapon.getDamage(), weapon.getDistance(), weapon.getAngle());
+
+        if (count == 0) {
+          debug_info[DEBUG_LINE_INFO].setText("No hit");
+        } else {
+          debug_info[DEBUG_LINE_INFO].setText("Hitted count: " + count);
+        }
+      }
+    }
   }
 
   private void logic() {
     player.update();
     current_room.update(Gdx.graphics.getDeltaTime());
-    debug_info[DEBUG_LINE_DISTANCE].setText("Dis: " + current_room.distanceToNearestItem(player.getPos()));
-    //info_label.setText("To door: " + Point.distance(player.getPos(), Room.GetDoorPosition(req_door_id)));
+    //debug_info[DEBUG_LINE_DISTANCE].setText("Dis to item: " + current_room.distanceToNearestItem(player.getPos()));
+    debug_info[DEBUG_LINE_DISTANCE].setText("Dis to mob: " + current_room.distanceToNearestMob(player.getPos()));
+    debug_info[DEBUG_LINE_ANGLE].setText("Angle to mob: " + current_room.angleToNearestMob(player.getPos(), player.getDirection()));
     Point pos = new Point(player.getPos());
 
     debug_info[DEBUG_LINE_PLAYER_POS].setText("Player X: " + pos.x + " Y: " + pos.y);

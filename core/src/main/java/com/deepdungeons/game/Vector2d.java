@@ -19,9 +19,18 @@ public class Vector2d {
     this.y = point.y;
   }
 
+  public Vector2d(Vector2d start, Vector2d end) {
+    this.x = end.x - start.x;
+    this.y = end.y - start.y;
+  }
+
   public Vector2d(Point point) {
     this.x = point.x;
     this.y = point.y;
+  }
+
+  public double lenght() {
+    return Math.sqrt((x) * (x) + (y) * (y));
   }
 
   public static Vector2d sum(Vector2d a, Vector2d b) {
@@ -44,5 +53,8 @@ public class Vector2d {
   }
   public static double distance(Vector2d a, Vector2d b) {
     return Math.sqrt((b.x - a.x) * (b.x - a.x) + (b.y - a.y) * (b.y - a.y));
+  }
+  public static double angle(Vector2d a, Vector2d b) {
+    return Math.acos((a.x * b.x + a.y * b.y) / (a.lenght() * b.lenght()));
   }
 }

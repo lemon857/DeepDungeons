@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.deepdungeons.game.items.Item;
+import com.deepdungeons.game.weapons.CloseRangeWeapon;
 
 public class Player {
   public static final int WIDTH = 7;
@@ -25,6 +26,8 @@ public class Player {
   private static final Color COLOR = new Color(0.8f, 0.7f, 0.9f, 0.7f);
   private static final Color EYE_COLOR = new Color(0, 0, 0, 1);
 
+  private static final double HALF_SQUARE_SUM = Math.sqrt(2)/2;
+
   private final Vector2d pos;
   private Texture image;
 
@@ -44,10 +47,14 @@ public class Player {
   public static Vector2d GetDirectionVector(Direction dir) {
     Vector2d delta = new Vector2d();
     switch (dir) {
-      case Up: delta.y = -1; break;
+      case Up: delta.y = 1; break;
       case Right: delta.x = 1; break;
-      case Down: delta.y = 1; break;
+      case Down: delta.y = -1; break;
       case Left: delta.x = -1; break;
+      case UpLeft: delta.x = -HALF_SQUARE_SUM; delta.y = HALF_SQUARE_SUM; break;
+      case UpRight: delta.x = HALF_SQUARE_SUM; delta.y = HALF_SQUARE_SUM; break;
+      case DownLeft: delta.x = -HALF_SQUARE_SUM; delta.y = -HALF_SQUARE_SUM; break;
+      case DownRight: delta.x = HALF_SQUARE_SUM; delta.y = -HALF_SQUARE_SUM; break;
       default: break;
     }
     return delta;
@@ -208,5 +215,9 @@ public class Player {
 
   public Vector2d getCenterPos() {
     return Vector2d.sum(pos, POS_OFFSET);
+  }
+
+  public Vector2d getDirection() {
+    return GetDirectionVector(dir);
   }
 }

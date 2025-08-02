@@ -10,8 +10,8 @@ import com.deepdungeons.game.Room;
 
 public class Skeleton extends Mob {
 
-  public static final int WIDTH = 8;
-  public static final int HEIGHT = 8;
+  public static final int WIDTH = 7;
+  public static final int HEIGHT = 7;
 
   private static final int START_BORDER = Room.START_BORDER;
   private static final int END_BORDER = Room.END_BORDER - WIDTH;
@@ -24,7 +24,7 @@ public class Skeleton extends Mob {
   public Skeleton(Vector2d pos) {
     super();
     this.pos = pos;
-    this.rand = new Random(System.currentTimeMillis());
+    this.rand = new Random(System.currentTimeMillis() * getId());
     this.size = new Vector2d(WIDTH, HEIGHT);
     generateImage();
   }
@@ -51,7 +51,7 @@ public class Skeleton extends Mob {
   protected final void generateImage() {
     image = new Pixmap(WIDTH, HEIGHT, Pixmap.Format.RGBA8888);
     image.setColor(COLOR);
-    image.fillCircle(WIDTH / 2, HEIGHT / 2, (WIDTH / 2) - 1);
+    image.fillCircle(WIDTH / 2, HEIGHT / 2, WIDTH / 2);
 
     texture = new Texture(image);
   }

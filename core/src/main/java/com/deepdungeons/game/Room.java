@@ -38,7 +38,7 @@ public class Room {
   private Texture background_texture;
   private Texture texture;
 
-  private Texture debug_texture;
+  //private Texture debug_texture;
 
   private boolean non_actual;
 
@@ -57,9 +57,9 @@ public class Room {
   public static Point GetRoomDeltaFromDoor(int door_id) {
     Point delta = new Point();
     switch (door_id) {
-      case 0: delta.y = -1; break; // top
+      case 0: delta.y = 1; break; // top
       case 1: delta.x = 1; break; // right
-      case 2: delta.y = 1; break; // bottom
+      case 2: delta.y = -1; break; // bottom
       case 3: delta.x = -1; break; // left
       default: break;
     }
@@ -68,9 +68,9 @@ public class Room {
 
   public static Point GetDoorPosition(int door_id) {
     switch (door_id) {
-      case 0: return new Point(DOOR_OFFSET, 1);
+      case 0: return new Point(DOOR_OFFSET, SCREEN_HEIGHT - DOOR_WIDTH);
       case 1: return new Point(SCREEN_WIDTH - DOOR_WIDTH, DOOR_OFFSET);
-      case 2: return new Point(DOOR_OFFSET, SCREEN_HEIGHT - DOOR_WIDTH);
+      case 2: return new Point(DOOR_OFFSET, 1);
       case 3: return new Point(1, DOOR_OFFSET);
       default: return new Point(-1, -1);
     }
@@ -91,11 +91,10 @@ public class Room {
     this.image = new Pixmap(SCREEN_WIDTH, SCREEN_HEIGHT, Pixmap.Format.RGBA8888);
     this.texture = new Texture(this.image);
 
-    Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGB888);
-    pixmap.setColor(1, 1, 1, 1);
-    pixmap.drawPixel(0, 0);
-    debug_texture = new Texture(pixmap);
-    last_pos = new Vector2d();
+    // Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGB888);
+    // pixmap.setColor(1, 1, 1, 1);
+    // pixmap.drawPixel(0, 0);
+    // debug_texture = new Texture(pixmap);
 
     generateNewDoors(must_doors);
   }
@@ -155,9 +154,9 @@ public class Room {
   }
 
   public void update(double delta) {
-    //for (Mob mob : mobs) {
-      //mob.update(delta);
-    //}
+    for (Mob mob : mobs) {
+      mob.update(delta);
+    }
     for (Item item : items) {
       item.update(delta);
     }
@@ -213,23 +212,45 @@ public class Room {
     return res;
   }
 
-  public double distanceToNearestMob(Vector2d pos) {
+  public double distanceToNearestMob(Vector2d cur_pos) {
     double res = 50;
     for (Mob mob : mobs) {
-      res = Math.min(res, Vector2d.distance(pos, mob.getPos()));
+      res = Math.min(res, Vector2d.distance(cur_pos, mob.getCenterPos()));
     }
     return res;
   }
-  Vector2d last_pos;
-  public void tryHitMob(Vector2d pos, double damage) {
-    last_pos = pos;
-    for (Mob mob : mobs) {
-      if (Vector2d.distance(mob.getCenterPos(), pos) < 3) {
-        // mob damage
-        //mobs.remove(mob);
+
+  public double angleToNearestMob(Vector2d cur_pos, Vector2d dir) {
+    double distance = distanceToNearestMob(cur_pos);
+
+    int current_mob = -1;
+
+    for (int i = 0; i < mobs.size(); ++i) {
+      if (Vector2d.distance(cur_pos, mobs.get(i).getCenterPos()) == distance) {
+        current_mob = i;
         break;
       }
     }
+
+    if (current_mob == -1) return -1;
+
+    Vector2d v2 = new Vector2d(cur_pos, mobs.get(current_mob).getCenterPos());
+
+    return Vector2d.angle(dir, v2);
+  }
+
+  public int tryHitMob(Vector2d player_pos, Vector2d dir, double damage, double max_distance, double max_angle) {
+    int res = 0;
+    for (int i = 0; i < mobs.size(); ++i) {
+      Vector2d v2 = new Vector2d(player_pos, mobs.get(i).getCenterPos());
+
+      if (v2.lenght() > max_distance) continue;
+      if (Vector2d.angle(dir, v2) > max_angle) continue;
+
+      mobs.remove(i); // damage (still critical)
+      ++res;
+    }
+    return res;
   }
 
   public void draw(SpriteBatch batch) {
@@ -239,10 +260,9 @@ public class Room {
 
     for (Mob mob : mobs) {
       mob.draw(batch);
-      Vector2d p = mob.getCenterPos();
-      batch.draw(debug_texture, (float)p.x, (float)p.y, 1, 1);
+      // Vector2d p = mob.getCenterPos();
+      // batch.draw(debug_texture, (float)p.x, (float)p.y, 1, 1);
     }
-    batch.draw(debug_texture, (float)last_pos.x, (float)last_pos.y, 1, 1);
   }
 
   public void generateBackground() {
@@ -261,13 +281,13 @@ public class Room {
     if (doors[0]) {
       if (lock_doors[0] != 0) { 
         map.setColor(CLOSED_DOOR_COLOR);
-        map.drawRectangle(DOOR_OFFSET, 1, DOOR_WIDTH, DOOR_HEIGHT);
+        map.drawRectangle(DOOR_OFFSET, SCREEN_HEIGHT - DOOR_HEIGHT - 1, DOOR_WIDTH, DOOR_HEIGHT);
         map.setColor(lock_doors_color[0]);
-        map.drawRectangle(DOOR_KEY_OFFSET, 1, DOOR_KEY_WIDTH, DOOR_HEIGHT);
+        map.drawRectangle(DOOR_KEY_OFFSET, SCREEN_HEIGHT - DOOR_HEIGHT - 1, DOOR_KEY_WIDTH, DOOR_HEIGHT);
       }
       else {
         map.setColor(OPENED_DOOR_COLOR);
-        map.drawRectangle(DOOR_OFFSET, 1, DOOR_WIDTH, DOOR_HEIGHT);
+        map.drawRectangle(DOOR_OFFSET, SCREEN_HEIGHT - DOOR_HEIGHT - 1, DOOR_WIDTH, DOOR_HEIGHT);
       }
     }
 
@@ -289,13 +309,13 @@ public class Room {
     if (doors[2]) {
       if (lock_doors[2] != 0) {
         map.setColor(CLOSED_DOOR_COLOR);
-        map.drawRectangle(DOOR_OFFSET, SCREEN_HEIGHT - DOOR_HEIGHT - 1, DOOR_WIDTH, DOOR_HEIGHT);
+        map.drawRectangle(DOOR_OFFSET, 1, DOOR_WIDTH, DOOR_HEIGHT);
         map.setColor(lock_doors_color[2]);
-        map.drawRectangle(DOOR_KEY_OFFSET, SCREEN_HEIGHT - DOOR_HEIGHT - 1 , DOOR_KEY_WIDTH, DOOR_HEIGHT);
+        map.drawRectangle(DOOR_KEY_OFFSET, 1, DOOR_KEY_WIDTH, DOOR_HEIGHT);
       }
       else {
         map.setColor(OPENED_DOOR_COLOR);
-        map.drawRectangle(DOOR_OFFSET, SCREEN_HEIGHT - DOOR_HEIGHT - 1, DOOR_WIDTH, DOOR_HEIGHT);
+        map.drawRectangle(DOOR_OFFSET, 1, DOOR_WIDTH, DOOR_HEIGHT);
       }
     }
 

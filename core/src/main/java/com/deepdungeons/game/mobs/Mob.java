@@ -38,7 +38,7 @@ public class Mob {
   }
 
   public final Vector2d getCenterPos() {
-    return Vector2d.sum(pos, Vector2d.div(size, 2));
+    return pos;
   }
 
   public final Pixmap getImage() {
