@@ -32,6 +32,8 @@ public class Room {
   private static final Color OPENED_DOOR_COLOR = new Color(0.5f, 0.3f, 0.13f, 1);
   private static final Color CLOSED_DOOR_COLOR = new Color(1, 0.3f, 0.3f, 0.5f);
 
+  private static final boolean MOBS_AI = true;
+
   private final Point pos;
 
   private Pixmap image;
@@ -79,7 +81,7 @@ public class Room {
   // Room
   // must_doors: -1 - door must empty, 0 - nevermind, 1 - doors must be
   public Room(Point pos, int[] must_doors) {
-    this.rand = new Random(System.currentTimeMillis());
+    this.rand = new Random(System.currentTimeMillis() * pos.x * pos.y);
     this.pos = pos;
 
     this.doors = new boolean[] {false, false, false, false};
@@ -154,9 +156,11 @@ public class Room {
   }
 
   public void update(double delta) {
-    // for (Mob mob : mobs) {
-    //   mob.update(delta);
-    // }
+    if (MOBS_AI) {
+      for (Mob mob : mobs) {
+        mob.update(delta);
+      }
+    }
     for (Item item : items) {
       item.update(delta);
     }
@@ -239,18 +243,25 @@ public class Room {
     return Vector2d.angle(dir, v2);
   }
 
-  public int tryHitMob(Vector2d player_pos, Vector2d dir, double damage, double max_distance, double max_angle) {
-    int res = 0;
+  public boolean  tryHitMob(Vector2d player_pos, Vector2d dir, double damage, double max_distance, double max_angle) {
     for (int i = 0; i < mobs.size(); ++i) {
       Vector2d v2 = new Vector2d(player_pos, mobs.get(i).getPos());
 
-      if (v2.lenght() > max_distance) continue;
-      if (Math.abs(Vector2d.angle(dir, v2)) > max_angle) continue;
+      if (v2.lenght() > max_distance) {
+        System.out.println("[" + i + "] Too far: " + v2.lenght());
+        continue;
+      }
+      if (Vector2d.angle(dir, v2) > max_angle) {
+        System.out.println("[" + i + "] Too much angle: " + Vector2d.angle(dir, v2));
+        continue;
+      }
 
-      mobs.remove(i); // damage (still critical)
-      ++res;
+      if (mobs.get(i).damage(damage)) {
+        mobs.remove(i);
+      }
+      return true; // Hit only one mob
     }
-    return res;
+    return false;
   }
 
   public void draw(SpriteBatch batch) {
@@ -260,8 +271,6 @@ public class Room {
 
     for (Mob mob : mobs) {
       mob.draw(batch);
-      // Vector2d p = mob.getCenterPos();
-      // batch.draw(debug_texture, (float)p.x, (float)p.y, 1, 1);
     }
   }
 

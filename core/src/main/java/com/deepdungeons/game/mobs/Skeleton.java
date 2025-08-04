@@ -1,17 +1,18 @@
 package com.deepdungeons.game.mobs;
 
-import java.util.Random;
-
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
-import com.deepdungeons.game.Vector2d;
 import com.deepdungeons.game.Room;
+import com.deepdungeons.game.Vector2d;
 
 public class Skeleton extends Mob {
 
   public static final int WIDTH = 7;
   public static final int HEIGHT = 7;
+
+  public static final double MAX_HP_LOW = 7;
+  public static final double MAX_HP_HIGH = 12;
 
   private static final int START_BORDER = Room.START_BORDER;
   private static final int END_BORDER = Room.END_BORDER - WIDTH;
@@ -19,13 +20,11 @@ public class Skeleton extends Mob {
   private static final Color COLOR = new Color(0.7f, 0.7f, 0.7f, 0.7f);
   private static final double SPEED = 50f;
 
-  private final Random rand;
-
   public Skeleton(Vector2d pos) {
     super();
     this.pos = pos;
-    this.rand = new Random(System.currentTimeMillis() * getId());
     this.size = new Vector2d(WIDTH, HEIGHT);
+    this.health_points = rand.nextDouble(MAX_HP_LOW, MAX_HP_HIGH + 1);
     generateImage();
   }
 
@@ -54,5 +53,17 @@ public class Skeleton extends Mob {
     image.fillCircle(WIDTH / 2, HEIGHT / 2, WIDTH / 2);
 
     texture = new Texture(image);
+  }
+
+  @Override
+  public boolean damage(double dmg) {
+    health_points -= dmg;
+    //if (health_points < MAX_HP * 0.7 && health_points > MAX_HP * 0.4) {
+      image.setColor(0, 0, 0, 1);
+      image.drawPixel(rand.nextInt(0, WIDTH), rand.nextInt(0, HEIGHT));
+      image.drawPixel(rand.nextInt(0, WIDTH), rand.nextInt(0, HEIGHT));
+      texture = new Texture(image);
+    //}
+    return health_points <= 0;
   }
 }

@@ -12,6 +12,7 @@ public class Knife extends Item implements CloseRangeWeapon {
   public static final double DISTANCE = 7;
   public static final double ANGLE = Math.PI / 4.0;
   public static final double DAMAGE = 1;
+  public static final double COOLDOWN = 0.5;
 
   public Knife(Point pos) {
     super(Item.Type.Weapon);
@@ -50,6 +51,11 @@ public class Knife extends Item implements CloseRangeWeapon {
   @Override
   public double getDamage() {
     return DAMAGE;
+  }
+
+  @Override
+  public double getCooldown() {
+    return COOLDOWN;
   }
 
   @Override

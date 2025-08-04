@@ -41,6 +41,8 @@ public class Main extends ApplicationAdapter {
   private Room current_room;
 
   private Player player;
+  private double timer;
+  private double cooldown;
 
   private int req_door_id;
 
@@ -128,6 +130,8 @@ public class Main extends ApplicationAdapter {
     debug_info[DEBUG_LINE_ROOM_POS].setText("Room X: " + current_room_pos.x + " Y: " + current_room_pos.y);
 
     req_door_id = -1;
+    timer = 0;
+    cooldown = 0;
   }
 
   @Override
@@ -214,16 +218,21 @@ public class Main extends ApplicationAdapter {
       }
     }
 
+    timer += delta;
     // Attack
     if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
       if (player.getItem() instanceof CloseRangeWeapon) {
-        CloseRangeWeapon weapon = (CloseRangeWeapon)player.getItem();
-        int count = current_room.tryHitMob(player.getPos(), player.getDirection(), weapon.getDamage(), weapon.getDistance(), weapon.getAngle());
-
-        if (count == 0) {
-          debug_info[DEBUG_LINE_INFO].setText("No hit");
+        if (timer >= cooldown) {
+          CloseRangeWeapon weapon = (CloseRangeWeapon)player.getItem();
+          if (current_room.tryHitMob(player.getPos(), player.getDirection(), weapon.getDamage(), weapon.getDistance(), weapon.getAngle())) {
+            debug_info[DEBUG_LINE_INFO].setText("Hitted");
+            cooldown = weapon.getCooldown();
+            timer = 0;
+          } else {
+            debug_info[DEBUG_LINE_INFO].setText("No hit");
+          }
         } else {
-          debug_info[DEBUG_LINE_INFO].setText("Hitted count: " + count);
+          debug_info[DEBUG_LINE_INFO].setText("Time left: " + (cooldown - timer));
         }
       }
     }
