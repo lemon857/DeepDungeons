@@ -154,9 +154,9 @@ public class Room {
   }
 
   public void update(double delta) {
-    for (Mob mob : mobs) {
-      mob.update(delta);
-    }
+    // for (Mob mob : mobs) {
+    //   mob.update(delta);
+    // }
     for (Item item : items) {
       item.update(delta);
     }
@@ -215,7 +215,7 @@ public class Room {
   public double distanceToNearestMob(Vector2d cur_pos) {
     double res = 50;
     for (Mob mob : mobs) {
-      res = Math.min(res, Vector2d.distance(cur_pos, mob.getCenterPos()));
+      res = Math.min(res, Vector2d.distance(cur_pos, mob.getPos()));
     }
     return res;
   }
@@ -226,7 +226,7 @@ public class Room {
     int current_mob = -1;
 
     for (int i = 0; i < mobs.size(); ++i) {
-      if (Vector2d.distance(cur_pos, mobs.get(i).getCenterPos()) == distance) {
+      if (Vector2d.distance(cur_pos, mobs.get(i).getPos()) == distance) {
         current_mob = i;
         break;
       }
@@ -234,7 +234,7 @@ public class Room {
 
     if (current_mob == -1) return -1;
 
-    Vector2d v2 = new Vector2d(cur_pos, mobs.get(current_mob).getCenterPos());
+    Vector2d v2 = new Vector2d(cur_pos, mobs.get(current_mob).getPos());
 
     return Vector2d.angle(dir, v2);
   }
@@ -242,10 +242,10 @@ public class Room {
   public int tryHitMob(Vector2d player_pos, Vector2d dir, double damage, double max_distance, double max_angle) {
     int res = 0;
     for (int i = 0; i < mobs.size(); ++i) {
-      Vector2d v2 = new Vector2d(player_pos, mobs.get(i).getCenterPos());
+      Vector2d v2 = new Vector2d(player_pos, mobs.get(i).getPos());
 
       if (v2.lenght() > max_distance) continue;
-      if (Vector2d.angle(dir, v2) > max_angle) continue;
+      if (Math.abs(Vector2d.angle(dir, v2)) > max_angle) continue;
 
       mobs.remove(i); // damage (still critical)
       ++res;

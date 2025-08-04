@@ -10,7 +10,7 @@ public class Knife extends Item implements CloseRangeWeapon {
   public static final int HEIGHT = 7;
 
   public static final double DISTANCE = 7;
-  public static final double ANGLE = Math.sqrt(2)/2;
+  public static final double ANGLE = Math.PI / 4.0;
   public static final double DAMAGE = 1;
 
   public Knife(Point pos) {

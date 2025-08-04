@@ -5,7 +5,6 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.deepdungeons.game.items.Item;
-import com.deepdungeons.game.weapons.CloseRangeWeapon;
 
 public class Player {
   public static final int WIDTH = 7;
@@ -20,8 +19,6 @@ public class Player {
 
   private static final int START_BORDER = Room.START_BORDER + 1;
   private static final int END_BORDER = Room.END_BORDER - WIDTH;
-
-  private  static final Point POS_OFFSET = new Point(WIDTH / 2, HEIGHT / 2);
 
   private static final Color COLOR = new Color(0.8f, 0.7f, 0.9f, 0.7f);
   private static final Color EYE_COLOR = new Color(0, 0, 0, 1);
@@ -211,10 +208,6 @@ public class Player {
 
   public Vector2d getPos() {
     return pos;
-  }
-
-  public Vector2d getCenterPos() {
-    return Vector2d.sum(pos, POS_OFFSET);
   }
 
   public Vector2d getDirection() {

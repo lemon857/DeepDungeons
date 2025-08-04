@@ -36,11 +36,7 @@ public class Mob {
   public final Vector2d getPos() {
     return pos;
   }
-
-  public final Vector2d getCenterPos() {
-    return pos;
-  }
-
+  
   public final Pixmap getImage() {
     return image;
   }

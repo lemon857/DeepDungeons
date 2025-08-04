@@ -179,7 +179,8 @@ public class Main extends ApplicationAdapter {
     }
 
     player.translate(vector);
-
+    
+    // Use (pick up, put down, open door)
     if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
       if (req_door_id != -1) {
         if (Point.distance(player.getPos(), Room.GetDoorPosition(req_door_id)) < 4 && player.getItem() instanceof Key) {
@@ -213,10 +214,11 @@ public class Main extends ApplicationAdapter {
       }
     }
 
+    // Attack
     if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
       if (player.getItem() instanceof CloseRangeWeapon) {
         CloseRangeWeapon weapon = (CloseRangeWeapon)player.getItem();
-        int count = current_room.tryHitMob(player.getCenterPos(), player.getDirection(), weapon.getDamage(), weapon.getDistance(), weapon.getAngle());
+        int count = current_room.tryHitMob(player.getPos(), player.getDirection(), weapon.getDamage(), weapon.getDistance(), weapon.getAngle());
 
         if (count == 0) {
           debug_info[DEBUG_LINE_INFO].setText("No hit");
@@ -224,6 +226,12 @@ public class Main extends ApplicationAdapter {
           debug_info[DEBUG_LINE_INFO].setText("Hitted count: " + count);
         }
       }
+    }
+
+    // Spawn new mob
+    if (Gdx.input.isKeyJustPressed(Input.Keys.T)) {
+      current_room.addMob(new Skeleton(new Vector2d(player.getPos())));
+      //current_room.addMob(new Skeleton(new Vector2d(23, 35)));
     }
   }
 
