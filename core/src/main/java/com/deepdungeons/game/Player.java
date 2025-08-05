@@ -17,8 +17,8 @@ public class Player {
   public static final int EYE_LEFT = (WIDTH / 2) - 1;
   public static final int EYE_RIGHT = WIDTH - EYE_LEFT - 1;
 
-  private static final int START_BORDER = Room.START_BORDER + 1;
-  private static final int END_BORDER = Room.END_BORDER - WIDTH;
+  private static final Point START_BORDER = Point.sum(Room.START_BORDER, new Point(1, 1));
+  private static final Point END_BORDER = Point.sub(Room.END_BORDER, new Point(WIDTH, HEIGHT));
 
   private static final Color COLOR = new Color(0.8f, 0.7f, 0.9f, 0.7f);
   private static final Color EYE_COLOR = new Color(0, 0, 0, 1);
@@ -145,11 +145,11 @@ public class Player {
     pos.x += x;
     pos.y += y;
 
-    if (pos.x < START_BORDER) pos.x = START_BORDER;
-    else if (pos.x > END_BORDER) pos.x = END_BORDER;
+    if (pos.x < START_BORDER.x) pos.x = START_BORDER.x;
+    else if (pos.x > END_BORDER.x) pos.x = END_BORDER.x;
 
-    if (pos.y < START_BORDER) pos.y = START_BORDER;
-    else if (pos.y > END_BORDER) pos.y = END_BORDER;
+    if (pos.y < START_BORDER.y) pos.y = START_BORDER.y;
+    else if (pos.y > END_BORDER.y) pos.y = END_BORDER.y;
 
     if (x > 0) {
       if (y > 0) {
@@ -179,13 +179,13 @@ public class Player {
 
   public void setX(int x) {
     pos.x = x;
-    if (pos.x < START_BORDER) pos.x = START_BORDER;
-    else if (pos.x > END_BORDER) pos.x = END_BORDER;
+    if (pos.x < START_BORDER.x) pos.x = START_BORDER.x;
+    else if (pos.x > END_BORDER.x) pos.x = END_BORDER.x;
   }
   public void setY(int y) {
     pos.y = y;
-    if (pos.y < START_BORDER) pos.y = START_BORDER;
-    else if (pos.y > END_BORDER) pos.y = END_BORDER;
+    if (pos.y < START_BORDER.y) pos.y = START_BORDER.y;
+    else if (pos.y > END_BORDER.y) pos.y = END_BORDER.y;
   }
 
   public void update() {

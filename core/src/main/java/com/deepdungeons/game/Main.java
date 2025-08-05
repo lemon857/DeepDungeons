@@ -115,14 +115,13 @@ public class Main extends ApplicationAdapter {
     Key key = new_room.lockDoor(0);
     generate_key_require = new_room.lockDoor(2);
     generate_key_chance = 10;
-
-    new_room.addMob(new Skeleton(new Vector2d(15, 20)));
-    new_room.addMob(new Skeleton(new Vector2d(35, 23)));
-    new_room.addMob(new Skeleton(new Vector2d(23, 35)));
-
     new_room.addItem(key);
 
-    new_room.addItem(new Knife(new Point(10, 10)));
+    new_room.addMob(new Skeleton(new Vector2d(Room.START_BORDER.x + 15, Room.START_BORDER.y + 20)));
+    new_room.addMob(new Skeleton(new Vector2d(Room.START_BORDER.x + 35, Room.START_BORDER.y + 23)));
+    new_room.addMob(new Skeleton(new Vector2d(Room.START_BORDER.x + 23, Room.START_BORDER.y + 35)));
+
+    new_room.addItem(new Knife(new Point(Room.START_BORDER.x + 10, Room.START_BORDER.y + 10)));
 
     current_room_pos = new_room.getPos();
     rooms.put(current_room_pos, new_room);
@@ -146,7 +145,7 @@ public class Main extends ApplicationAdapter {
   }
 
   private void input() {
-    float speed = 20f;
+    float speed = 40f;
     float delta = Gdx.graphics.getDeltaTime();
 
     Point pos = new Point(player.getPos());
@@ -156,16 +155,16 @@ public class Main extends ApplicationAdapter {
       pos.y += 1;
       vector.y += speed * delta;
       // Top door
-      if (pos.x >= Room.DOOR_OFFSET - 3 && pos.x <= Room.DOOR_OFFSET + 4 && pos.y > Room.SCREEN_HEIGHT - Player.HEIGHT - Room.DOOR_HEIGHT - 1) {
-        if (tryGoToNextRoom(0)) player.setY(Room.DOOR_HEIGHT);
+      if (pos.x >= Room.DOOR_OFFSET.x - 3 && pos.x <= Room.DOOR_OFFSET.x + 4 && pos.y > Room.END_BORDER.y - Player.HEIGHT - Room.DOOR_HEIGHT) {
+        if (tryGoToNextRoom(0)) player.setY(Room.START_BORDER.y + Room.DOOR_HEIGHT);
       }
 
     } else if (Gdx.input.isKeyPressed(Input.Keys.S)) {
       pos.y -= 1;
       vector.y -= speed * delta;
       // Bottom door
-      if (pos.x >= Room.DOOR_OFFSET - 3 && pos.x <= Room.DOOR_OFFSET + 4 && pos.y < Room.DOOR_HEIGHT + 1) {
-        if (tryGoToNextRoom(2)) player.setY(Room.SCREEN_HEIGHT - Player.HEIGHT - Room.DOOR_HEIGHT - 1);
+      if (pos.x >= Room.DOOR_OFFSET.x - 3 && pos.x <= Room.DOOR_OFFSET.x + 4 && pos.y < Room.START_BORDER.y + Room.DOOR_HEIGHT + 1) {
+        if (tryGoToNextRoom(2)) player.setY(Room.END_BORDER.y - Player.HEIGHT - Room.DOOR_HEIGHT - 1);
       }
     }
     
@@ -173,16 +172,16 @@ public class Main extends ApplicationAdapter {
       pos.x += 1;
       vector.x += speed * delta;
       // Right door
-      if (pos.y >= Room.DOOR_OFFSET - 3 && pos.y <= Room.DOOR_OFFSET + 4 && pos.x > Room.SCREEN_WIDTH - Player.WIDTH - Room.DOOR_HEIGHT - 1) {
-        if (tryGoToNextRoom(1)) player.setX(Room.DOOR_HEIGHT);
+      if (pos.y >= Room.DOOR_OFFSET.y - 3 && pos.y <= Room.DOOR_OFFSET.y + 4 && pos.x > Room.END_BORDER.x - Player.WIDTH - Room.DOOR_HEIGHT - 1) {
+        if (tryGoToNextRoom(1)) player.setX(Room.START_BORDER.x + Room.DOOR_HEIGHT);
       }
       
     } else if (Gdx.input.isKeyPressed(Input.Keys.A)) {
       pos.x -= 1;
       vector.x -= speed * delta;
       // Left door
-      if (pos.y >= Room.DOOR_OFFSET - 3 && pos.y <= Room.DOOR_OFFSET + 4 && pos.x < Room.DOOR_HEIGHT + 1) {
-        if (tryGoToNextRoom(3)) player.setX(Room.SCREEN_WIDTH - Player.WIDTH - Room.DOOR_HEIGHT - 1);
+      if (pos.y >= Room.DOOR_OFFSET.y - 3 && pos.y <= Room.DOOR_OFFSET.y + 4 && pos.x < Room.START_BORDER.x + Room.DOOR_HEIGHT + 1) {
+        if (tryGoToNextRoom(3)) player.setX(Room.END_BORDER.x - Player.WIDTH - Room.DOOR_HEIGHT - 1);
       }
     }
 

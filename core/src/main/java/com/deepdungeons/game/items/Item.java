@@ -76,11 +76,11 @@ public class Item {
 
   public final void setPos(Point new_pos) {
     pos = Point.sum(new_pos, Point.div(size, 2));
-    if (pos.x + size.x > Room.END_BORDER) {
-      pos.x = Room.END_BORDER - size.x - 1;
+    if (pos.x + size.x > Room.END_BORDER.x) {
+      pos.x = Room.END_BORDER.x - size.x - 1;
     }
-    if (pos.y + size.y > Room.END_BORDER) {
-      pos.y = Room.END_BORDER - size.y - 1;
+    if (pos.y + size.y > Room.END_BORDER.y) {
+      pos.y = Room.END_BORDER.y - size.y - 1;
     }
   }
 

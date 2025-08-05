@@ -3,6 +3,7 @@ package com.deepdungeons.game.mobs;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
+import com.deepdungeons.game.Point;
 import com.deepdungeons.game.Room;
 import com.deepdungeons.game.Vector2d;
 
@@ -14,8 +15,8 @@ public class Skeleton extends Mob {
   public static final double MAX_HP_LOW = 1;
   public static final double MAX_HP_HIGH = 3;
 
-  private static final int START_BORDER = Room.START_BORDER;
-  private static final int END_BORDER = Room.END_BORDER - WIDTH;
+  private static final Point START_BORDER = Point.sum(Room.START_BORDER, new Point(1, 1));
+  private static final Point END_BORDER = Point.sub(Room.END_BORDER, new Point(WIDTH, HEIGHT));
 
   private static final Color COLOR = new Color(0.7f, 0.7f, 0.7f, 0.7f);
   private static final double SPEED = 50f; // TODO: use random speed
@@ -38,11 +39,11 @@ public class Skeleton extends Mob {
       case 2: pos.y += delta * SPEED; break;
       case 3: pos.x -= delta * SPEED; break;
       }
-      if (pos.x < START_BORDER) pos.x = START_BORDER;
-      else if (pos.x > END_BORDER) pos.x = END_BORDER;
+      if (pos.x < START_BORDER.x) pos.x = START_BORDER.x;
+      else if (pos.x > END_BORDER.x) pos.x = END_BORDER.x;
 
-      if (pos.y < START_BORDER) pos.y = START_BORDER;
-      else if (pos.y > END_BORDER) pos.y = END_BORDER;
+      if (pos.y < START_BORDER.y) pos.y = START_BORDER.y;
+      else if (pos.y > END_BORDER.y) pos.y = END_BORDER.y;
     }
   }
   

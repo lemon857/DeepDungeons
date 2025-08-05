@@ -12,19 +12,25 @@ import com.deepdungeons.game.items.Key;
 import com.deepdungeons.game.mobs.Mob;
 
 public class Room {
-  public static final int SCREEN_WIDTH = 100;
+  public static final int SCREEN_WIDTH = 150;
   public static final int SCREEN_HEIGHT = 100;
 
-  public  static final int START_BORDER = 1;
-  public static final int END_BORDER = SCREEN_WIDTH - 2;
+  public static final int WIDTH = 100;
+  public static final int HEIGHT = 100;
+
+  public static final int SHIFT_X = 25;
+
+  public static final Point START_BORDER = new Point(SHIFT_X + 1, 1);
+  public static final Point END_BORDER = Point.sum(START_BORDER, new Point(WIDTH - 3, HEIGHT - 3));
 
   // for horizontal position
   public static final int DOOR_WIDTH = 10;
   public static final int DOOR_KEY_WIDTH = DOOR_WIDTH - 8;
   public static final int DOOR_HEIGHT = 1;
 
-  public static final int DOOR_OFFSET = (SCREEN_WIDTH - DOOR_WIDTH) / 2;
-  public static final int DOOR_KEY_OFFSET = (SCREEN_WIDTH - DOOR_KEY_WIDTH) / 2;
+  // x - for x axis, y - for y axis
+  public static final Point DOOR_OFFSET = new Point(START_BORDER.x + (WIDTH - DOOR_WIDTH) / 2, START_BORDER.y + (HEIGHT - DOOR_WIDTH) / 2);
+  public static final Point DOOR_KEY_OFFSET = new Point(START_BORDER.x + (WIDTH - DOOR_KEY_WIDTH) / 2, START_BORDER.y + (HEIGHT - DOOR_KEY_WIDTH) / 2);
 
   public static final int MAX_DOORS_COUNT = 4;
 
@@ -70,10 +76,10 @@ public class Room {
 
   public static Point GetDoorPosition(int door_id) {
     switch (door_id) {
-      case 0: return new Point(DOOR_OFFSET, SCREEN_HEIGHT - DOOR_WIDTH);
-      case 1: return new Point(SCREEN_WIDTH - DOOR_WIDTH, DOOR_OFFSET);
-      case 2: return new Point(DOOR_OFFSET, 1);
-      case 3: return new Point(1, DOOR_OFFSET);
+      case 0: return new Point(DOOR_OFFSET.x, END_BORDER.y - DOOR_WIDTH);
+      case 1: return new Point(END_BORDER.x - DOOR_WIDTH, DOOR_OFFSET.y);
+      case 2: return new Point(DOOR_OFFSET.x, START_BORDER.y);
+      case 3: return new Point(START_BORDER.x, DOOR_OFFSET.y);
       default: return new Point(-1, -1);
     }
   }
@@ -81,6 +87,8 @@ public class Room {
   // Room
   // must_doors: -1 - door must empty, 0 - nevermind, 1 - doors must be
   public Room(Point pos, int[] must_doors) {
+    System.out.println("Room Start X: " + START_BORDER.x + " Start Y: " + START_BORDER.y);
+    System.out.println("Room End X: " + END_BORDER.x + " End Y: " + END_BORDER.y);
     this.rand = new Random();
     this.pos = pos;
 
@@ -120,8 +128,8 @@ public class Room {
     lock_doors_color[door_id] = new Color(rand.nextFloat(1), rand.nextFloat(1), rand.nextFloat(1), 1);
     Point new_pos = new Point();
     do {
-    new_pos.x = rand.nextInt(Key.WIDTH + 1, SCREEN_WIDTH - Key.WIDTH - 1);
-    new_pos.y = rand.nextInt(Key.HEIGHT + 1, SCREEN_HEIGHT - Key.HEIGHT - 1);
+    new_pos.x = rand.nextInt(Key.WIDTH + START_BORDER.x + 1, END_BORDER.x - Key.WIDTH - 1);
+    new_pos.y = rand.nextInt(START_BORDER.y + Key.HEIGHT + 1, END_BORDER.y - Key.HEIGHT - 1);
     } while(distanceToNearestItem(new_pos) < 7);
 
     non_actual = true;
@@ -269,7 +277,7 @@ public class Room {
 
   public void draw(SpriteBatch batch) {
     // correct coords for correct Pixmap drawing
-    batch.draw(background_texture, 0, SCREEN_HEIGHT, SCREEN_WIDTH, -SCREEN_HEIGHT);
+    batch.draw(background_texture, SHIFT_X, HEIGHT, WIDTH, -HEIGHT);
 
     for (Item item : items) {
       item.draw(batch);
@@ -281,28 +289,33 @@ public class Room {
   }
 
   public void generateBackground() {
-    Pixmap map = new Pixmap(SCREEN_WIDTH, SCREEN_HEIGHT, Pixmap.Format.RGB888);
+    Pixmap map = new Pixmap(WIDTH, HEIGHT, Pixmap.Format.RGB888);
 
     map.setColor(BORDER_COLOR);
 
-    map.drawLine(START_BORDER, START_BORDER, START_BORDER, END_BORDER);
-    map.drawLine(START_BORDER, START_BORDER, END_BORDER, START_BORDER);
+    final Point start = new Point(START_BORDER.x - SHIFT_X, START_BORDER.y);
+    final Point end = new Point(END_BORDER.x - START_BORDER.x + 1, END_BORDER.y);
 
-    map.drawLine(END_BORDER, END_BORDER, START_BORDER, END_BORDER);
-    map.drawLine(END_BORDER, END_BORDER, END_BORDER, START_BORDER);
+    map.drawLine(start.x, start.y, start.x, end.y);
+    map.drawLine(start.x, start.y, end.x, start.y);
+
+    map.drawLine(end.x, end.y, start.x, end.y);
+    map.drawLine(end.x, end.y, end.x, start.x);
 
 
+    final Point door_offset = new Point(DOOR_OFFSET.x - SHIFT_X, DOOR_OFFSET.y);
+    final Point door_key_offset = new Point(DOOR_KEY_OFFSET.x - SHIFT_X, DOOR_KEY_OFFSET.y);
     // Top door
     if (doors[0]) {
       if (lock_doors[0] != 0) { 
         map.setColor(CLOSED_DOOR_COLOR);
-        map.drawRectangle(DOOR_OFFSET, SCREEN_HEIGHT - DOOR_HEIGHT - 1, DOOR_WIDTH, DOOR_HEIGHT);
+        map.drawRectangle(door_offset.x, HEIGHT - DOOR_HEIGHT - 1, DOOR_WIDTH, DOOR_HEIGHT);
         map.setColor(lock_doors_color[0]);
-        map.drawRectangle(DOOR_KEY_OFFSET, SCREEN_HEIGHT - DOOR_HEIGHT - 1, DOOR_KEY_WIDTH, DOOR_HEIGHT);
+        map.drawRectangle(door_key_offset.x, HEIGHT - DOOR_HEIGHT - 1, DOOR_KEY_WIDTH, DOOR_HEIGHT);
       }
       else {
         map.setColor(OPENED_DOOR_COLOR);
-        map.drawRectangle(DOOR_OFFSET, SCREEN_HEIGHT - DOOR_HEIGHT - 1, DOOR_WIDTH, DOOR_HEIGHT);
+        map.drawRectangle(door_offset.x, HEIGHT - DOOR_HEIGHT - 1, DOOR_WIDTH, DOOR_HEIGHT);
       }
     }
 
@@ -310,13 +323,13 @@ public class Room {
     if (doors[1]) {
       if (lock_doors[1] != 0) {
         map.setColor(CLOSED_DOOR_COLOR);
-        map.drawRectangle(SCREEN_WIDTH - DOOR_HEIGHT - 1, DOOR_OFFSET, DOOR_HEIGHT, DOOR_WIDTH);
+        map.drawRectangle(WIDTH - DOOR_HEIGHT - 1, door_offset.y, DOOR_HEIGHT, DOOR_WIDTH);
         map.setColor(lock_doors_color[1]);
-        map.drawRectangle(SCREEN_WIDTH - DOOR_HEIGHT - 1,  DOOR_KEY_OFFSET, DOOR_HEIGHT, DOOR_KEY_WIDTH);
+        map.drawRectangle(WIDTH - DOOR_HEIGHT - 1,  door_key_offset.y, DOOR_HEIGHT, DOOR_KEY_WIDTH);
       }
       else {
         map.setColor(OPENED_DOOR_COLOR);
-        map.drawRectangle(SCREEN_WIDTH - DOOR_HEIGHT - 1, DOOR_OFFSET, DOOR_HEIGHT, DOOR_WIDTH);
+        map.drawRectangle(WIDTH - DOOR_HEIGHT - 1, door_offset.y, DOOR_HEIGHT, DOOR_WIDTH);
       }
     }
 
@@ -324,13 +337,13 @@ public class Room {
     if (doors[2]) {
       if (lock_doors[2] != 0) {
         map.setColor(CLOSED_DOOR_COLOR);
-        map.drawRectangle(DOOR_OFFSET, 1, DOOR_WIDTH, DOOR_HEIGHT);
+        map.drawRectangle(door_offset.x, 1, DOOR_WIDTH, DOOR_HEIGHT);
         map.setColor(lock_doors_color[2]);
-        map.drawRectangle(DOOR_KEY_OFFSET, 1, DOOR_KEY_WIDTH, DOOR_HEIGHT);
+        map.drawRectangle(door_key_offset.x, 1, DOOR_KEY_WIDTH, DOOR_HEIGHT);
       }
       else {
         map.setColor(OPENED_DOOR_COLOR);
-        map.drawRectangle(DOOR_OFFSET, 1, DOOR_WIDTH, DOOR_HEIGHT);
+        map.drawRectangle(door_offset.x, 1, DOOR_WIDTH, DOOR_HEIGHT);
       }
     }
 
@@ -338,13 +351,13 @@ public class Room {
     if (doors[3]) {
       if (lock_doors[3] != 0) {
         map.setColor(CLOSED_DOOR_COLOR);
-        map.drawRectangle(1, DOOR_OFFSET, DOOR_HEIGHT, DOOR_WIDTH);
+        map.drawRectangle(1, door_offset.y, DOOR_HEIGHT, DOOR_WIDTH);
         map.setColor(lock_doors_color[3]);
-        map.drawRectangle(1, DOOR_KEY_OFFSET, DOOR_HEIGHT, DOOR_KEY_WIDTH);
+        map.drawRectangle(1, door_key_offset.y, DOOR_HEIGHT, DOOR_KEY_WIDTH);
       }
       else {
         map.setColor(OPENED_DOOR_COLOR);
-        map.drawRectangle(1, DOOR_OFFSET, DOOR_HEIGHT, DOOR_WIDTH);
+        map.drawRectangle(1, door_offset.y, DOOR_HEIGHT, DOOR_WIDTH);
       }
     }
 

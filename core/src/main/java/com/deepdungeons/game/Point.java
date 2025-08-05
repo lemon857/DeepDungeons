@@ -24,6 +24,10 @@ public class Point {
     this.y = (int)point.y;
   }
 
+  public final void print() {
+    System.out.println("X: " + x + " Y: " + y);
+  }
+
   public static Point sum(Point a, Point b) {
     return new Point(a.x + b.x, a.y + b.y);
   }
