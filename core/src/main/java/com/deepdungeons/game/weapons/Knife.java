@@ -10,7 +10,7 @@ public class Knife extends Item implements CloseRangeWeapon {
   public static final int WIDTH = 4;
   public static final int HEIGHT = 7;
 
-  public static final double DISTANCE = 7;
+  public static final double DISTANCE = 8.5;
   public static final double ANGLE = Math.PI / 4.0;
   public static final double DAMAGE = 1;
   public static final double COOLDOWN = 0.5;
@@ -37,7 +37,7 @@ public class Knife extends Item implements CloseRangeWeapon {
     image.drawPixel(2,4);
     image.drawPixel(2, 5);
     image.drawPixel(1, 6);
-    
+
     texture = new Texture(image);
   }
 

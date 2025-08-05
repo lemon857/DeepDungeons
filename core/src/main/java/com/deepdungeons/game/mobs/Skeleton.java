@@ -11,8 +11,8 @@ public class Skeleton extends Mob {
   public static final int WIDTH = 7;
   public static final int HEIGHT = 7;
 
-  public static final double MAX_HP_LOW = 7;
-  public static final double MAX_HP_HIGH = 12;
+  public static final double MAX_HP_LOW = 1;
+  public static final double MAX_HP_HIGH = 3;
 
   private static final int START_BORDER = Room.START_BORDER;
   private static final int END_BORDER = Room.END_BORDER - WIDTH;
@@ -58,12 +58,17 @@ public class Skeleton extends Mob {
   @Override
   public boolean damage(double dmg) {
     health_points -= dmg;
-    //if (health_points < MAX_HP * 0.7 && health_points > MAX_HP * 0.4) {
+    for (int i = 0; i < 2; ++i) {
+      int x = rand.nextInt(0, WIDTH);
+      int y = rand.nextInt(0, HEIGHT);
+      while (image.getPixel(x, y) == 0) {
+        x = rand.nextInt(0, WIDTH);
+        y = rand.nextInt(0, HEIGHT);
+      }
       image.setColor(0, 0, 0, 1);
-      image.drawPixel(rand.nextInt(0, WIDTH), rand.nextInt(0, HEIGHT));
-      image.drawPixel(rand.nextInt(0, WIDTH), rand.nextInt(0, HEIGHT));
-      texture = new Texture(image);
-    //}
+      image.drawPixel(x, y);
+    }
+    texture = new Texture(image);
     return health_points <= 0;
   }
 }

@@ -26,7 +26,7 @@ public class Mob {
   public Mob() {
     this.id = current_id;
     ++current_id;
-    this.rand = new Random(System.currentTimeMillis() * current_id);
+    this.rand = new Random();
   }
 
   public void update(double delta) {}

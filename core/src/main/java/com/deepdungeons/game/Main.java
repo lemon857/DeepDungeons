@@ -61,16 +61,16 @@ public class Main extends ApplicationAdapter {
 
   private static final int DEBUG_LINE_INFO = 0;
   private static final int DEBUG_LINE_DISTANCE = 1;
-  private static final int DEBUG_LINE_PLAYER_POS = 2;
-  private static final int DEBUG_LINE_ROOM_POS = 3;
-  private static final int DEBUG_LINE_ANGLE = 4;
+  private static final int DEBUG_LINE_ANGLE = 2;
+  private static final int DEBUG_LINE_PLAYER_POS = 3;
+  private static final int DEBUG_LINE_ROOM_POS = 4;
   private static final int DEBUG_LINE_ITEM_NAME = 5;
 
   @Override
   public void create() {
-    rand = new Random(System.currentTimeMillis());
+    rand = new Random();
     batch = new SpriteBatch();
-    viewport = new FitViewport(50, 50);
+    viewport = new FitViewport(Room.SCREEN_WIDTH, Room.SCREEN_HEIGHT);
     stage = new Stage();
     Gdx.input.setInputProcessor(stage);
 
@@ -241,7 +241,7 @@ public class Main extends ApplicationAdapter {
       }
     }
 
-    // Spawn new mob
+    // Spawn new mob.
     if (Gdx.input.isKeyJustPressed(Input.Keys.T)) {
       current_room.addMob(new Skeleton(new Vector2d(player.getPos())));
       //current_room.addMob(new Skeleton(new Vector2d(23, 35)));
@@ -266,8 +266,8 @@ public class Main extends ApplicationAdapter {
   private void logic() {
     player.update();
     current_room.update(Gdx.graphics.getDeltaTime());
-    debug_info[DEBUG_LINE_DISTANCE].setText("Dis to item: " + current_room.distanceToNearestItem(player.getPos()));
-    //debug_info[DEBUG_LINE_DISTANCE].setText("Dis to mob: " + current_room.distanceToNearestMob(player.getPos()));
+    //debug_info[DEBUG_LINE_DISTANCE].setText("Dis to item: " + current_room.distanceToNearestItem(player.getPos()));
+    debug_info[DEBUG_LINE_DISTANCE].setText("Dis to mob: " + current_room.distanceToNearestMob(player.getPos()));
     debug_info[DEBUG_LINE_ANGLE].setText("Angle to mob: " + current_room.angleToNearestMob(player.getPos(), player.getDirection()));
     Point pos = new Point(player.getPos());
 

@@ -12,8 +12,8 @@ import com.deepdungeons.game.items.Key;
 import com.deepdungeons.game.mobs.Mob;
 
 public class Room {
-  public static final int SCREEN_WIDTH = 50;
-  public static final int SCREEN_HEIGHT = 50;
+  public static final int SCREEN_WIDTH = 100;
+  public static final int SCREEN_HEIGHT = 100;
 
   public  static final int START_BORDER = 1;
   public static final int END_BORDER = SCREEN_WIDTH - 2;
@@ -81,7 +81,7 @@ public class Room {
   // Room
   // must_doors: -1 - door must empty, 0 - nevermind, 1 - doors must be
   public Room(Point pos, int[] must_doors) {
-    this.rand = new Random(System.currentTimeMillis() * pos.x * pos.y);
+    this.rand = new Random();
     this.pos = pos;
 
     this.doors = new boolean[] {false, false, false, false};
