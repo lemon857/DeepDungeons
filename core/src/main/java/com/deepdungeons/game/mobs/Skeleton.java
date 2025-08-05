@@ -18,7 +18,7 @@ public class Skeleton extends Mob {
   private static final int END_BORDER = Room.END_BORDER - WIDTH;
 
   private static final Color COLOR = new Color(0.7f, 0.7f, 0.7f, 0.7f);
-  private static final double SPEED = 50f;
+  private static final double SPEED = 50f; // TODO: use random speed
 
   public Skeleton(Vector2d pos) {
     super();

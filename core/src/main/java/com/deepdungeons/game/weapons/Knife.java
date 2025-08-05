@@ -1,6 +1,7 @@
 package com.deepdungeons.game.weapons;
 
 import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
 import com.deepdungeons.game.Point;
 import com.deepdungeons.game.items.Item;
 
@@ -15,7 +16,7 @@ public class Knife extends Item implements CloseRangeWeapon {
   public static final double COOLDOWN = 0.5;
 
   public Knife(Point pos) {
-    super(Item.Type.Weapon);
+    super(Item.Type.Weapon, "Knife");
     this.pos = pos;
     this.size = new Point(WIDTH, HEIGHT);
 
@@ -36,6 +37,8 @@ public class Knife extends Item implements CloseRangeWeapon {
     image.drawPixel(2,4);
     image.drawPixel(2, 5);
     image.drawPixel(1, 6);
+    
+    texture = new Texture(image);
   }
 
   @Override

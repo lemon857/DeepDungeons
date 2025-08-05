@@ -28,6 +28,8 @@ public class Room {
 
   public static final int MAX_DOORS_COUNT = 4;
 
+  public static final double PICK_UP_MAX_DISTANCE = 4.2;
+
   private static final Color BORDER_COLOR = new Color(1, 0, 0, 0.25f);
   private static final Color OPENED_DOOR_COLOR = new Color(0.5f, 0.3f, 0.13f, 1);
   private static final Color CLOSED_DOOR_COLOR = new Color(1, 0.3f, 0.3f, 0.5f);
@@ -36,9 +38,7 @@ public class Room {
 
   private final Point pos;
 
-  private Pixmap image;
   private Texture background_texture;
-  private Texture texture;
 
   //private Texture debug_texture;
 
@@ -90,8 +90,6 @@ public class Room {
     this.non_actual = true;
     this.items = new ArrayList<>();
     this.mobs = new ArrayList<>();
-    this.image = new Pixmap(SCREEN_WIDTH, SCREEN_HEIGHT, Pixmap.Format.RGBA8888);
-    this.texture = new Texture(this.image);
 
     // Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGB888);
     // pixmap.setColor(1, 1, 1, 1);
@@ -167,37 +165,42 @@ public class Room {
 
     if (non_actual) {
       generateBackground();
-      image = new Pixmap(SCREEN_WIDTH, SCREEN_HEIGHT, Pixmap.Format.RGBA8888);
-      generateItems();
-      updateTexture();
       non_actual = false;
     }
   }
 
   public void addMob(Mob mob) {
     mobs.add(mob);
-    non_actual = true;
   }
 
   public void addItem(Item item) {
     items.add(item);
-    non_actual = true;
   }
 
   public Item grabItem() {
     items.remove(can_grab_item);
-    non_actual = true;
     return can_grab_item;
   }
 
   public boolean canGrabItem(Vector2d cur_pos) {
     for (Item item : items) {
-      if (Point.distance(cur_pos, item.getPos()) < 4.2) {
+      if (Point.distance(cur_pos, item.getPos()) < PICK_UP_MAX_DISTANCE) {
         can_grab_item = item;
         return true;
       }
     }
     return false;
+  }
+
+  public Item getNearestItem(Vector2d cur_pos) {
+    double res = 50;
+    for (Item item : items) {
+      res = Math.min(res, Point.distance(cur_pos, item.getPos()));
+    }
+    for (Item item : items) {
+      if (Point.distance(cur_pos, item.getPos()) == res) return item;
+    }
+    return null;    
   }
 
   public double distanceToNearestItem(Point cur_pos) {
@@ -267,7 +270,10 @@ public class Room {
   public void draw(SpriteBatch batch) {
     // correct coords for correct Pixmap drawing
     batch.draw(background_texture, 0, SCREEN_HEIGHT, SCREEN_WIDTH, -SCREEN_HEIGHT);
-    batch.draw(texture, 0, SCREEN_HEIGHT, SCREEN_WIDTH, -SCREEN_HEIGHT);
+
+    for (Item item : items) {
+      item.draw(batch);
+    }
 
     for (Mob mob : mobs) {
       mob.draw(batch);
@@ -343,20 +349,6 @@ public class Room {
     }
 
     background_texture = new Texture(map);
-  }
-
-  public void generateItems() {
-    Pixmap map = new Pixmap(SCREEN_WIDTH, SCREEN_HEIGHT, Pixmap.Format.RGBA8888);
-
-    for (Item item : items) {
-      item.draw(map);
-    }
-
-    image.drawPixmap(map, 0, 0);
-  }
-
-  private void updateTexture() {
-    texture = new Texture(image);
   }
 
   public void printDoors() {

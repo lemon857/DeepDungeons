@@ -51,17 +51,20 @@ public class Main extends ApplicationAdapter {
 
   private Random rand;
 
+  private boolean show_item_info;
+
   private Label[] debug_info;
   private static final Point DEBUG_START = new Point(10, 10);
   private static final int DEBUG_Y_STEP = 15;
 
-  private static final int DEBUG_LINES = 5;
+  private static final int DEBUG_LINES = 6;
 
   private static final int DEBUG_LINE_INFO = 0;
   private static final int DEBUG_LINE_DISTANCE = 1;
   private static final int DEBUG_LINE_PLAYER_POS = 2;
   private static final int DEBUG_LINE_ROOM_POS = 3;
   private static final int DEBUG_LINE_ANGLE = 4;
+  private static final int DEBUG_LINE_ITEM_NAME = 5;
 
   @Override
   public void create() {
@@ -132,6 +135,7 @@ public class Main extends ApplicationAdapter {
     req_door_id = -1;
     timer = 0;
     cooldown = 0;
+    show_item_info = false;
   }
 
   @Override
@@ -242,17 +246,36 @@ public class Main extends ApplicationAdapter {
       current_room.addMob(new Skeleton(new Vector2d(player.getPos())));
       //current_room.addMob(new Skeleton(new Vector2d(23, 35)));
     }
+
+    // Get item info
+    if (Gdx.input.isKeyJustPressed(Input.Keys.I)) {
+      show_item_info = !show_item_info;
+      if (current_room.distanceToNearestItem(player.getPos()) < Room.PICK_UP_MAX_DISTANCE && show_item_info) {
+        Item item = current_room.getNearestItem(player.getPos());
+        debug_info[DEBUG_LINE_ITEM_NAME].setColor(1, 0, 1, 1);
+        debug_info[DEBUG_LINE_ITEM_NAME].setFontScale(3);
+        debug_info[DEBUG_LINE_ITEM_NAME].setVisible(true);
+        debug_info[DEBUG_LINE_ITEM_NAME].setText(item.getName());
+        debug_info[DEBUG_LINE_ITEM_NAME].setPosition(item.getCenterPos().x * 10, item.getCenterPos().y * 10);
+      } else {
+        debug_info[DEBUG_LINE_ITEM_NAME].setVisible(false);
+      }
+    }
   }
 
   private void logic() {
     player.update();
     current_room.update(Gdx.graphics.getDeltaTime());
-    //debug_info[DEBUG_LINE_DISTANCE].setText("Dis to item: " + current_room.distanceToNearestItem(player.getPos()));
-    debug_info[DEBUG_LINE_DISTANCE].setText("Dis to mob: " + current_room.distanceToNearestMob(player.getPos()));
+    debug_info[DEBUG_LINE_DISTANCE].setText("Dis to item: " + current_room.distanceToNearestItem(player.getPos()));
+    //debug_info[DEBUG_LINE_DISTANCE].setText("Dis to mob: " + current_room.distanceToNearestMob(player.getPos()));
     debug_info[DEBUG_LINE_ANGLE].setText("Angle to mob: " + current_room.angleToNearestMob(player.getPos(), player.getDirection()));
     Point pos = new Point(player.getPos());
 
     debug_info[DEBUG_LINE_PLAYER_POS].setText("Player X: " + pos.x + " Y: " + pos.y);
+    if (current_room.distanceToNearestItem(player.getPos()) > Room.PICK_UP_MAX_DISTANCE) {
+      debug_info[DEBUG_LINE_ITEM_NAME].setVisible(false);
+      show_item_info = false;
+    }
   }
 
   private void draw() {

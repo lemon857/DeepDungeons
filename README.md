@@ -30,6 +30,7 @@ A  | Go left
 S  | Go down
 D  | Go right
 E  | Use (pick up, put down, open locked door)
+I  | Get info about item
 Space  | Attack
 *Debug features*
 T  | Spawn new skeleton *(for debug)*

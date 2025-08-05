@@ -2,6 +2,7 @@ package com.deepdungeons.game.items;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
 import com.deepdungeons.game.Point;
 
 public class Key extends Item {
@@ -12,7 +13,7 @@ public class Key extends Item {
   private final Color color;
 
   public Key(int key, Color color, Point pos) {
-    super(Item.Type.Key);
+    super(Item.Type.Key, "Key");
     this.key = key;
     this.color = color;
     this.pos = pos;
@@ -48,6 +49,8 @@ public class Key extends Item {
 
     image.drawPixel(5, 1);
     image.drawPixel(6, 1);
+    
+    texture = new Texture(image);
   }
 
   @Override
