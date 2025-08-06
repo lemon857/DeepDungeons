@@ -240,12 +240,6 @@ public class Main extends ApplicationAdapter {
       }
     }
 
-    // Spawn new mob.
-    if (Gdx.input.isKeyJustPressed(Input.Keys.T)) {
-      current_room.addMob(new Skeleton(new Vector2d(player.getPos())));
-      //current_room.addMob(new Skeleton(new Vector2d(23, 35)));
-    }
-
     // Get item info
     if (Gdx.input.isKeyJustPressed(Input.Keys.I)) {
       show_item_info = !show_item_info;
@@ -259,6 +253,21 @@ public class Main extends ApplicationAdapter {
       } else {
         debug_info[DEBUG_LINE_ITEM_NAME].setVisible(false);
       }
+    }
+
+    // [DEBUG] Spawn new mob
+    if (Gdx.input.isKeyJustPressed(Input.Keys.T)) {
+      current_room.addMob(new Skeleton(new Vector2d(player.getPos())));
+    }
+
+    // [DEBUG] Self damage
+    if (Gdx.input.isKeyJustPressed(Input.Keys.G)) {
+      player.damage(1);
+    }
+    
+    // [DEBUG] Self treat
+    if (Gdx.input.isKeyJustPressed(Input.Keys.H)) {
+      player.treat(1);
     }
   }
 
@@ -311,10 +320,8 @@ public class Main extends ApplicationAdapter {
     }
 
     Point new_pos = Point.sum(current_room_pos, Room.GetRoomDeltaFromDoor(door_id));
-    System.out.printf("----------------------\nNext pos: sx: %d y: %d\nContains: %b\n", new_pos.x, new_pos.y, rooms.containsKey(new_pos));
 
     if (!rooms.containsKey(new_pos)) {
-      System.out.printf("Create room from: x: %d y: %d\n", current_room_pos.x, current_room_pos.y);
 
       current_room_pos = Point.sub(current_room_pos, Room.GetRoomDeltaFromDoor((door_id + 2) % 4));
 
@@ -322,8 +329,6 @@ public class Main extends ApplicationAdapter {
       for (int i = 0; i < 4; ++i) {
         Point cur_room = Point.sum(current_room_pos, Room.GetRoomDeltaFromDoor(i));
         if (rooms.containsKey(cur_room)) {
-          System.out.println("Check pos: X: " + cur_room.x + " Y: " + cur_room.y + " Check door: " + ((i + 2) % 4) + " from: " + i + " res: " + rooms.get(cur_room).isDoorExist((i + 2) % 4));
-
           if (rooms.get(cur_room).isDoorExist((i + 2) % 4)) {
             must_doors[i] = 1;
           } else {
@@ -353,7 +358,6 @@ public class Main extends ApplicationAdapter {
 
     current_room = rooms.get(current_room_pos);
 
-    rooms.get(current_room_pos).printDoors();
     debug_info[DEBUG_LINE_ROOM_POS].setText("Room X: " + current_room_pos.x + " Y: " + current_room_pos.y);
     return true;
   }

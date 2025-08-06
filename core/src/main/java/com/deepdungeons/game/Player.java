@@ -1,5 +1,7 @@
 package com.deepdungeons.game;
 
+import java.util.Random;
+
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
@@ -9,6 +11,8 @@ import com.deepdungeons.game.items.Item;
 public class Player {
   public static final int WIDTH = 7;
   public static final int HEIGHT = 7;
+
+  public static final int MAX_HP = 30;
 
   public static final int EYE_DOWN = (HEIGHT / 2) - 1;
   public static final int EYE_UP = HEIGHT - EYE_DOWN - 1;
@@ -21,20 +25,35 @@ public class Player {
   private static final Point END_BORDER = Point.sub(Room.END_BORDER, new Point(WIDTH, HEIGHT));
 
   private static final Color COLOR = new Color(0.8f, 0.7f, 0.9f, 0.7f);
+  private static final Color HEALTH_COLOR = new Color(1f, 0f, 0.2f, 1f);
+  private static final Color DEAD_HEALTH_COLOR = new Color(0.8f, 0.5f, 0.65f, 1f);
   private static final Color EYE_COLOR = new Color(0, 0, 0, 1);
 
   private static final double HALF_SQUARE_SUM = Math.sqrt(2)/2;
 
+  private final Random rand;
+
   private final Vector2d pos;
   private Texture image;
 
-  private Texture inventory_image;
+  private Texture inventory_texture;
+
+  private Pixmap health_map;
+
+  private final Pixmap hearts[];
+  private Pixmap heart_mask;
+
+  private Texture health_texture;
 
   private Direction dir;
 
   private boolean non_actual;
 
   private Item inventory;
+
+  private static final int WHITE_IN_HEART_MASK = -1;
+
+  private int health_points;
 
   public enum Direction {
     Up, Down, Right, Left,
@@ -58,11 +77,24 @@ public class Player {
   }
 
   public Player(int x, int y) {
+    this.rand = new Random();
     this.pos = new Vector2d(x, y);
     this.dir = Direction.Up;
-    this.non_actual = true;
+    this.non_actual = false;
+    this.health_points = MAX_HP;
     Pixmap map = new Pixmap(18, 6, Pixmap.Format.RGBA8888);
-    inventory_image = new Texture(map);
+    inventory_texture = new Texture(map);
+
+    generateHeartMask();
+
+    hearts = new Pixmap[]{ generateHeart(), generateHeart(), generateHeart() };
+
+    generatePlayerImage();
+    generateInventoryTexture();
+    generateHealthTexture();
+
+    System.out.println("Black: " + Color.BLACK.toIntBits());
+    System.out.println("Health color: " + HEALTH_COLOR.toIntBits());
   }
 
   private void generatePlayerImage() {
@@ -110,13 +142,69 @@ public class Player {
     image = new Texture(map);
   }
 
-  private void generateInventoryImage() {
+  private void generateInventoryTexture() {
     if (inventory != null) {
-      inventory_image = new Texture(inventory.getImage());
+      inventory_texture = new Texture(inventory.getImage());
     } else {
       Pixmap map = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
-      inventory_image = new Texture(map);
+      inventory_texture = new Texture(map);
     }
+  }
+
+  private void generateHeartMask() {
+    int width = 7;
+    int height = 7;
+    heart_mask = new Pixmap(width, height, Pixmap.Format.RGBA4444);
+
+    heart_mask.setColor(1, 1, 1, 1);
+    heart_mask.fillCircle(width / 2, height / 2, width / 2);
+
+    heart_mask.setColor(0, 0, 0, 1);
+    heart_mask.drawLine(width / 2, height / 2 + 1, width / 2, height - 1);
+    heart_mask.drawLine(width / 2 - 2, height - 1, width / 2 + 2, height - 1);
+    heart_mask.drawLine(width / 2 - 1, height - 2, width / 2 + 1, height - 2);
+
+    // for (int i = 0; i < heart_mask.getWidth(); ++i) {
+    //   for (int j = 0; j < heart_mask.getHeight(); ++j) {
+    //     // if (heart_mask.getPixel(i, j) != BLACK_IN_HEART_MASK) {
+    //     //   ++count_heart_pixels;
+    //     // }
+    //     System.out.print(heart_mask.getPixel(i, j) + " ");
+    //   }
+    //   System.out.print("\n");
+    // }
+
+    //System.out.println("0: " + heart_mask.getPixel(0, 0) + " 1: " + heart_mask.getPixel(WIDTH / 2, HEIGHT / 2));
+  }
+
+  private Pixmap generateHeart() {
+    Pixmap map = new Pixmap(heart_mask.getWidth(), heart_mask.getHeight(), Pixmap.Format.RGB888);
+
+    for (int i = 0; i < heart_mask.getWidth(); ++i) {
+      for (int j = 0; j < heart_mask.getHeight(); ++j) {
+        if (heart_mask.getPixel(i, j) == WHITE_IN_HEART_MASK) {
+          map.setColor(HEALTH_COLOR);
+          map.drawPixel(i, j);
+        }
+      }
+    }
+
+    return map;
+  }
+
+  private void generateHealthTexture() {
+    health_map = new Pixmap(WIDTH * 4, HEIGHT * 4, Pixmap.Format.RGBA8888);
+
+    health_map.drawPixmap(hearts[0], 0, HEIGHT * 3);
+    health_map.drawPixmap(hearts[1], WIDTH + 1, HEIGHT * 3);
+    health_map.drawPixmap(hearts[2], WIDTH * 2 + 2, HEIGHT * 3);
+
+    health_map.setColor(HEALTH_COLOR);
+    health_map.drawPixel(0, 0);
+    health_map.setColor(COLOR);
+    health_map.drawPixel(WIDTH * 4 - 1, HEIGHT * 4 - 1);
+
+    health_texture = new Texture(health_map);
   }
 
   public Item getItem() {
@@ -191,7 +279,7 @@ public class Player {
   public void update() {
     if (non_actual) {
       generatePlayerImage();
-      generateInventoryImage();
+      generateInventoryTexture();
       non_actual = false;
     }
   }
@@ -201,9 +289,10 @@ public class Player {
     batch.draw(image, (float)pos.x, (float)pos.y + (float)HEIGHT,
     (float)WIDTH, -(float)HEIGHT);
     if (inventory != null) {
-      batch.draw(inventory_image, (float)pos.x + 5.5f, (float)pos.y + 4.5f + inventory.getSize().y * 0.6f, 
+      batch.draw(inventory_texture, (float)pos.x + 5.5f, (float)pos.y + 4.5f + inventory.getSize().y * 0.6f, 
       inventory.getSize().x * 0.6f, -inventory.getSize().y * 0.6f);
     }
+    batch.draw(health_texture, 1, Room.SCREEN_HEIGHT - 1, WIDTH * 4, -HEIGHT * 4);
   }
 
   public Vector2d getPos() {
@@ -212,5 +301,114 @@ public class Player {
 
   public Vector2d getDirection() {
     return GetDirectionVector(dir);
+  }
+
+  // True if it dead
+  public boolean damage(int dmg) {
+    if (health_points < 0) return true;
+
+    System.out.println("[damage] HP: " + (health_points - dmg));
+    for (int i = 0; i < dmg; ++i) {
+      --health_points;
+      simple_damage();
+    }
+       
+    return health_points <= 0;
+  }
+  private void simple_damage() {
+    if (health_points == 0) {
+      hearts[0] = Utils.replacePixelsColor(hearts[0], HEALTH_COLOR, DEAD_HEALTH_COLOR);
+      health_map.drawPixmap(hearts[0], 0, HEIGHT * 3);
+      health_texture = new Texture(health_map);
+
+    } else if (health_points > 0 && health_points < 10) {
+      damage_heart(0);
+
+    } else if (health_points == 10) {
+      hearts[1] = Utils.replacePixelsColor(hearts[1], HEALTH_COLOR, DEAD_HEALTH_COLOR);
+      health_map.drawPixmap(hearts[1], WIDTH + 1, HEIGHT * 3);
+      health_texture = new Texture(health_map);
+
+    } else if (health_points > 10 && health_points < 20) {
+      damage_heart(1);
+
+    } else if (health_points == 20) {
+      hearts[2] = Utils.replacePixelsColor(hearts[2], HEALTH_COLOR, DEAD_HEALTH_COLOR);
+      health_map.drawPixmap(hearts[2], WIDTH * 2 + 2, HEIGHT * 3);
+      health_texture = new Texture(health_map);
+
+    } else if (health_points > 20 && health_points < 30) {
+      damage_heart(2);
+    }
+  }
+  private void damage_heart(int heart_num) {
+    hearts[heart_num].setColor(Color.BLACK);
+    for (int i = 0; i < 2; ++i) {
+      int x, y;
+      do {
+        x = rand.nextInt(0, WIDTH);
+        y = rand.nextInt(0, HEIGHT);
+      } while(Utils.isEqualColorsWithoutAlpha(hearts[heart_num].getPixel(x, y), Color.BLACK)
+        || heart_mask.getPixel(x, y) != WHITE_IN_HEART_MASK);
+      System.out.println("[damage] Selected: x: " + x + " y: " + y + " color: " + Utils.getRGBAString(hearts[heart_num].getPixel(x, y)));
+
+      hearts[heart_num].drawPixel(x, y);
+    }
+    health_map.drawPixmap(hearts[heart_num], (WIDTH + 1) * heart_num, HEIGHT * 3);
+    health_texture = new Texture(health_map);
+  }
+
+  public void treat(int health) {
+    if (health_points >= MAX_HP) return;
+    System.out.println("[treat] HP: " + (health_points + health));
+    for (int i = 0; i < health; ++i) {
+      ++health_points;
+      simple_treat();
+    }
+    if (health_points >= MAX_HP) health_points = MAX_HP;
+  }
+  private void simple_treat() {
+    if (health_points == 0) {
+
+    } else if (health_points > 0 && health_points < 10) {
+      treat_heart(0);
+
+    } else if (health_points == 10) {
+      hearts[0] = generateHeart();
+      health_map.drawPixmap(hearts[0], 0, HEIGHT * 3);
+      health_texture = new Texture(health_map);
+
+    } else if (health_points > 10 && health_points < 20) {
+      treat_heart(1);
+
+    } else if (health_points == 20) {
+      hearts[1] = generateHeart();
+      health_map.drawPixmap(hearts[1], WIDTH + 1, HEIGHT * 3);
+      health_texture = new Texture(health_map);
+
+    } else if (health_points > 20 && health_points < 30) {
+      treat_heart(2);
+
+    } else if (health_points == 30) {
+      hearts[2] = generateHeart();
+      health_map.drawPixmap(hearts[2], WIDTH * 2 + 2, HEIGHT * 3);
+      health_texture = new Texture(health_map);
+    } 
+  }
+  private void treat_heart(int heart_num) {
+    hearts[heart_num].setColor(HEALTH_COLOR);
+    for (int i = 0; i < 2; ++i) {
+      int x, y;
+      do {
+        x = rand.nextInt(0, WIDTH);
+        y = rand.nextInt(0, HEIGHT);
+      } while(!Utils.isEqualColorsWithoutAlpha(hearts[heart_num].getPixel(x, y), Color.BLACK)
+        || heart_mask.getPixel(x, y) != WHITE_IN_HEART_MASK);
+      System.out.println("[treat] Selected: x: " + x + " y: " + y + " color: " + Utils.getRGBAString(hearts[heart_num].getPixel(x, y)));
+
+      hearts[heart_num].drawPixel(x, y);
+    }
+    health_map.drawPixmap(hearts[heart_num], (WIDTH + 1) * heart_num, HEIGHT * 3);
+    health_texture = new Texture(health_map);
   }
 }

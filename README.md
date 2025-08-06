@@ -34,6 +34,7 @@ I  | Get info about item
 Space  | Attack
 *Debug features*
 T  | Spawn new skeleton *(for debug)*
+G  | Self-damage *(for debug)*
 Arrow up | Go top room *(for debug)*
 Arrow left | Go left room *(for debug)*
 Arrow down | Go bottom room *(for debug)*

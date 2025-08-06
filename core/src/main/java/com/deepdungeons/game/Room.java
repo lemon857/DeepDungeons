@@ -87,8 +87,6 @@ public class Room {
   // Room
   // must_doors: -1 - door must empty, 0 - nevermind, 1 - doors must be
   public Room(Point pos, int[] must_doors) {
-    System.out.println("Room Start X: " + START_BORDER.x + " Start Y: " + START_BORDER.y);
-    System.out.println("Room End X: " + END_BORDER.x + " End Y: " + END_BORDER.y);
     this.rand = new Random();
     this.pos = pos;
 
@@ -364,16 +362,8 @@ public class Room {
     background_texture = new Texture(map);
   }
 
-  public void printDoors() {
-    for (int i = 0; i < MAX_DOORS_COUNT; ++i) {
-      System.out.print(doors[i] + " ");
-    }
-    System.out.print("\n");
-  }
-
   private void generateNewDoors(int[] must_doors) {
     for (int i = 0; i < MAX_DOORS_COUNT; ++i) {
-      System.out.print(must_doors[i] + " ");
       if (must_doors[i] == 1) {
         doors[i] = true;
       } else if (must_doors[i] == -1) {
@@ -382,6 +372,5 @@ public class Room {
         doors[i] = (rand.nextInt(100) > 70);
       }
     }
-    System.out.print("\n");
   }
 }
