@@ -269,6 +269,16 @@ public class Main extends ApplicationAdapter {
     if (Gdx.input.isKeyJustPressed(Input.Keys.H)) {
       player.treat(1);
     }
+
+    // [DEBUG] Self hunger
+    if (Gdx.input.isKeyJustPressed(Input.Keys.B)) {
+      player.hunger(1);
+    }
+    
+    // [DEBUG] Self saturation
+    if (Gdx.input.isKeyJustPressed(Input.Keys.N)) {
+      player.saturation(1);
+    }
   }
 
   private void logic() {

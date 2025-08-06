@@ -13,6 +13,7 @@ public class Player {
   public static final int HEIGHT = 7;
 
   public static final int MAX_HP = 30;
+  public static final int MAX_FP = 25;
 
   public static final int EYE_DOWN = (HEIGHT / 2) - 1;
   public static final int EYE_UP = HEIGHT - EYE_DOWN - 1;
@@ -43,6 +44,9 @@ public class Player {
   private final Pixmap hearts[];
   private Pixmap heart_mask;
 
+  private final Pixmap full_food_point;
+  private final Pixmap empty_food_point;
+
   private Texture health_texture;
 
   private Direction dir;
@@ -54,6 +58,7 @@ public class Player {
   private static final int WHITE_IN_HEART_MASK = -1;
 
   private int health_points;
+  private int food_points;
 
   public enum Direction {
     Up, Down, Right, Left,
@@ -82,12 +87,16 @@ public class Player {
     this.dir = Direction.Up;
     this.non_actual = false;
     this.health_points = MAX_HP;
+    this.food_points = MAX_FP;
     Pixmap map = new Pixmap(18, 6, Pixmap.Format.RGBA8888);
     inventory_texture = new Texture(map);
 
+    this.full_food_point = generateFullFoodPoint();
+    this.empty_food_point = generateEmptyFoodPoint();
+
     generateHeartMask();
 
-    hearts = new Pixmap[]{ generateHeart(), generateHeart(), generateHeart() };
+    this.hearts = new Pixmap[]{ generateHeart(), generateHeart(), generateHeart() };
 
     generatePlayerImage();
     generateInventoryTexture();
@@ -192,12 +201,42 @@ public class Player {
     return map;
   }
 
+  private Pixmap generateFullFoodPoint() {
+    Pixmap map = new Pixmap(3, 3, Pixmap.Format.RGB888);
+
+    map.setColor(1f, 0.3f, 0.5f, 1f);
+    map.drawRectangle(1, 1, 2, 2);
+    map.setColor(1f, 0.6f, 0.4f, 1f);
+    map.drawPixel(1, 1);
+    map.setColor(1f, 1f, 1f, 1f);
+    map.drawPixel(0, 0);
+
+    return map;
+  }
+
+  private Pixmap generateEmptyFoodPoint() {
+    Pixmap map = new Pixmap(3, 3, Pixmap.Format.RGB888);
+
+    map.setColor(0.7f, 0.4f, 0.35f, 1f);
+    map.drawRectangle(1, 1, 2, 2);
+    map.setColor(0.6f, 0.3f, 0.4f, 1f);
+    map.drawPixel(1, 1);
+    map.setColor(0.4f, 0.4f, 0.4f, 1f);
+    map.drawPixel(0, 0);
+
+    return map;
+  }
+
   private void generateHealthTexture() {
     health_map = new Pixmap(WIDTH * 4, HEIGHT * 4, Pixmap.Format.RGBA8888);
 
-    health_map.drawPixmap(hearts[0], 0, HEIGHT * 3);
-    health_map.drawPixmap(hearts[1], WIDTH + 1, HEIGHT * 3);
-    health_map.drawPixmap(hearts[2], WIDTH * 2 + 2, HEIGHT * 3);
+    for (int i = 0; i < 3; ++i) {
+      health_map.drawPixmap(hearts[i], i * (WIDTH + 1), HEIGHT * 3);
+    }
+
+    for (int i = 0; i < 5; ++i) {
+      health_map.drawPixmap(full_food_point, 2 + i * 4, HEIGHT * 2 + 2);
+    }
 
     health_map.setColor(HEALTH_COLOR);
     health_map.drawPixel(0, 0);
@@ -409,6 +448,30 @@ public class Player {
       hearts[heart_num].drawPixel(x, y);
     }
     health_map.drawPixmap(hearts[heart_num], (WIDTH + 1) * heart_num, HEIGHT * 3);
+    health_texture = new Texture(health_map);
+  }
+
+  public void saturation(int points) {
+    food_points += points;
+    if (food_points > MAX_FP) food_points = MAX_FP;
+
+    System.out.println("[saturation] FP: " + food_points + " int: " + (food_points / 5));
+
+    for (int i = 0; i < (int)Math.ceil(food_points / 5.0); ++i) {
+      health_map.drawPixmap(full_food_point, 2 + i * 4, HEIGHT * 2 + 2);
+    }
+    health_texture = new Texture(health_map);
+  }
+
+  public void hunger(int points) {
+    food_points -= points;
+    if (food_points < 0) food_points = 0;
+
+    System.out.println("[hunger] FP: " + food_points + " int: " + (food_points / 5));
+
+    for (int i = (int)Math.ceil(food_points / 5.0); i < MAX_FP / 5; ++i) {
+      health_map.drawPixmap(empty_food_point, 2 + i * 4, HEIGHT * 2 + 2);
+    }
     health_texture = new Texture(health_map);
   }
 }
