@@ -22,7 +22,7 @@ public class Skeleton extends Mob {
   private static final double SPEED = 50f; // TODO: use random speed
 
   public Skeleton(Vector2d pos) {
-    super();
+    super(Mob.Tier.Humble);
     this.pos = pos;
     this.size = new Vector2d(WIDTH, HEIGHT);
     this.health_points = rand.nextDouble(MAX_HP_LOW, MAX_HP_HIGH + 1);

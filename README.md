@@ -35,6 +35,11 @@ Space  | Attack
 *Debug features*
 T  | Spawn new skeleton *(for debug)*
 G  | Self-damage *(for debug)*
+H  | Self-treat *(for debug)*
+B  | Self-hunger *(for debug)*
+N  | Self-saturation *(for debug)*
+J  | Self-thirsty *(for debug)*
+K  | Self-drink *(for debug)*
 Arrow up | Go top room *(for debug)*
 Arrow left | Go left room *(for debug)*
 Arrow down | Go bottom room *(for debug)*

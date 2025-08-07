@@ -118,9 +118,6 @@ public class Player {
     generatePlayerImage();
     generateInventoryTexture();
     generateHealthTexture();
-
-    System.out.println("Black: " + Color.BLACK.toIntBits());
-    System.out.println("Health color: " + HEALTH_COLOR.toIntBits());
   }
 
   private void generatePlayerImage() {
@@ -378,14 +375,23 @@ public class Player {
     batch.draw(image, (float)pos.x, (float)pos.y + (float)HEIGHT,
     (float)WIDTH, -(float)HEIGHT);
     if (inventory != null) {
-      batch.draw(inventory_texture, (float)pos.x + 5.5f, (float)pos.y + 4.5f + inventory.getSize().y * 0.6f, 
-      inventory.getSize().x * 0.6f, -inventory.getSize().y * 0.6f);
+      if (inventory.isTExtureFromFile()) {
+        batch.draw(inventory_texture, (float)pos.x + 5.5f, (float)pos.y + 4.5f, 
+        inventory.getSize().x * 0.6f, inventory.getSize().y * 0.6f);
+      } else {
+        batch.draw(inventory_texture, (float)pos.x + 5.5f, (float)pos.y + 4.5f + inventory.getSize().y * 0.6f, 
+        inventory.getSize().x * 0.6f, -inventory.getSize().y * 0.6f);
+      }
     }
     batch.draw(health_texture, 1, Room.SCREEN_HEIGHT - 1, WIDTH * 4, -HEIGHT * 3);
   }
 
   public Vector2d getPos() {
     return pos;
+  }
+
+  public Vector2d getCenterPos() {
+    return Vector2d.sum(pos, new Vector2d(WIDTH / 2, HEIGHT / 2));
   }
 
   public Vector2d getDirection() {

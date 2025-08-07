@@ -23,7 +23,14 @@ public class Mob {
 
   private static int current_id = 1;
 
-  public Mob() {
+  private final Tier tier;
+
+  public enum Tier {
+    Humble, General, Wicked, Aggressive
+  }
+
+  public Mob(Tier tier) {
+    this.tier = tier;
     this.id = current_id;
     ++current_id;
     this.rand = new Random();
@@ -38,6 +45,10 @@ public class Mob {
 
   public final int getId() {
     return id;
+  }
+
+  public final Tier getTier() {
+    return tier;
   }
 
   public final double getHealthPoints() {

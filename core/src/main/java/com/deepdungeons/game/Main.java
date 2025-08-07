@@ -14,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.deepdungeons.game.items.CommonItemForCraft;
 import com.deepdungeons.game.items.Item;
 import com.deepdungeons.game.items.Key;
 import com.deepdungeons.game.mobs.Skeleton;
@@ -28,6 +29,8 @@ import com.deepdungeons.game.weapons.Knife;
 // here always 
 // X from left to right
 // Y from down to up
+// But if load Pixmap from file all is correct,
+// I fix it with crutch - flag for check loaded from file
 
 public class Main extends ApplicationAdapter {
   private SpriteBatch batch;
@@ -66,6 +69,11 @@ public class Main extends ApplicationAdapter {
   private static final int DEBUG_LINE_ROOM_POS = 4;
   private static final int DEBUG_LINE_ITEM_NAME = 5;
 
+  public static CommonItemForCraft[] static_items;
+  public static final int BONE_ITEM = 0;
+  public static final int ROW_ITEM = 1;
+  public static final int LEATHER_ITEM = 2;
+
   @Override
   public void create() {
     rand = new Random();
@@ -97,6 +105,11 @@ public class Main extends ApplicationAdapter {
       }
     });
 
+    static_items = new CommonItemForCraft[3];
+    static_items[BONE_ITEM] = new CommonItemForCraft("bone.png", "bone");
+    static_items[ROW_ITEM] = new CommonItemForCraft("row.png", "row");
+    static_items[LEATHER_ITEM] = new CommonItemForCraft("leather.png", "leather");
+
     Skin skin = new Skin(Gdx.files.internal("ui/uiskin.json"));
 
     debug_info = new Label[DEBUG_LINES];
@@ -111,7 +124,6 @@ public class Main extends ApplicationAdapter {
     rooms = new HashMap<>();
 
     Room new_room = new Room(new Point(0, 0), new int[]{1, 1, 1, 1});
-
     Key key = new_room.lockDoor(0);
     generate_key_require = new_room.lockDoor(2);
     generate_key_chance = 10;
@@ -123,6 +135,10 @@ public class Main extends ApplicationAdapter {
 
     new_room.addItem(new Knife(new Point(Room.START_BORDER.x + 10, Room.START_BORDER.y + 10)));
 
+    new_room.addItem(new CommonItemForCraft(static_items[BONE_ITEM], new Point(Room.START_BORDER.x + 50, Room.START_BORDER.y + 50)));
+    new_room.addItem(new CommonItemForCraft(static_items[ROW_ITEM], new Point(Room.START_BORDER.x + 60, Room.START_BORDER.y + 60)));
+    new_room.addItem(new CommonItemForCraft(static_items[LEATHER_ITEM], new Point(Room.START_BORDER.x + 70, Room.START_BORDER.y + 70)));
+
     current_room_pos = new_room.getPos();
     rooms.put(current_room_pos, new_room);
 
@@ -130,6 +146,8 @@ public class Main extends ApplicationAdapter {
 
     current_room = rooms.get(current_room_pos);
     debug_info[DEBUG_LINE_ROOM_POS].setText("Room X: " + current_room_pos.x + " Y: " + current_room_pos.y);
+
+    debug_info[DEBUG_LINE_ITEM_NAME].setPosition(DEBUG_START.x, 100);
 
     req_door_id = -1;
     timer = 0;
@@ -190,7 +208,7 @@ public class Main extends ApplicationAdapter {
     // Use (pick up, put down, open door)
     if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
       if (req_door_id != -1) {
-        if (Point.distance(player.getPos(), Room.GetDoorPosition(req_door_id)) < 4 && player.getItem() instanceof Key) {
+        if (Point.distance(player.getCenterPos(), Room.GetDoorPosition(req_door_id)) < 7 && player.getItem() instanceof Key) {
           if (current_room.tryUnlockDoor(req_door_id, ((Key)player.getItem()).getKey())) {
             current_room.generateBackground();
             req_door_id = -1;
@@ -199,11 +217,11 @@ public class Main extends ApplicationAdapter {
           req_door_id = -1;
         }
       } else {
-        if (current_room.canGrabItem(player.getPos())) {
+        if (current_room.canGrabItem(player.getCenterPos())) {
           if (player.isDropAvailable()) {
             Item item = player.dropItem();
 
-            item.setPos(new Point(player.getPos()));
+            item.setCenterPos(new Point(player.getCenterPos()));
             current_room.addItem(item);
           }
           player.pickupItem(current_room.grabItem());
@@ -213,7 +231,7 @@ public class Main extends ApplicationAdapter {
           if (player.isDropAvailable()) {
           Item item = player.dropItem();
 
-          item.setPos(new Point(player.getPos()));
+          item.setCenterPos(new Point(player.getCenterPos()));
           current_room.addItem(item);
           }
           debug_info[DEBUG_LINE_INFO].setText("Can't grab!");
@@ -243,13 +261,12 @@ public class Main extends ApplicationAdapter {
     // Get item info
     if (Gdx.input.isKeyJustPressed(Input.Keys.I)) {
       show_item_info = !show_item_info;
-      if (current_room.distanceToNearestItem(player.getPos()) < Room.PICK_UP_MAX_DISTANCE && show_item_info) {
-        Item item = current_room.getNearestItem(player.getPos());
+      if (current_room.distanceToNearestItem(player.getCenterPos()) < Room.PICK_UP_MAX_DISTANCE && show_item_info) {
+        Item item = current_room.getNearestItem(player.getCenterPos());
         debug_info[DEBUG_LINE_ITEM_NAME].setColor(1, 0, 1, 1);
         debug_info[DEBUG_LINE_ITEM_NAME].setFontScale(3);
         debug_info[DEBUG_LINE_ITEM_NAME].setVisible(true);
         debug_info[DEBUG_LINE_ITEM_NAME].setText(item.getName());
-        debug_info[DEBUG_LINE_ITEM_NAME].setPosition(item.getCenterPos().x * 10, item.getCenterPos().y * 10);
       } else {
         debug_info[DEBUG_LINE_ITEM_NAME].setVisible(false);
       }
@@ -295,13 +312,14 @@ public class Main extends ApplicationAdapter {
     double delta = Gdx.graphics.getDeltaTime();
     player.update(delta);
     current_room.update(delta);
-    //debug_info[DEBUG_LINE_DISTANCE].setText("Dis to item: " + current_room.distanceToNearestItem(player.getPos()));
-    debug_info[DEBUG_LINE_DISTANCE].setText("Dis to mob: " + current_room.distanceToNearestMob(player.getPos()));
-    debug_info[DEBUG_LINE_ANGLE].setText("Angle to mob: " + current_room.angleToNearestMob(player.getPos(), player.getDirection()));
+    debug_info[DEBUG_LINE_DISTANCE].setText("Dis to door: " + Point.distance(player.getCenterPos(), Room.GetDoorPosition(req_door_id)));
+    //debug_info[DEBUG_LINE_DISTANCE].setText("Dis to item: " + current_room.distanceToNearestItem(player.getCenterPos()));
+    //debug_info[DEBUG_LINE_DISTANCE].setText("Dis to mob: " + current_room.distanceToNearestMob(player.getCenterPos()));
+    debug_info[DEBUG_LINE_ANGLE].setText("Angle to mob: " + current_room.angleToNearestMob(player.getCenterPos(), player.getDirection()));
     Point pos = new Point(player.getPos());
 
     debug_info[DEBUG_LINE_PLAYER_POS].setText("Player X: " + pos.x + " Y: " + pos.y);
-    if (current_room.distanceToNearestItem(player.getPos()) > Room.PICK_UP_MAX_DISTANCE) {
+    if (current_room.distanceToNearestItem(player.getCenterPos()) > Room.PICK_UP_MAX_DISTANCE) {
       debug_info[DEBUG_LINE_ITEM_NAME].setVisible(false);
       show_item_info = false;
     }

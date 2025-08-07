@@ -16,7 +16,7 @@ public class Knife extends Item implements CloseRangeWeapon {
   public static final double COOLDOWN = 0.5;
 
   public Knife(Point pos) {
-    super(Item.Type.Weapon, "Knife");
+    super(Item.Type.Weapon, Item.Tier.Common, "knife");
     this.pos = pos;
     this.size = new Point(WIDTH, HEIGHT);
 

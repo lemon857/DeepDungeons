@@ -13,7 +13,7 @@ public class Key extends Item {
   private final Color color;
 
   public Key(int key, Color color, Point pos) {
-    super(Item.Type.Key, "Key");
+    super(Item.Type.Key, Item.Tier.Common,  "key");
     this.key = key;
     this.color = color;
     this.pos = pos;

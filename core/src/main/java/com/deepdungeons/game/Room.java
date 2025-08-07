@@ -76,10 +76,10 @@ public class Room {
 
   public static Point GetDoorPosition(int door_id) {
     switch (door_id) {
-      case 0: return new Point(DOOR_OFFSET.x, END_BORDER.y - DOOR_WIDTH);
-      case 1: return new Point(END_BORDER.x - DOOR_WIDTH, DOOR_OFFSET.y);
-      case 2: return new Point(DOOR_OFFSET.x, START_BORDER.y);
-      case 3: return new Point(START_BORDER.x, DOOR_OFFSET.y);
+      case 0: return new Point(DOOR_OFFSET.x + DOOR_WIDTH / 2, END_BORDER.y - DOOR_WIDTH);
+      case 1: return new Point(END_BORDER.x - DOOR_WIDTH, DOOR_OFFSET.y + DOOR_WIDTH / 2);
+      case 2: return new Point(DOOR_OFFSET.x + DOOR_WIDTH / 2, START_BORDER.y);
+      case 3: return new Point(START_BORDER.x, DOOR_OFFSET.y + DOOR_WIDTH / 2);
       default: return new Point(-1, -1);
     }
   }
@@ -190,7 +190,7 @@ public class Room {
 
   public boolean canGrabItem(Vector2d cur_pos) {
     for (Item item : items) {
-      if (Point.distance(cur_pos, item.getPos()) < PICK_UP_MAX_DISTANCE) {
+      if (Point.distance(cur_pos, item.getCenterPos()) < PICK_UP_MAX_DISTANCE) {
         can_grab_item = item;
         return true;
       }
@@ -201,10 +201,10 @@ public class Room {
   public Item getNearestItem(Vector2d cur_pos) {
     double res = 50;
     for (Item item : items) {
-      res = Math.min(res, Point.distance(cur_pos, item.getPos()));
+      res = Math.min(res, Point.distance(cur_pos, item.getCenterPos()));
     }
     for (Item item : items) {
-      if (Point.distance(cur_pos, item.getPos()) == res) return item;
+      if (Point.distance(cur_pos, item.getCenterPos()) == res) return item;
     }
     return null;    
   }
@@ -212,7 +212,7 @@ public class Room {
   public double distanceToNearestItem(Point cur_pos) {
     double res = 50;
     for (Item item : items) {
-      res = Math.min(res, Point.distance(cur_pos, item.getPos()));
+      res = Math.min(res, Point.distance(cur_pos, item.getCenterPos()));
     }
     return res;
   }
@@ -220,7 +220,7 @@ public class Room {
   public double distanceToNearestItem(Vector2d cur_pos) {
     double res = 50;
     for (Item item : items) {
-      res = Math.min(res, Point.distance(cur_pos, item.getPos()));
+      res = Math.min(res, Point.distance(cur_pos, item.getCenterPos()));
     }
     return res;
   }
