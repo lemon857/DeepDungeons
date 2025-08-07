@@ -6,9 +6,16 @@ Doors can be locked, every locked door have one unique key same with door lock c
 
 # Items desctiption
 
-Now game have two items - key and knife  
-Key have unique color which open only one locked door  
-Knife is a base weapon  
+Items have a four tiers: `common`, `uncommon`, `startling`, `incredible`  
+Now game have five items - key, knife, bone, row, leather  
+key have unique color which open only one locked door  
+knife is a base weapon  
+bone, row and leather - common items for craft  
+
+# Mobs desctiption
+
+Mobs like items have a four tiers: `humble`, `general`, `wicked`, `aggressive`  
+Now game have one mob - skeleton
 
 # Attack description
 

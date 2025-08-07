@@ -100,8 +100,14 @@ public class Item {
     if (pos.x + size.x > Room.END_BORDER.x) {
       pos.x = Room.END_BORDER.x - size.x - 1;
     }
+    if (pos.x < Room.START_BORDER.x) {
+      pos.x = Room.START_BORDER.x + 1;
+    }
     if (pos.y + size.y > Room.END_BORDER.y) {
       pos.y = Room.END_BORDER.y - size.y - 1;
+    }
+    if (pos.y < Room.START_BORDER.y) {
+      pos.y = Room.START_BORDER.y + 1;
     }
   }
 
@@ -110,8 +116,14 @@ public class Item {
     if (pos.x + size.x > Room.END_BORDER.x) {
       pos.x = Room.END_BORDER.x - size.x - 1;
     }
+    if (pos.x < Room.START_BORDER.x + 1) {
+      pos.x = Room.START_BORDER.x + 1;
+    }
     if (pos.y + size.y > Room.END_BORDER.y) {
       pos.y = Room.END_BORDER.y - size.y - 1;
+    }
+    if (pos.y < Room.START_BORDER.y + 1) {
+      pos.y = Room.START_BORDER.y + 1;
     }
   }
 
