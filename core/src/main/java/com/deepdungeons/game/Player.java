@@ -14,6 +14,7 @@ public class Player {
 
   public static final int MAX_HP = 30;
   public static final int MAX_FP = 25;
+  public static final int MAX_TP = 25;
 
   public static final int EYE_DOWN = (HEIGHT / 2) - 1;
   public static final int EYE_UP = HEIGHT - EYE_DOWN - 1;
@@ -32,6 +33,10 @@ public class Player {
 
   private static final double HALF_SQUARE_SUM = Math.sqrt(2)/2;
 
+  private static final int WHITE_IN_HEART_MASK = -1;
+
+  private static final double HUNGER_DAMAGE_COOLDOWN = 2.5;
+
   private final Random rand;
 
   private final Vector2d pos;
@@ -47,6 +52,9 @@ public class Player {
   private final Pixmap full_food_point;
   private final Pixmap empty_food_point;
 
+  private final Pixmap full_thirsty_point;
+  private final Pixmap empty_thirsty_point;
+
   private Texture health_texture;
 
   private Direction dir;
@@ -55,10 +63,12 @@ public class Player {
 
   private Item inventory;
 
-  private static final int WHITE_IN_HEART_MASK = -1;
-
   private int health_points;
   private int food_points;
+  private int thirsty_points;
+
+  private double timer;
+
 
   public enum Direction {
     Up, Down, Right, Left,
@@ -88,11 +98,18 @@ public class Player {
     this.non_actual = false;
     this.health_points = MAX_HP;
     this.food_points = MAX_FP;
+    this.thirsty_points = MAX_TP;
+
+    this.timer = 0;
+
     Pixmap map = new Pixmap(18, 6, Pixmap.Format.RGBA8888);
     inventory_texture = new Texture(map);
 
     this.full_food_point = generateFullFoodPoint();
     this.empty_food_point = generateEmptyFoodPoint();
+
+    this.full_thirsty_point = generateFullThirstyPoint();
+    this.empty_thirsty_point = generateEmptyThirstyPoint();
 
     generateHeartMask();
 
@@ -227,21 +244,46 @@ public class Player {
     return map;
   }
 
+  private Pixmap generateFullThirstyPoint() {
+    Pixmap map = new Pixmap(3, 5, Pixmap.Format.RGB888);
+
+    map.setColor(0.2f, 0.3f, 1f, 1f);
+    map.fillRectangle(0, 0, 3, 3);
+    map.setColor(1f, 0.6f, 0.4f, 1f);
+    map.drawPixel(1, 3);
+    map.setColor(1f, 1f, 1f, 1f);
+    map.drawLine(0, 4, 2, 4);
+
+    return map;
+  }
+
+  private Pixmap generateEmptyThirstyPoint() {
+    Pixmap map = new Pixmap(3, 5, Pixmap.Format.RGB888);
+
+    map.setColor(0.2f, 0.2f, 0.2f, 1f);
+    map.fillRectangle(0, 0, 3, 3);
+    map.setColor(1f, 0.6f, 0.4f, 1f);
+    map.drawPixel(1, 3);
+    map.setColor(1f, 1f, 1f, 1f);
+    map.drawLine(0, 4, 2, 4);
+
+    return map;
+  }
+
   private void generateHealthTexture() {
-    health_map = new Pixmap(WIDTH * 4, HEIGHT * 4, Pixmap.Format.RGBA8888);
+    health_map = new Pixmap(WIDTH * 4, HEIGHT * 3, Pixmap.Format.RGBA8888);
 
     for (int i = 0; i < 3; ++i) {
-      health_map.drawPixmap(hearts[i], i * (WIDTH + 1), HEIGHT * 3);
+      health_map.drawPixmap(hearts[i], i * (WIDTH + 1), HEIGHT * 2);
     }
 
     for (int i = 0; i < 5; ++i) {
-      health_map.drawPixmap(full_food_point, 2 + i * 4, HEIGHT * 2 + 2);
+      health_map.drawPixmap(full_food_point, 2 + i * 4, HEIGHT + 2);
     }
 
-    health_map.setColor(HEALTH_COLOR);
-    health_map.drawPixel(0, 0);
-    health_map.setColor(COLOR);
-    health_map.drawPixel(WIDTH * 4 - 1, HEIGHT * 4 - 1);
+    for (int i = 0; i < 5; ++i) {
+      health_map.drawPixmap(full_thirsty_point, 2 + i * 4, 2);
+    }
 
     health_texture = new Texture(health_map);
   }
@@ -315,11 +357,19 @@ public class Player {
     else if (pos.y > END_BORDER.y) pos.y = END_BORDER.y;
   }
 
-  public void update() {
+  public void update(double delta) {
     if (non_actual) {
       generatePlayerImage();
       generateInventoryTexture();
       non_actual = false;
+    }
+
+    if (food_points == 0) {
+      timer += delta;
+      if (timer >= HUNGER_DAMAGE_COOLDOWN) {
+        damage(1);
+        timer = 0;
+      }
     }
   }
 
@@ -331,7 +381,7 @@ public class Player {
       batch.draw(inventory_texture, (float)pos.x + 5.5f, (float)pos.y + 4.5f + inventory.getSize().y * 0.6f, 
       inventory.getSize().x * 0.6f, -inventory.getSize().y * 0.6f);
     }
-    batch.draw(health_texture, 1, Room.SCREEN_HEIGHT - 1, WIDTH * 4, -HEIGHT * 4);
+    batch.draw(health_texture, 1, Room.SCREEN_HEIGHT - 1, WIDTH * 4, -HEIGHT * 3);
   }
 
   public Vector2d getPos() {
@@ -357,7 +407,7 @@ public class Player {
   private void simple_damage() {
     if (health_points == 0) {
       hearts[0] = Utils.replacePixelsColor(hearts[0], HEALTH_COLOR, DEAD_HEALTH_COLOR);
-      health_map.drawPixmap(hearts[0], 0, HEIGHT * 3);
+      health_map.drawPixmap(hearts[0], 0, HEIGHT * 2);
       health_texture = new Texture(health_map);
 
     } else if (health_points > 0 && health_points < 10) {
@@ -365,7 +415,7 @@ public class Player {
 
     } else if (health_points == 10) {
       hearts[1] = Utils.replacePixelsColor(hearts[1], HEALTH_COLOR, DEAD_HEALTH_COLOR);
-      health_map.drawPixmap(hearts[1], WIDTH + 1, HEIGHT * 3);
+      health_map.drawPixmap(hearts[1], WIDTH + 1, HEIGHT * 2);
       health_texture = new Texture(health_map);
 
     } else if (health_points > 10 && health_points < 20) {
@@ -373,7 +423,7 @@ public class Player {
 
     } else if (health_points == 20) {
       hearts[2] = Utils.replacePixelsColor(hearts[2], HEALTH_COLOR, DEAD_HEALTH_COLOR);
-      health_map.drawPixmap(hearts[2], WIDTH * 2 + 2, HEIGHT * 3);
+      health_map.drawPixmap(hearts[2], WIDTH * 2 + 2, HEIGHT * 2);
       health_texture = new Texture(health_map);
 
     } else if (health_points > 20 && health_points < 30) {
@@ -384,16 +434,21 @@ public class Player {
     hearts[heart_num].setColor(Color.BLACK);
     for (int i = 0; i < 2; ++i) {
       int x, y;
+      int counter = 0;
       do {
         x = rand.nextInt(0, WIDTH);
         y = rand.nextInt(0, HEIGHT);
-      } while(Utils.isEqualColorsWithoutAlpha(hearts[heart_num].getPixel(x, y), Color.BLACK)
-        || heart_mask.getPixel(x, y) != WHITE_IN_HEART_MASK);
+        ++counter;
+      } while((Utils.isEqualColorsWithoutAlpha(hearts[heart_num].getPixel(x, y), Color.BLACK)
+        || heart_mask.getPixel(x, y) != WHITE_IN_HEART_MASK) && counter < 1000);
       System.out.println("[damage] Selected: x: " + x + " y: " + y + " color: " + Utils.getRGBAString(hearts[heart_num].getPixel(x, y)));
 
+      if (counter >= 1000) {
+        System.out.println("[damage] Count of tries is over");
+      }
       hearts[heart_num].drawPixel(x, y);
     }
-    health_map.drawPixmap(hearts[heart_num], (WIDTH + 1) * heart_num, HEIGHT * 3);
+    health_map.drawPixmap(hearts[heart_num], (WIDTH + 1) * heart_num, HEIGHT * 2);
     health_texture = new Texture(health_map);
   }
 
@@ -414,7 +469,7 @@ public class Player {
 
     } else if (health_points == 10) {
       hearts[0] = generateHeart();
-      health_map.drawPixmap(hearts[0], 0, HEIGHT * 3);
+      health_map.drawPixmap(hearts[0], 0, HEIGHT * 2);
       health_texture = new Texture(health_map);
 
     } else if (health_points > 10 && health_points < 20) {
@@ -422,7 +477,7 @@ public class Player {
 
     } else if (health_points == 20) {
       hearts[1] = generateHeart();
-      health_map.drawPixmap(hearts[1], WIDTH + 1, HEIGHT * 3);
+      health_map.drawPixmap(hearts[1], WIDTH + 1, HEIGHT * 2);
       health_texture = new Texture(health_map);
 
     } else if (health_points > 20 && health_points < 30) {
@@ -430,7 +485,7 @@ public class Player {
 
     } else if (health_points == 30) {
       hearts[2] = generateHeart();
-      health_map.drawPixmap(hearts[2], WIDTH * 2 + 2, HEIGHT * 3);
+      health_map.drawPixmap(hearts[2], WIDTH * 2 + 2, HEIGHT * 2);
       health_texture = new Texture(health_map);
     } 
   }
@@ -438,19 +493,25 @@ public class Player {
     hearts[heart_num].setColor(HEALTH_COLOR);
     for (int i = 0; i < 2; ++i) {
       int x, y;
+      int counter = 0;
       do {
         x = rand.nextInt(0, WIDTH);
         y = rand.nextInt(0, HEIGHT);
-      } while(!Utils.isEqualColorsWithoutAlpha(hearts[heart_num].getPixel(x, y), Color.BLACK)
-        || heart_mask.getPixel(x, y) != WHITE_IN_HEART_MASK);
+        ++counter;
+      } while((!Utils.isEqualColorsWithoutAlpha(hearts[heart_num].getPixel(x, y), Color.BLACK)
+        || heart_mask.getPixel(x, y) != WHITE_IN_HEART_MASK) && counter < 1000);
       System.out.println("[treat] Selected: x: " + x + " y: " + y + " color: " + Utils.getRGBAString(hearts[heart_num].getPixel(x, y)));
 
+      if (counter >= 1000) {
+        System.out.println("[treat] Count of tries is over");
+      }
       hearts[heart_num].drawPixel(x, y);
     }
-    health_map.drawPixmap(hearts[heart_num], (WIDTH + 1) * heart_num, HEIGHT * 3);
+    health_map.drawPixmap(hearts[heart_num], (WIDTH + 1) * heart_num, HEIGHT * 2);
     health_texture = new Texture(health_map);
   }
 
+  // Increase food points
   public void saturation(int points) {
     food_points += points;
     if (food_points > MAX_FP) food_points = MAX_FP;
@@ -458,11 +519,12 @@ public class Player {
     System.out.println("[saturation] FP: " + food_points + " int: " + (food_points / 5));
 
     for (int i = 0; i < (int)Math.ceil(food_points / 5.0); ++i) {
-      health_map.drawPixmap(full_food_point, 2 + i * 4, HEIGHT * 2 + 2);
+      health_map.drawPixmap(full_food_point, 2 + i * 4, HEIGHT + 2);
     }
     health_texture = new Texture(health_map);
   }
 
+  // Decrease food points
   public void hunger(int points) {
     food_points -= points;
     if (food_points < 0) food_points = 0;
@@ -470,7 +532,33 @@ public class Player {
     System.out.println("[hunger] FP: " + food_points + " int: " + (food_points / 5));
 
     for (int i = (int)Math.ceil(food_points / 5.0); i < MAX_FP / 5; ++i) {
-      health_map.drawPixmap(empty_food_point, 2 + i * 4, HEIGHT * 2 + 2);
+      health_map.drawPixmap(empty_food_point, 2 + i * 4, HEIGHT + 2);
+    }
+    health_texture = new Texture(health_map);
+  }
+
+  // Increase thirsty points
+  public void drink(int points) {
+    thirsty_points += points;
+    if (thirsty_points > MAX_TP) thirsty_points = MAX_TP;
+
+    System.out.println("[drink] TP: " + thirsty_points + " int: " + (thirsty_points / 5));
+
+    for (int i = 0; i < (int)Math.ceil(thirsty_points / 5.0); ++i) {
+      health_map.drawPixmap(full_thirsty_point, 2 + i * 4, 2);
+    }
+    health_texture = new Texture(health_map);
+  }
+
+  // Decrease thirsty points
+  public void thirst(int points) {
+    thirsty_points -= points;
+    if (thirsty_points < 0) thirsty_points = 0;
+
+    System.out.println("[thirst] TP: " + thirsty_points + " int: " + (thirsty_points / 5));
+
+    for (int i = (int)Math.ceil(thirsty_points / 5.0); i < MAX_TP / 5; ++i) {
+      health_map.drawPixmap(empty_thirsty_point, 2 + i * 4, 2);
     }
     health_texture = new Texture(health_map);
   }

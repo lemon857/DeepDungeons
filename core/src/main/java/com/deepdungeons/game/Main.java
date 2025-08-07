@@ -279,11 +279,22 @@ public class Main extends ApplicationAdapter {
     if (Gdx.input.isKeyJustPressed(Input.Keys.N)) {
       player.saturation(1);
     }
+
+    // [DEBUG] Self thirst
+    if (Gdx.input.isKeyJustPressed(Input.Keys.J)) {
+      player.thirst(1);
+    }
+    
+    // [DEBUG] Self drink
+    if (Gdx.input.isKeyJustPressed(Input.Keys.K)) {
+      player.drink(1);
+    }
   }
 
   private void logic() {
-    player.update();
-    current_room.update(Gdx.graphics.getDeltaTime());
+    double delta = Gdx.graphics.getDeltaTime();
+    player.update(delta);
+    current_room.update(delta);
     //debug_info[DEBUG_LINE_DISTANCE].setText("Dis to item: " + current_room.distanceToNearestItem(player.getPos()));
     debug_info[DEBUG_LINE_DISTANCE].setText("Dis to mob: " + current_room.distanceToNearestMob(player.getPos()));
     debug_info[DEBUG_LINE_ANGLE].setText("Angle to mob: " + current_room.angleToNearestMob(player.getPos(), player.getDirection()));
