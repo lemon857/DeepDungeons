@@ -7,6 +7,10 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.deepdungeons.game.items.Item;
+import com.deepdungeons.game.utils.Direction;
+import com.deepdungeons.game.utils.Point;
+import com.deepdungeons.game.utils.Utility;
+import com.deepdungeons.game.utils.Vector2d;
 
 public class Player {
   public static final int WIDTH = 7;
@@ -68,12 +72,6 @@ public class Player {
   private int thirsty_points;
 
   private double timer;
-
-
-  public enum Direction {
-    Up, Down, Right, Left,
-    UpRight, UpLeft, DownRight, DownLeft
-  }
 
   public static Vector2d GetDirectionVector(Direction dir) {
     Vector2d delta = new Vector2d();
@@ -416,7 +414,7 @@ public class Player {
   }
   private void simple_damage() {
     if (health_points == 0) {
-      hearts[0] = Utils.replacePixelsColor(hearts[0], HEALTH_COLOR, DEAD_HEALTH_COLOR);
+      hearts[0] = Utility.replacePixelsColor(hearts[0], HEALTH_COLOR, DEAD_HEALTH_COLOR);
       health_map.drawPixmap(hearts[0], 0, HEIGHT * 2);
       health_texture = new Texture(health_map);
 
@@ -424,7 +422,7 @@ public class Player {
       damage_heart(0);
 
     } else if (health_points == 10) {
-      hearts[1] = Utils.replacePixelsColor(hearts[1], HEALTH_COLOR, DEAD_HEALTH_COLOR);
+      hearts[1] = Utility.replacePixelsColor(hearts[1], HEALTH_COLOR, DEAD_HEALTH_COLOR);
       health_map.drawPixmap(hearts[1], WIDTH + 1, HEIGHT * 2);
       health_texture = new Texture(health_map);
 
@@ -432,7 +430,7 @@ public class Player {
       damage_heart(1);
 
     } else if (health_points == 20) {
-      hearts[2] = Utils.replacePixelsColor(hearts[2], HEALTH_COLOR, DEAD_HEALTH_COLOR);
+      hearts[2] = Utility.replacePixelsColor(hearts[2], HEALTH_COLOR, DEAD_HEALTH_COLOR);
       health_map.drawPixmap(hearts[2], WIDTH * 2 + 2, HEIGHT * 2);
       health_texture = new Texture(health_map);
 
@@ -449,9 +447,9 @@ public class Player {
         x = rand.nextInt(0, WIDTH);
         y = rand.nextInt(0, HEIGHT);
         ++counter;
-      } while((Utils.isEqualColorsWithoutAlpha(hearts[heart_num].getPixel(x, y), Color.BLACK)
+      } while((Utility.isEqualColorsWithoutAlpha(hearts[heart_num].getPixel(x, y), Color.BLACK)
         || heart_mask.getPixel(x, y) != WHITE_IN_HEART_MASK) && counter < 1000);
-      System.out.println("[damage] Selected: x: " + x + " y: " + y + " color: " + Utils.getRGBAString(hearts[heart_num].getPixel(x, y)));
+      System.out.println("[damage] Selected: x: " + x + " y: " + y + " color: " + Utility.getRGBAString(hearts[heart_num].getPixel(x, y)));
 
       if (counter >= 1000) {
         System.out.println("[damage] Count of tries is over");
@@ -508,9 +506,9 @@ public class Player {
         x = rand.nextInt(0, WIDTH);
         y = rand.nextInt(0, HEIGHT);
         ++counter;
-      } while((!Utils.isEqualColorsWithoutAlpha(hearts[heart_num].getPixel(x, y), Color.BLACK)
+      } while((!Utility.isEqualColorsWithoutAlpha(hearts[heart_num].getPixel(x, y), Color.BLACK)
         || heart_mask.getPixel(x, y) != WHITE_IN_HEART_MASK) && counter < 1000);
-      System.out.println("[treat] Selected: x: " + x + " y: " + y + " color: " + Utils.getRGBAString(hearts[heart_num].getPixel(x, y)));
+      System.out.println("[treat] Selected: x: " + x + " y: " + y + " color: " + Utility.getRGBAString(hearts[heart_num].getPixel(x, y)));
 
       if (counter >= 1000) {
         System.out.println("[treat] Count of tries is over");

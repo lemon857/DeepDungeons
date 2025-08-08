@@ -10,6 +10,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.deepdungeons.game.items.Item;
 import com.deepdungeons.game.items.Key;
 import com.deepdungeons.game.mobs.Mob;
+import com.deepdungeons.game.utils.Point;
+import com.deepdungeons.game.utils.Vector2d;
 
 public class Room {
   public static final int SCREEN_WIDTH = 150;

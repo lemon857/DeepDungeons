@@ -1,4 +1,4 @@
-package com.deepdungeons.game;
+package com.deepdungeons.game.utils;
 
 public class Point {
   public int x;

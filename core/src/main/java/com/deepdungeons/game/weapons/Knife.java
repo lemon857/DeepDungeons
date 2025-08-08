@@ -2,8 +2,8 @@ package com.deepdungeons.game.weapons;
 
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
-import com.deepdungeons.game.Point;
 import com.deepdungeons.game.items.Item;
+import com.deepdungeons.game.utils.Point;
 
 public class Knife extends Item implements CloseRangeWeapon {
 

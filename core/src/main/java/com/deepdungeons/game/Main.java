@@ -18,6 +18,8 @@ import com.deepdungeons.game.items.CommonItemForCraft;
 import com.deepdungeons.game.items.Item;
 import com.deepdungeons.game.items.Key;
 import com.deepdungeons.game.mobs.Skeleton;
+import com.deepdungeons.game.utils.Point;
+import com.deepdungeons.game.utils.Vector2d;
 import com.deepdungeons.game.weapons.CloseRangeWeapon;
 import com.deepdungeons.game.weapons.Knife;
 

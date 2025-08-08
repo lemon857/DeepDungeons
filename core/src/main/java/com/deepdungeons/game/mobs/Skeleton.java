@@ -3,9 +3,9 @@ package com.deepdungeons.game.mobs;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
-import com.deepdungeons.game.Point;
 import com.deepdungeons.game.Room;
-import com.deepdungeons.game.Vector2d;
+import com.deepdungeons.game.utils.Point;
+import com.deepdungeons.game.utils.Vector2d;
 
 public class Skeleton extends Mob {
 

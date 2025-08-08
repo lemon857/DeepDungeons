@@ -3,7 +3,7 @@ package com.deepdungeons.game.items;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
-import com.deepdungeons.game.Point;
+import com.deepdungeons.game.utils.Point;
 
 public class CommonItemForCraft extends Item {
 

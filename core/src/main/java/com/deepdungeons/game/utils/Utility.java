@@ -1,9 +1,9 @@
-package com.deepdungeons.game;
+package com.deepdungeons.game.utils;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 
-public class Utils {
+public class Utility {
 
   public static Pixmap replacePixelsColor(Pixmap map, Color src_color, Color new_color) {
     for (int i = 0; i < map.getWidth(); ++i) {

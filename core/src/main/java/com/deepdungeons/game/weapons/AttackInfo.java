@@ -1,6 +1,6 @@
 package com.deepdungeons.game.weapons;
 
-import com.deepdungeons.game.Vector2d;
+import com.deepdungeons.game.utils.Vector2d;
 
 public class AttackInfo {
   public double damage;
