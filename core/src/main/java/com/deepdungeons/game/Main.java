@@ -44,6 +44,7 @@ public class Main extends ApplicationAdapter {
   private Room current_room;
 
   private Player player;
+  private boolean is_die;
   private double timer;
   private double cooldown;
 
@@ -51,6 +52,9 @@ public class Main extends ApplicationAdapter {
 
   private Key generate_key_require;
   private int generate_key_chance;
+
+  private Label die_info;
+  private Label die_tip;
 
   private Random rand;
 
@@ -121,6 +125,27 @@ public class Main extends ApplicationAdapter {
       current_y += DEBUG_Y_STEP;
     }
 
+    die_info = new Label("You die", skin);
+    die_info.setPosition(1500 / 2 - 360, 1000 / 2);
+    die_info.setColor(1, 0, 0, 1);
+    die_info.setFontScale(15);
+    stage.addActor(die_info);
+
+    die_tip = new Label("Press SPACE to restart", skin);
+    die_tip.setPosition(1500 / 2 - 200, 1000 / 2 - 200);
+    die_tip.setColor(1, 1, 1, 1);
+    die_tip.setFontScale(3);
+    stage.addActor(die_tip);
+
+    start();
+  }
+
+  private void start() {
+    die_info.setVisible(false);
+    die_tip.setVisible(false);
+
+    player = new Player(20, 20);
+
     rooms = new HashMap<>();
 
     Room new_room = new Room(new Point(0, 0), new int[]{1, 1, 1, 1});
@@ -142,8 +167,6 @@ public class Main extends ApplicationAdapter {
     current_room_pos = new_room.getPos();
     rooms.put(current_room_pos, new_room);
 
-    player = new Player(20, 20);
-
     current_room = rooms.get(current_room_pos);
     debug_info[DEBUG_LINE_ROOM_POS].setText("Room X: " + current_room_pos.x + " Y: " + current_room_pos.y);
 
@@ -153,6 +176,7 @@ public class Main extends ApplicationAdapter {
     timer = 0;
     cooldown = 0;
     show_item_info = false;
+    is_die = false;
   }
 
   @Override
@@ -163,6 +187,12 @@ public class Main extends ApplicationAdapter {
   }
 
   private void input() {
+    if (is_die) {
+      if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+        start();
+      }
+      return;
+    }
     float speed = 40f;
     float delta = Gdx.graphics.getDeltaTime();
 
@@ -255,6 +285,18 @@ public class Main extends ApplicationAdapter {
         } else {
           debug_info[DEBUG_LINE_INFO].setText("Time left: " + (cooldown - timer));
         }
+      } else if (player.getItem() == null) { // aka hand
+        if (timer >= cooldown) {
+          if (current_room.tryHitMob(player.getPos(), player.getDirection(), 1, 5, Math.PI)) {
+            debug_info[DEBUG_LINE_INFO].setText("Hitted");
+            cooldown = 0.3;
+            timer = 0;
+          } else {
+            debug_info[DEBUG_LINE_INFO].setText("No hit");
+          }
+        } else {
+          debug_info[DEBUG_LINE_INFO].setText("Time left: " + (cooldown - timer));
+        }
       }
     }
 
@@ -309,6 +351,7 @@ public class Main extends ApplicationAdapter {
   }
 
   private void logic() {
+    if (is_die) return;
     double delta = Gdx.graphics.getDeltaTime();
     player.update(delta);
     current_room.update(delta);
@@ -322,6 +365,12 @@ public class Main extends ApplicationAdapter {
     if (current_room.distanceToNearestItem(player.getCenterPos()) > Room.PICK_UP_MAX_DISTANCE) {
       debug_info[DEBUG_LINE_ITEM_NAME].setVisible(false);
       show_item_info = false;
+    }
+
+    if (player.isDie()) {
+      die_info.setVisible(true);
+      die_tip.setVisible(true);
+      is_die = true;
     }
   }
 

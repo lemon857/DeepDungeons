@@ -398,6 +398,10 @@ public class Player {
     return GetDirectionVector(dir);
   }
 
+  public boolean isDie() {
+    return health_points <= 0;
+  }
+
   // True if it dead
   public boolean damage(int dmg) {
     if (health_points < 0) return true;
