@@ -3,6 +3,7 @@ package com.deepdungeons.game.mobs;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
+import com.deepdungeons.game.utils.Direction;
 import com.deepdungeons.game.utils.Utility;
 import com.deepdungeons.game.utils.Vector2d;
 
@@ -30,6 +31,7 @@ public class Skeleton extends Mob {
 
   @Override
   public final void update(double delta) {
+    attack_timer += delta;
     if (rand.nextInt(10000) < 2000) {
       if (rand.nextInt(10000) < 3000) {
         Vector2d del = Utility.getRandomDirectionVector(rand);
@@ -65,7 +67,11 @@ public class Skeleton extends Mob {
         current_move_dir.normalize();
       }
 
-      dir = Utility.getTranslateDirection(move.x, move.y);
+      if (Utility.getTranslateDirection(move.x, move.y) != Direction.Undefined) dir = Utility.getTranslateDirection(move.x, move.y);
+    }
+
+    if (rand.nextInt(10000) < 1000) {
+      attack();
     }
   }
   

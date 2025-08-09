@@ -271,7 +271,7 @@ public class Player {
 
   public void pickupItem(Item item) {
     inventory = item;
-    non_actual = true;
+    generateInventoryTexture();
   }
 
   public boolean isDropAvailable() {
@@ -281,7 +281,7 @@ public class Player {
   public Item dropItem() {
     Item res = inventory;
     inventory = null;
-    non_actual = true;
+    generateInventoryTexture();
     return res;
   }
   public void translate(Vector2d vector) {
@@ -297,7 +297,7 @@ public class Player {
     if (pos.y < START_BORDER.y) pos.y = START_BORDER.y;
     else if (pos.y > END_BORDER.y) pos.y = END_BORDER.y;
 
-    dir = Utility.getTranslateDirection(x, y);
+    if (Utility.getTranslateDirection(x, y) != Direction.Undefined) dir = Utility.getTranslateDirection(x, y);
     
     non_actual = true;
   }
@@ -316,7 +316,6 @@ public class Player {
   public void update(double delta) {
     if (non_actual) {
       generatePlayerImage();
-      generateInventoryTexture();
       non_actual = false;
     }
 
@@ -335,10 +334,10 @@ public class Player {
     (float)WIDTH, -(float)HEIGHT);
     if (inventory != null) {
       if (inventory.isTExtureFromFile()) {
-        batch.draw(inventory_texture, (float)pos.x + 5.5f, (float)pos.y + 4.5f, 
+        batch.draw(inventory_texture, (float)pos.x + WIDTH * 0.7f, (float)pos.y + HEIGHT * 0.65f, 
         inventory.getSize().x * 0.6f, inventory.getSize().y * 0.6f);
       } else {
-        batch.draw(inventory_texture, (float)pos.x + 5.5f, (float)pos.y + 4.5f + inventory.getSize().y * 0.6f, 
+        batch.draw(inventory_texture, (float)pos.x + WIDTH * 0.7f, (float)pos.y + HEIGHT * 0.65f + inventory.getSize().y * 0.6f, 
         inventory.getSize().x * 0.6f, -inventory.getSize().y * 0.6f);
       }
     }

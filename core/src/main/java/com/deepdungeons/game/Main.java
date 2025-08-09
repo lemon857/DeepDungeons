@@ -17,6 +17,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.deepdungeons.game.items.CommonItemForCraft;
 import com.deepdungeons.game.items.Item;
 import com.deepdungeons.game.items.Key;
+import com.deepdungeons.game.mobs.Mob;
 import com.deepdungeons.game.mobs.Skeleton;
 import com.deepdungeons.game.utils.Point;
 import com.deepdungeons.game.utils.Vector2d;
@@ -45,7 +46,7 @@ public class Main extends ApplicationAdapter {
   private Point current_room_pos;
   private Room current_room;
 
-  private Player player;
+  public static Player player;
   private boolean is_pause;
   private double timer;
   private double cooldown;
@@ -161,7 +162,10 @@ public class Main extends ApplicationAdapter {
     generate_key_chance = 10;
     new_room.addItem(key);
 
-    new_room.addMob(new Skeleton(new Vector2d(Room.START_BORDER.x + Room.WIDTH / 2, Room.START_BORDER.y + Room.HEIGHT / 2)));
+    Mob mob = new Skeleton(new Vector2d(Room.START_BORDER.x + Room.WIDTH / 2, Room.START_BORDER.y + Room.HEIGHT / 2));
+    mob.pickUpItem(new Knife());
+    new_room.addMob(mob);
+  
     //new_room.addMob(new Skeleton(new Vector2d(Room.START_BORDER.x + 35, Room.START_BORDER.y + 23)));
     //new_room.addMob(new Skeleton(new Vector2d(Room.START_BORDER.x + 23, Room.START_BORDER.y + 35)));
 
@@ -358,9 +362,9 @@ public class Main extends ApplicationAdapter {
     double delta = Gdx.graphics.getDeltaTime();
     player.update(delta);
     current_room.update(delta);
-    debug_info[DEBUG_LINE_DISTANCE].setText("Dis to door: " + Point.distance(player.getCenterPos(), Room.GetDoorPosition(req_door_id)));
+    //debug_info[DEBUG_LINE_DISTANCE].setText("Dis to door: " + Point.distance(player.getCenterPos(), Room.GetDoorPosition(req_door_id)));
     //debug_info[DEBUG_LINE_DISTANCE].setText("Dis to item: " + current_room.distanceToNearestItem(player.getCenterPos()));
-    //debug_info[DEBUG_LINE_DISTANCE].setText("Dis to mob: " + current_room.distanceToNearestMob(player.getCenterPos()));
+    debug_info[DEBUG_LINE_DISTANCE].setText("Dis to mob: " + current_room.distanceToNearestMob(player.getCenterPos()));
     debug_info[DEBUG_LINE_ANGLE].setText("Angle to mob: " + current_room.angleToNearestMob(player.getCenterPos(), player.getDirection()));
     Point pos = new Point(player.getPos());
 

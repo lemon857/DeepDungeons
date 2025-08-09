@@ -11,9 +11,17 @@ public class Knife extends Item implements CloseRangeWeapon {
   public static final int HEIGHT = 7;
 
   public static final double DISTANCE = 8.5;
-  public static final double ANGLE = Math.PI / 4.0;
-  public static final double DAMAGE = 1;
+  public static final double ANGLE = Math.PI / 2.0;
+  public static final double DAMAGE = 2;
   public static final double COOLDOWN = 0.5;
+
+  public Knife() {
+    super(Item.Type.Weapon, Item.Tier.Common, "knife");
+    this.pos = new Point();
+    this.size = new Point(WIDTH, HEIGHT);
+
+    generateImage();
+  }
 
   public Knife(Point pos) {
     super(Item.Type.Weapon, Item.Tier.Common, "knife");

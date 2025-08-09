@@ -5,11 +5,14 @@ import java.util.Random;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.deepdungeons.game.Main;
 import com.deepdungeons.game.Room;
+import com.deepdungeons.game.items.Item;
 import com.deepdungeons.game.utils.Direction;
 import com.deepdungeons.game.utils.Point;
 import com.deepdungeons.game.utils.Utility;
 import com.deepdungeons.game.utils.Vector2d;
+import com.deepdungeons.game.weapons.CloseRangeWeapon;
 
 public class Mob {
   protected Pixmap image;
@@ -21,6 +24,12 @@ public class Mob {
   protected Texture texture;
 
   protected double health_points;
+
+  protected Item inventory;
+  protected Texture inventory_texture;
+
+  protected double attack_timer;
+  private double cooldown;
 
   protected final Random rand;
 
@@ -44,9 +53,14 @@ public class Mob {
     this.id = current_id;
     ++current_id;
     this.rand = new Random();
+    this.cooldown = 0;
+    this.attack_timer = 0;
+    this.dir = Direction.Undefined;
   }
 
-  public void update(double delta) {}
+  public void update(double delta) {
+    attack_timer += delta;
+  }
   protected void generateImage() {
     image = new Pixmap(1, 1, Pixmap.Format.RGB888);
 
@@ -96,15 +110,59 @@ public class Mob {
     if (pos.y < start_border.y) pos.y = start_border.y;
     else if (pos.y > end_border.y) pos.y = end_border.y;
 
-    dir = Utility.getTranslateDirection(x, y);
+    if (Utility.getTranslateDirection(x, y) != Direction.Undefined) dir = Utility.getTranslateDirection(x, y);
+  }
+
+  private void generateInventoryTexture() {
+    if (inventory != null) {
+      inventory_texture = new Texture(inventory.getImage());
+    } else {
+      Pixmap map = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
+      inventory_texture = new Texture(map);
+    }
+  }
+
+  public void pickUpItem(Item item) {
+    inventory = item;
+    generateInventoryTexture();
   }
 
   public final void draw(SpriteBatch batch) {
     batch.draw(texture, (float)pos.x, (float)pos.y + (float)size.y, (float)size.x, -(float)size.y);
+    if (inventory != null) {
+      if (inventory.isTExtureFromFile()) {
+        batch.draw(inventory_texture, (float)pos.x + (float)size.x * 0.7f, (float)pos.y + (float)size.y * 0.65f, 
+        inventory.getSize().x * 0.6f, inventory.getSize().y * 0.6f);
+      } else {
+        batch.draw(inventory_texture, (float)pos.x + (float)size.x * 0.7f, (float)pos.y + (float)size.y * 0.65f + inventory.getSize().y * 0.6f, 
+        inventory.getSize().x * 0.6f, -inventory.getSize().y * 0.6f);
+      }
+    }
   }
 
   protected void attack() {
-    
+    if (attack_timer < cooldown) return;
+    double max_distance = 0;
+    double max_angle = 0;
+    double damage = 0;
+    if (inventory instanceof CloseRangeWeapon) {
+      CloseRangeWeapon weapon = (CloseRangeWeapon)inventory;
+      damage = weapon.getDamage();
+      max_angle = weapon.getAngle();
+      max_distance = weapon.getDistance();
+      cooldown = weapon.getCooldown();
+    } else { // aka hand
+      damage = 1;
+      max_distance = 5;
+      max_angle = Math.PI;
+      cooldown = 0.3;
+    }
+    Vector2d v2 = new Vector2d(pos, Main.player.getPos());
+
+    if (v2.length() < max_distance && Vector2d.angle(Utility.getDirectionVector(dir), v2) < max_angle) {
+      Main.player.damage((int)damage);
+      attack_timer = 0;
+    }
   }
 
   // True if it dead
