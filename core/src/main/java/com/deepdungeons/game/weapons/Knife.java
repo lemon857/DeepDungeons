@@ -3,7 +3,7 @@ package com.deepdungeons.game.weapons;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.deepdungeons.game.items.Item;
-import com.deepdungeons.game.utils.Point;
+import com.deepdungeons.game.utils.Vector2d;
 
 public class Knife extends Item implements CloseRangeWeapon {
 
@@ -17,23 +17,24 @@ public class Knife extends Item implements CloseRangeWeapon {
 
   public Knife() {
     super(Item.Type.Weapon, Item.Tier.Common, "knife");
-    this.pos = new Point();
-    this.size = new Point(WIDTH, HEIGHT);
+    this.pos = new Vector2d();
+    this.size = new Vector2d(WIDTH, HEIGHT);
 
+    generateRandomPos();
     generateImage();
   }
 
-  public Knife(Point pos) {
+  public Knife(Vector2d pos) {
     super(Item.Type.Weapon, Item.Tier.Common, "knife");
     this.pos = pos;
-    this.size = new Point(WIDTH, HEIGHT);
+    this.size = new Vector2d(WIDTH, HEIGHT);
 
     generateImage();
   }
  
   @Override
   protected final void generateImage() {
-    image = new Pixmap(size.x, size.y, Pixmap.Format.RGBA8888);
+    image = new Pixmap(WIDTH, HEIGHT, Pixmap.Format.RGBA8888);
 
     image.setColor(1, 1, 1, 1);
     

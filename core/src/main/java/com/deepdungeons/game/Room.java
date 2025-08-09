@@ -126,15 +126,10 @@ public class Room {
   public Key lockDoor(int door_id) {
     lock_doors[door_id] = rand.nextInt();
     lock_doors_color[door_id] = new Color(rand.nextFloat(1), rand.nextFloat(1), rand.nextFloat(1), 1);
-    Point new_pos = new Point();
-    do {
-    new_pos.x = rand.nextInt(Key.WIDTH + START_BORDER.x + 1, END_BORDER.x - Key.WIDTH - 1);
-    new_pos.y = rand.nextInt(START_BORDER.y + Key.HEIGHT + 1, END_BORDER.y - Key.HEIGHT - 1);
-    } while(distanceToNearestItem(new_pos) < 7);
 
     non_actual = true;
   
-    return new Key(lock_doors[door_id], lock_doors_color[door_id], new_pos);
+    return new Key(lock_doors[door_id], lock_doors_color[door_id]);
   }
 
   public void lockAllDoors() {
@@ -192,7 +187,7 @@ public class Room {
 
   public boolean canGrabItem(Vector2d cur_pos) {
     for (Item item : items) {
-      if (Point.distance(cur_pos, item.getCenterPos()) < PICK_UP_MAX_DISTANCE) {
+      if (Vector2d.distance(cur_pos, item.getCenterPos()) < PICK_UP_MAX_DISTANCE) {
         can_grab_item = item;
         return true;
       }
@@ -203,26 +198,18 @@ public class Room {
   public Item getNearestItem(Vector2d cur_pos) {
     double res = 50;
     for (Item item : items) {
-      res = Math.min(res, Point.distance(cur_pos, item.getCenterPos()));
+      res = Math.min(res, Vector2d.distance(cur_pos, item.getCenterPos()));
     }
     for (Item item : items) {
-      if (Point.distance(cur_pos, item.getCenterPos()) == res) return item;
+      if (Vector2d.distance(cur_pos, item.getCenterPos()) == res) return item;
     }
     return null;    
-  }
-
-  public double distanceToNearestItem(Point cur_pos) {
-    double res = 50;
-    for (Item item : items) {
-      res = Math.min(res, Point.distance(cur_pos, item.getCenterPos()));
-    }
-    return res;
   }
 
   public double distanceToNearestItem(Vector2d cur_pos) {
     double res = 50;
     for (Item item : items) {
-      res = Math.min(res, Point.distance(cur_pos, item.getCenterPos()));
+      res = Math.min(res, Vector2d.distance(cur_pos, item.getCenterPos()));
     }
     return res;
   }

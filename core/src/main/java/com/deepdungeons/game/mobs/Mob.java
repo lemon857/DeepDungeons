@@ -138,10 +138,10 @@ public class Mob {
     if (inventory != null) {
       if (inventory.isTExtureFromFile()) {
         batch.draw(inventory_texture, (float)pos.x + (float)size.x * 0.7f, (float)pos.y + (float)size.y * 0.65f, 
-        inventory.getSize().x * 0.6f, inventory.getSize().y * 0.6f);
+        (float)inventory.getSize().x * 0.6f, (float)inventory.getSize().y * 0.6f);
       } else {
-        batch.draw(inventory_texture, (float)pos.x + (float)size.x * 0.7f, (float)pos.y + (float)size.y * 0.65f + inventory.getSize().y * 0.6f, 
-        inventory.getSize().x * 0.6f, -inventory.getSize().y * 0.6f);
+        batch.draw(inventory_texture, (float)pos.x + (float)size.x * 0.7f, (float)pos.y + (float)size.y * 0.65f + (float)inventory.getSize().y * 0.6f, 
+        (float)inventory.getSize().x * 0.6f, (float)inventory.getSize().y * -0.6f);
       }
     }
   }

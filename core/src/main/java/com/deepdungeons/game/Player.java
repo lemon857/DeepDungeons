@@ -37,7 +37,13 @@ public class Player {
 
   private static final int WHITE_IN_HEART_MASK = -1;
 
-  private static final double HUNGER_DAMAGE_COOLDOWN = 2.5;
+  private static final double HUNGER_DAMAGE_COOLDOWN = 3;
+  private static final double STRENGTH_HUNGER_COOLDOWN = 4;
+  private static final double FAST_ATTACK_THIRSTY_COOLDOWN = 5;
+
+  private double hunger_damage_timer;
+  private double strength_hunger_timer;
+  private double fast_attack_thirsty_timer;
 
   private final Random rand;
 
@@ -69,7 +75,10 @@ public class Player {
   private int food_points;
   private int thirsty_points;
 
-  private double timer;
+  private double move_speed;
+  private double attack_speed;
+  private double strength;
+  private double luck;
 
   public Player(int x, int y) {
     this.rand = new Random();
@@ -80,7 +89,14 @@ public class Player {
     this.food_points = MAX_FP;
     this.thirsty_points = MAX_TP;
 
-    this.timer = 0;
+    this.move_speed = 40;
+    this.attack_speed = 1;
+    this.strength = 1;
+    this.luck = 0;
+
+    this.hunger_damage_timer = 0;
+    this.strength_hunger_timer = 0;
+    this.fast_attack_thirsty_timer = 0;
 
     Pixmap map = new Pixmap(18, 6, Pixmap.Format.RGBA8888);
     inventory_texture = new Texture(map);
@@ -320,10 +336,26 @@ public class Player {
     }
 
     if (food_points == 0) {
-      timer += delta;
-      if (timer >= HUNGER_DAMAGE_COOLDOWN) {
+      hunger_damage_timer += delta;
+      if (hunger_damage_timer >= HUNGER_DAMAGE_COOLDOWN) {
         damage(1);
-        timer = 0;
+        hunger_damage_timer = 0;
+      }
+    }
+
+    if (strength > 1) {
+      strength_hunger_timer += delta;
+      if (strength_hunger_timer >= STRENGTH_HUNGER_COOLDOWN) {
+        hunger(1);
+        strength_hunger_timer = 0;
+      }
+    }
+
+    if (attack_speed > 1) {
+      fast_attack_thirsty_timer += delta;
+      if (fast_attack_thirsty_timer >= FAST_ATTACK_THIRSTY_COOLDOWN) {
+        thirst(1);
+        fast_attack_thirsty_timer = 0;
       }
     }
   }
@@ -335,13 +367,48 @@ public class Player {
     if (inventory != null) {
       if (inventory.isTExtureFromFile()) {
         batch.draw(inventory_texture, (float)pos.x + WIDTH * 0.7f, (float)pos.y + HEIGHT * 0.65f, 
-        inventory.getSize().x * 0.6f, inventory.getSize().y * 0.6f);
+        (float)inventory.getSize().x * 0.6f, (float)inventory.getSize().y * 0.6f);
       } else {
-        batch.draw(inventory_texture, (float)pos.x + WIDTH * 0.7f, (float)pos.y + HEIGHT * 0.65f + inventory.getSize().y * 0.6f, 
-        inventory.getSize().x * 0.6f, -inventory.getSize().y * 0.6f);
+        batch.draw(inventory_texture, (float)pos.x + WIDTH * 0.7f, (float)pos.y + HEIGHT * 0.65f + (float)inventory.getSize().y * 0.6f, 
+        (float)inventory.getSize().x * 0.6f, (float)inventory.getSize().y * -0.6f);
       }
     }
     batch.draw(health_texture, 1, Room.SCREEN_HEIGHT - 1, WIDTH * 4, -HEIGHT * 3);
+  }
+  
+  public void setMoveSpeed(double move_speed) {
+    this.move_speed = move_speed;
+  }
+
+  public void setAttackSpeed(double attack_speed) {
+    this.attack_speed = attack_speed;
+  }
+
+  public void setStrength(double strength) {
+    this.strength = strength;
+  }
+
+  public void setLuck(double luck) {
+    this.luck = luck;
+  }
+
+  public double getMoveSpeed() {
+    return move_speed;
+  }
+
+  public double getAttackSpeed() {
+    return attack_speed;
+  }
+
+  public double getStrength() {
+    return strength;
+  }
+
+  public double useLuck(double negativeMax, double positiveMax) {
+    if (luck == 0) return 0;
+    else if (luck > 0) return rand.nextDouble(luck * Math.abs(positiveMax)) * Math.signum(positiveMax);
+
+    return rand.nextDouble(luck * Math.abs(negativeMax)) * Math.signum(negativeMax);
   }
 
   public Vector2d getPos() {

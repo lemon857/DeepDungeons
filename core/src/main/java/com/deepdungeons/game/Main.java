@@ -79,7 +79,7 @@ public class Main extends ApplicationAdapter {
 
   public static CommonItemForCraft[] static_items;
   public static final int BONE_ITEM = 0;
-  public static final int ROW_ITEM = 1;
+  public static final int ROPE_ITEM = 1;
   public static final int LEATHER_ITEM = 2;
 
   @Override
@@ -115,7 +115,7 @@ public class Main extends ApplicationAdapter {
 
     static_items = new CommonItemForCraft[3];
     static_items[BONE_ITEM] = new CommonItemForCraft("bone.png", "bone");
-    static_items[ROW_ITEM] = new CommonItemForCraft("row.png", "row");
+    static_items[ROPE_ITEM] = new CommonItemForCraft("rope.png", "rope");
     static_items[LEATHER_ITEM] = new CommonItemForCraft("leather.png", "leather");
 
     Skin skin = new Skin(Gdx.files.internal("ui/uiskin.json"));
@@ -173,11 +173,11 @@ public class Main extends ApplicationAdapter {
       new_room.addMob(mob);
     }
 
-    new_room.addItem(new Knife(new Point(Room.START_BORDER.x + 10, Room.START_BORDER.y + 10)));
+    new_room.addItem(new Knife());
 
-    new_room.addItem(new CommonItemForCraft(static_items[BONE_ITEM], new Point(Room.START_BORDER.x + 50, Room.START_BORDER.y + 50)));
-    new_room.addItem(new CommonItemForCraft(static_items[ROW_ITEM], new Point(Room.START_BORDER.x + 60, Room.START_BORDER.y + 60)));
-    new_room.addItem(new CommonItemForCraft(static_items[LEATHER_ITEM], new Point(Room.START_BORDER.x + 70, Room.START_BORDER.y + 70)));
+    new_room.addItem(new CommonItemForCraft(static_items[BONE_ITEM]));
+    new_room.addItem(new CommonItemForCraft(static_items[ROPE_ITEM]));
+    new_room.addItem(new CommonItemForCraft(static_items[LEATHER_ITEM]));
 
     current_room_pos = new_room.getPos();
     rooms.put(current_room_pos, new_room);
@@ -217,8 +217,8 @@ public class Main extends ApplicationAdapter {
     if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
       is_pause = true;
     }
-    float speed = 40f;
-    float delta = Gdx.graphics.getDeltaTime();
+    double speed = player.getMoveSpeed();
+    double delta = Gdx.graphics.getDeltaTime();
 
     Point pos = new Point(player.getPos());
     Vector2d vector = new Vector2d();
@@ -275,7 +275,7 @@ public class Main extends ApplicationAdapter {
           if (player.isDropAvailable()) {
             Item item = player.dropItem();
 
-            item.setCenterPos(new Point(player.getCenterPos()));
+            item.setCenterPos(player.getCenterPos());
             current_room.addItem(item);
           }
           player.pickupItem(current_room.grabItem());
@@ -285,7 +285,7 @@ public class Main extends ApplicationAdapter {
           if (player.isDropAvailable()) {
           Item item = player.dropItem();
 
-          item.setCenterPos(new Point(player.getCenterPos()));
+          item.setCenterPos(player.getCenterPos());
           current_room.addItem(item);
           }
           debug_info[DEBUG_LINE_INFO].setText("Can't grab!");
@@ -299,9 +299,10 @@ public class Main extends ApplicationAdapter {
       if (player.getItem() instanceof CloseRangeWeapon) {
         if (timer >= cooldown) {
           CloseRangeWeapon weapon = (CloseRangeWeapon)player.getItem();
-          if (current_room.tryHitMob(player.getPos(), player.getDirection(), weapon.getDamage(), weapon.getDistance(), weapon.getAngle())) {
+          if (current_room.tryHitMob(player.getPos(), player.getDirection(), 
+            weapon.getDamage() * player.getStrength(), weapon.getDistance(), weapon.getAngle())) {
             debug_info[DEBUG_LINE_INFO].setText("Hitted");
-            cooldown = weapon.getCooldown();
+            cooldown = weapon.getCooldown() / player.getAttackSpeed();
             timer = 0;
           } else {
             debug_info[DEBUG_LINE_INFO].setText("No hit");
@@ -311,9 +312,10 @@ public class Main extends ApplicationAdapter {
         }
       } else if (player.getItem() == null) { // aka hand
         if (timer >= cooldown) {
-          if (current_room.tryHitMob(player.getPos(), player.getDirection(), Hand.getDamage(rand), Hand.DISTANCE, Hand.ANGLE)) {
+          if (current_room.tryHitMob(player.getPos(), player.getDirection(), 
+            Hand.getDamage(rand) * player.getStrength(), Hand.DISTANCE, Hand.ANGLE)) {
             debug_info[DEBUG_LINE_INFO].setText("Hitted");
-            cooldown = Hand.getCooldown(rand);
+            cooldown = Hand.getCooldown(rand) / player.getAttackSpeed();
             timer = 0;
           } else {
             debug_info[DEBUG_LINE_INFO].setText("No hit");
@@ -455,14 +457,21 @@ public class Main extends ApplicationAdapter {
         }
       }
 
-      int count_new_mobs = rand.nextInt(10);
+      int count_new_mobs = rand.nextInt(10 + (int)Math.floor(player.useLuck(5, -5)));
 
       for (int i = 0; i < count_new_mobs; ++i) {
         Mob mob = new Skeleton();
-        if (rand.nextInt(10000) < 800) {
+        if (rand.nextInt(10000) < 800 + (int)Math.floor(player.useLuck(100, -100))) {
           mob.pickUpItem(new Knife());
         }
         new_room.addMob(mob);
+      }
+
+      if (rand.nextInt(10000) < 5000) { // have items
+        int count_new_items = rand.nextInt(2 + (int)Math.ceil(player.useLuck(1, -1)));
+        for (int i = 0; i < count_new_items; ++i) {
+          new_room.addItem(new CommonItemForCraft(static_items[rand.nextInt(3)]));
+        }
       }
 
       rooms.put(current_room_pos, new_room);

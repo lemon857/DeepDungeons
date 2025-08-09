@@ -1,20 +1,24 @@
 package com.deepdungeons.game.items;
 
+import java.util.Random;
+
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.deepdungeons.game.Room;
-import com.deepdungeons.game.utils.Point;
+import com.deepdungeons.game.utils.Vector2d;
 
 public class Item {
   protected Pixmap image;
 
   protected Texture texture;
 
-  protected Point pos;
-  protected Point size;
+  protected Vector2d pos;
+  protected Vector2d size;
 
   protected boolean is_texture_from_file = false;
+  
+  protected final Random rand;
 
   private final int id;
 
@@ -40,9 +44,15 @@ public class Item {
     this.name = name;
     this.id = current_id;
     ++current_id;
+    this.rand = new Random();
   }
 
   public void update(double delta) {}
+
+  public final void generateRandomPos() {
+    pos.x = rand.nextDouble(size.x + Room.START_BORDER.x + 1, Room.END_BORDER.x - size.x - 1);
+    pos.y = rand.nextDouble(Room.START_BORDER.y + size.y + 1, Room.END_BORDER.y - size.y - 1);
+  }
 
   protected void generateImage() {
     image = new Pixmap(1, 1, Pixmap.Format.RGB888);
@@ -78,7 +88,7 @@ public class Item {
     return name;
   }
 
-  public final Point getPos() {
+  public final Vector2d getPos() {
     return pos;
   }
 
@@ -87,15 +97,15 @@ public class Item {
   }
 
   // For text drawing
-  public final Point getCenterPos() {
-    return Point.sum(pos, Point.div(size, 2));
+  public final Vector2d getCenterPos() {
+    return Vector2d.sum(pos, Vector2d.div(size, 2));
   }
 
-  public final Point getSize() {
+  public final Vector2d getSize() {
     return size;
   }
 
-  public final void setPos(Point new_pos) {
+  public final void setPos(Vector2d new_pos) {
     pos = new_pos;
     if (pos.x + size.x > Room.END_BORDER.x) {
       pos.x = Room.END_BORDER.x - size.x - 1;
@@ -111,8 +121,8 @@ public class Item {
     }
   }
 
-  public final void setCenterPos(Point new_pos) {
-    pos = Point.sub(new_pos, Point.div(size, 2));
+  public final void setCenterPos(Vector2d new_pos) {
+    pos = Vector2d.sub(new_pos, Vector2d.div(size, 2));
     if (pos.x + size.x > Room.END_BORDER.x) {
       pos.x = Room.END_BORDER.x - size.x - 1;
     }

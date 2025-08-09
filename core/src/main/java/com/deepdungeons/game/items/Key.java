@@ -3,7 +3,7 @@ package com.deepdungeons.game.items;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
-import com.deepdungeons.game.utils.Point;
+import com.deepdungeons.game.utils.Vector2d;
 
 public class Key extends Item {
   public static final int WIDTH = 8;
@@ -12,12 +12,24 @@ public class Key extends Item {
   private final int key;
   private final Color color;
 
-  public Key(int key, Color color, Point pos) {
+  public Key(int key, Color color) {
+    super(Item.Type.Key, Item.Tier.Common,  "key");
+    this.key = key;
+    this.color = color;
+    this.pos = new Vector2d();
+    this.size = new Vector2d(WIDTH, HEIGHT);
+
+    generateRandomPos();
+    generateImage();
+  }
+
+  public Key(int key, Color color, Vector2d pos) {
     super(Item.Type.Key, Item.Tier.Common,  "key");
     this.key = key;
     this.color = color;
     this.pos = pos;
-    this.size = new Point(WIDTH, HEIGHT);
+    this.size = new Vector2d(WIDTH, HEIGHT);
+    
     generateImage();
   }
 
@@ -27,7 +39,7 @@ public class Key extends Item {
 
   @Override
   protected final void generateImage() {
-    image = new Pixmap(size.x, size.y, Pixmap.Format.RGBA8888);
+    image = new Pixmap(WIDTH, HEIGHT, Pixmap.Format.RGBA8888);
 
     image.setColor(1, 1, 1, 1);
 
