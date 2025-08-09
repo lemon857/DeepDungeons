@@ -20,6 +20,16 @@ public class Skeleton extends Mob {
 
   private Vector2d current_move_dir;
 
+  public Skeleton() {
+    super(Mob.Tier.Humble, SPEED);
+    this.health_points = rand.nextDouble(MAX_HP_LOW, MAX_HP_HIGH + 1);
+    this.pos = new Vector2d();
+    setSize(WIDTH, HEIGHT);
+    generateRandomPos();
+    generateImage();
+    current_move_dir = Utility.getRandomDirectionVector(rand);
+  }
+  
   public Skeleton(Vector2d pos) {
     super(Mob.Tier.Humble, SPEED);
     this.pos = pos;

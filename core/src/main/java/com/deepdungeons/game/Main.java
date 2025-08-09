@@ -162,12 +162,15 @@ public class Main extends ApplicationAdapter {
     generate_key_chance = 10;
     new_room.addItem(key);
 
-    Mob mob = new Skeleton(new Vector2d(Room.START_BORDER.x + Room.WIDTH / 2, Room.START_BORDER.y + Room.HEIGHT / 2));
-    mob.pickUpItem(new Knife());
-    new_room.addMob(mob);
-  
-    //new_room.addMob(new Skeleton(new Vector2d(Room.START_BORDER.x + 35, Room.START_BORDER.y + 23)));
-    //new_room.addMob(new Skeleton(new Vector2d(Room.START_BORDER.x + 23, Room.START_BORDER.y + 35)));
+    int count_new_mobs = rand.nextInt(10);
+
+    for (int i = 0; i < count_new_mobs; ++i) {
+      Mob mob = new Skeleton();
+      if (rand.nextInt(10000) < 800) {
+        mob.pickUpItem(new Knife());
+      }
+      new_room.addMob(mob);
+    }
 
     new_room.addItem(new Knife(new Point(Room.START_BORDER.x + 10, Room.START_BORDER.y + 10)));
 
@@ -449,6 +452,16 @@ public class Main extends ApplicationAdapter {
         } else {
           ++generate_key_chance;
         }
+      }
+
+      int count_new_mobs = rand.nextInt(10);
+
+      for (int i = 0; i < count_new_mobs; ++i) {
+        Mob mob = new Skeleton();
+        if (rand.nextInt(10000) < 800) {
+          mob.pickUpItem(new Knife());
+        }
+        new_room.addMob(mob);
       }
 
       rooms.put(current_room_pos, new_room);

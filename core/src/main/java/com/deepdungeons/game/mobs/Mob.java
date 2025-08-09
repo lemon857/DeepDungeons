@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.deepdungeons.game.Main;
 import com.deepdungeons.game.Room;
 import com.deepdungeons.game.items.Item;
+import com.deepdungeons.game.items.Key;
 import com.deepdungeons.game.utils.Direction;
 import com.deepdungeons.game.utils.Point;
 import com.deepdungeons.game.utils.Utility;
@@ -89,6 +90,11 @@ public class Mob {
 
   public final Pixmap getImage() {
     return image;
+  }
+
+  public final void generateRandomPos() {
+    pos.x = rand.nextDouble(size.x + Room.START_BORDER.x + 1, Room.END_BORDER.x - size.x - 1);
+    pos.y = rand.nextDouble(Room.START_BORDER.y + size.y + 1, Room.END_BORDER.y - size.y - 1);
   }
 
   public final void setSize(double width, double height) {

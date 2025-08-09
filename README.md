@@ -4,6 +4,8 @@ Game will be about dungeons like a set of dynamic-generating rooms with mobs, ch
 Every room has some doors, in quantity from one to four  
 Doors can be locked, every locked door have one unique key same with door lock color  
 
+Now room can be generated with some Skeletons, if you need you can kill they
+
 # Items desctiption
 
 Items have a four tiers: `common`, `uncommon`, `startling`, `incredible`  
@@ -16,6 +18,8 @@ bone, row and leather - common items for craft
 
 Mobs like items have a four tiers: `humble`, `general`, `wicked`, `aggressive`  
 Now game have one mob - skeleton
+
+Skeleton can attack with hand and knife, attack depends on his direction, good luck
 
 # Attack description
 
