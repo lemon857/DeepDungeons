@@ -123,6 +123,14 @@ public class Room {
     return lock_doors[door_id];
   }
 
+  public int getDoorsCount() {
+    int res = 0;
+    for (int i = 0; i < MAX_DOORS_COUNT; ++i) {
+      if (doors[i]) ++res;
+    }
+    return res;
+  }
+
   public Key lockDoor(int door_id) {
     lock_doors[door_id] = rand.nextInt();
     lock_doors_color[door_id] = new Color(rand.nextFloat(1), rand.nextFloat(1), rand.nextFloat(1), 1);

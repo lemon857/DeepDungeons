@@ -57,8 +57,14 @@ public class Main extends ApplicationAdapter {
   private Key generate_key_require;
   private int generate_key_chance;
 
-  private Label die_info;
-  private Label die_tip;
+  private Label pause_info_label;
+  private Label pause_tip_label;
+
+  private static final String die_message = "YOU DIED";
+  private static final String die_tip = "Press SPACE to restart";
+
+  private static final String pause_message = "PAUSE";
+  private static final String pause_tip = "Press ESC to resume\nPress SPACE to restart";
 
   private Random rand;
 
@@ -129,17 +135,17 @@ public class Main extends ApplicationAdapter {
       current_y += DEBUG_Y_STEP;
     }
 
-    die_info = new Label("You die", skin);
-    die_info.setPosition(1500 / 2 - 360, 1000 / 2);
-    die_info.setColor(1, 0, 0, 1);
-    die_info.setFontScale(15);
-    stage.addActor(die_info);
+    pause_info_label = new Label("", skin);
+    pause_info_label.setPosition(1500 / 2 - 360, 1000 / 2);
+    pause_info_label.setColor(1, 0, 0, 1);
+    pause_info_label.setFontScale(15);
+    stage.addActor(pause_info_label);
 
-    die_tip = new Label("Press SPACE to restart", skin);
-    die_tip.setPosition(1500 / 2 - 200, 1000 / 2 - 200);
-    die_tip.setColor(1, 1, 1, 1);
-    die_tip.setFontScale(3);
-    stage.addActor(die_tip);
+    pause_tip_label = new Label("", skin);
+    pause_tip_label.setPosition(1500 / 2 - 200, 1000 / 2 - 200);
+    pause_tip_label.setColor(1, 1, 1, 1);
+    pause_tip_label.setFontScale(3);
+    stage.addActor(pause_tip_label);
 
     debug_info[DEBUG_LINE_ITEM_NAME].setPosition(DEBUG_START.x, 100);
     
@@ -150,10 +156,10 @@ public class Main extends ApplicationAdapter {
   }
 
   private void start() {
-    die_info.setVisible(false);
-    die_tip.setVisible(false);
+    pause_info_label.setVisible(false);
+    pause_tip_label.setVisible(false);
 
-    player = new Player(20, 20);
+    player = new Player();
 
     rooms = new HashMap<>();
 
@@ -209,12 +215,20 @@ public class Main extends ApplicationAdapter {
       
       if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
         is_pause = false;
+      
+        pause_info_label.setVisible(false);
+        pause_tip_label.setVisible(false);
       }
 
       return;
     }
 
     if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+      pause_info_label.setText(pause_message);
+      pause_tip_label.setText(pause_tip);
+
+      pause_info_label.setVisible(true);
+      pause_tip_label.setVisible(true);
       is_pause = true;
     }
     double speed = player.getMoveSpeed();
@@ -387,9 +401,13 @@ public class Main extends ApplicationAdapter {
     }
 
     if (player.isDie()) {
-      die_info.setVisible(true);
-      die_tip.setVisible(true);
       is_pause = true;
+
+      pause_info_label.setText(die_message);
+      pause_tip_label.setText(die_tip);
+
+      pause_info_label.setVisible(true);
+      pause_tip_label.setVisible(true);
     }
   }
 
@@ -457,20 +475,24 @@ public class Main extends ApplicationAdapter {
         }
       }
 
-      int count_new_mobs = rand.nextInt(10 + (int)Math.floor(player.useLuck(5, -5)));
+      int type_room = rand.nextInt(10); // 0-1 - empty room, 2-5 - room with enemies, 6-9 - room with items
 
-      for (int i = 0; i < count_new_mobs; ++i) {
-        Mob mob = new Skeleton();
-        if (rand.nextInt(10000) < 800 + (int)Math.floor(player.useLuck(100, -100))) {
-          mob.pickUpItem(new Knife());
+      if (type_room > 1 && type_room < 6) {
+        int count_new_mobs = rand.nextInt(10 + (int)Math.floor(player.useLuck(5, -5)));
+
+        for (int i = 0; i < count_new_mobs; ++i) {
+          Mob mob = new Skeleton();
+          if (rand.nextInt(10000) < 800 + (int)Math.floor(player.useLuck(100, -100))) {
+            mob.pickUpItem(new Knife());
+          }
+          new_room.addMob(mob);
         }
-        new_room.addMob(mob);
-      }
-
-      if (rand.nextInt(10000) < 5000) { // have items
-        int count_new_items = rand.nextInt(2 + (int)Math.ceil(player.useLuck(1, -1)));
-        for (int i = 0; i < count_new_items; ++i) {
-          new_room.addItem(new CommonItemForCraft(static_items[rand.nextInt(3)]));
+      } else if (type_room > 6) {
+        if (rand.nextInt(10000) < 7500 + (4 - new_room.getDoorsCount()) * 250) { // have items
+          int count_new_items = rand.nextInt(3 + (int)Math.ceil(player.useLuck(1, -1)));
+          for (int i = 0; i < count_new_items; ++i) {
+            new_room.addItem(new CommonItemForCraft(static_items[rand.nextInt(3)]));
+          }
         }
       }
 

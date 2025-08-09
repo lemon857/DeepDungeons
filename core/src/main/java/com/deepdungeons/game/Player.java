@@ -80,9 +80,9 @@ public class Player {
   private double strength;
   private double luck;
 
-  public Player(int x, int y) {
+  public Player() {
     this.rand = new Random();
-    this.pos = new Vector2d(x, y);
+    this.pos = new Vector2d();
     this.dir = Direction.Up;
     this.non_actual = false;
     this.health_points = MAX_HP;
@@ -97,6 +97,8 @@ public class Player {
     this.hunger_damage_timer = 0;
     this.strength_hunger_timer = 0;
     this.fast_attack_thirsty_timer = 0;
+
+    generateRandomPos();
 
     Pixmap map = new Pixmap(18, 6, Pixmap.Format.RGBA8888);
     inventory_texture = new Texture(map);
@@ -114,6 +116,10 @@ public class Player {
     generatePlayerImage();
     generateInventoryTexture();
     generateHealthTexture();
+  }
+  public final void generateRandomPos() {
+    pos.x = rand.nextDouble(WIDTH + Room.START_BORDER.x + 1, Room.END_BORDER.x - WIDTH - 1);
+    pos.y = rand.nextDouble(Room.START_BORDER.y + HEIGHT + 1, Room.END_BORDER.y - HEIGHT - 1);
   }
 
   private void generatePlayerImage() {
