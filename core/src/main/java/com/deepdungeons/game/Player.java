@@ -65,7 +65,7 @@ public class Player {
 
   private Item inventory;
 
-  private int health_points;
+  private double health_points;
   private int food_points;
   private int thirsty_points;
 
@@ -361,38 +361,46 @@ public class Player {
   }
 
   // True if it dead
-  public boolean damage(int dmg) {
+  public boolean damage(double dmg) {
     if (health_points < 0) return true;
 
-    System.out.println("[damage] HP: " + (health_points - dmg));
-    for (int i = 0; i < dmg; ++i) {
+    int i;
+    for (i = 0; i < Math.floor(dmg); ++i) {
       --health_points;
-      simple_damage();
+      simple_damage(1);
     }
-       
+    int before = (int)Math.ceil(health_points);
+    health_points -= (dmg - i);
+    int after = (int)Math.ceil(health_points);
+    System.out.println("[damage] before: " + before + " after: " + after);
+    if (before - after != 0) {
+      simple_damage(dmg - i);
+    }
+
+    System.out.println("[damage] HP: " + health_points);
     return health_points <= 0;
   }
-  private void simple_damage() {
-    if (health_points == 0) {
+  private void simple_damage(double delta) {
+    if (health_points <= 0) {
       hearts[0] = Utility.replacePixelsColor(hearts[0], HEALTH_COLOR, DEAD_HEALTH_COLOR);
       health_map.drawPixmap(hearts[0], 0, HEIGHT * 2);
+      health_texture = new Texture(health_map);
+
+    } else if (health_points == 10 || (health_points + delta > 10 && health_points < 10)) {
+      hearts[1] = Utility.replacePixelsColor(hearts[1], HEALTH_COLOR, DEAD_HEALTH_COLOR);
+      health_map.drawPixmap(hearts[1], WIDTH + 1, HEIGHT * 2);
       health_texture = new Texture(health_map);
 
     } else if (health_points > 0 && health_points < 10) {
       damage_heart(0);
 
-    } else if (health_points == 10) {
-      hearts[1] = Utility.replacePixelsColor(hearts[1], HEALTH_COLOR, DEAD_HEALTH_COLOR);
-      health_map.drawPixmap(hearts[1], WIDTH + 1, HEIGHT * 2);
+    } else if (health_points == 20 || (health_points + delta > 20 && health_points < 20)) {
+      hearts[2] = Utility.replacePixelsColor(hearts[2], HEALTH_COLOR, DEAD_HEALTH_COLOR);
+      health_map.drawPixmap(hearts[2], WIDTH * 2 + 2, HEIGHT * 2);
       health_texture = new Texture(health_map);
 
     } else if (health_points > 10 && health_points < 20) {
       damage_heart(1);
-
-    } else if (health_points == 20) {
-      hearts[2] = Utility.replacePixelsColor(hearts[2], HEALTH_COLOR, DEAD_HEALTH_COLOR);
-      health_map.drawPixmap(hearts[2], WIDTH * 2 + 2, HEIGHT * 2);
-      health_texture = new Texture(health_map);
 
     } else if (health_points > 20 && health_points < 30) {
       damage_heart(2);
@@ -420,42 +428,51 @@ public class Player {
     health_texture = new Texture(health_map);
   }
 
-  public void treat(int health) {
+  public void treat(double health) {
     if (health_points >= MAX_HP) return;
-    System.out.println("[treat] HP: " + (health_points + health));
-    for (int i = 0; i < health; ++i) {
+    int i;
+    for (i = 0; i < Math.floor(health); ++i) {
       ++health_points;
-      simple_treat();
+      simple_treat(1);
     }
+    
     if (health_points >= MAX_HP) health_points = MAX_HP;
+    int before = (int)Math.ceil(health_points);
+    health_points += (health - i);
+    int after = (int)Math.ceil(health_points);
+    System.out.println("[treat] before: " + before + " after: " + after);
+    if (before - after != 0) {
+      simple_damage(health - i);
+    }
+    System.out.println("[treat] HP: " + health_points);
   }
-  private void simple_treat() {
+  private void simple_treat(double delta) {
     if (health_points == 0) {
+
+    } else if (health_points == 10 || (health_points - delta < 10 && health_points > 10)) {
+      hearts[0] = generateHeart();
+      health_map.drawPixmap(hearts[0], 0, HEIGHT * 2);
+      health_texture = new Texture(health_map);
 
     } else if (health_points > 0 && health_points < 10) {
       treat_heart(0);
 
-    } else if (health_points == 10) {
-      hearts[0] = generateHeart();
-      health_map.drawPixmap(hearts[0], 0, HEIGHT * 2);
+    } else if (health_points == 20 || (health_points - delta < 20 && health_points > 20)) {
+      hearts[1] = generateHeart();
+      health_map.drawPixmap(hearts[1], WIDTH + 1, HEIGHT * 2);
       health_texture = new Texture(health_map);
 
     } else if (health_points > 10 && health_points < 20) {
       treat_heart(1);
 
-    } else if (health_points == 20) {
-      hearts[1] = generateHeart();
-      health_map.drawPixmap(hearts[1], WIDTH + 1, HEIGHT * 2);
-      health_texture = new Texture(health_map);
-
-    } else if (health_points > 20 && health_points < 30) {
-      treat_heart(2);
-
-    } else if (health_points == 30) {
+    } else if (health_points == 30 || (health_points - delta < 30 && health_points > 30)) {
       hearts[2] = generateHeart();
       health_map.drawPixmap(hearts[2], WIDTH * 2 + 2, HEIGHT * 2);
       health_texture = new Texture(health_map);
-    } 
+    } else if (health_points > 20 && health_points < 30) {
+      treat_heart(2);
+
+    }
   }
   private void treat_heart(int heart_num) {
     hearts[heart_num].setColor(HEALTH_COLOR);

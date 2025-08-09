@@ -8,12 +8,12 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.deepdungeons.game.Main;
 import com.deepdungeons.game.Room;
 import com.deepdungeons.game.items.Item;
-import com.deepdungeons.game.items.Key;
 import com.deepdungeons.game.utils.Direction;
 import com.deepdungeons.game.utils.Point;
 import com.deepdungeons.game.utils.Utility;
 import com.deepdungeons.game.utils.Vector2d;
 import com.deepdungeons.game.weapons.CloseRangeWeapon;
+import com.deepdungeons.game.weapons.Hand;
 
 public class Mob {
   protected Pixmap image;
@@ -158,15 +158,15 @@ public class Mob {
       max_distance = weapon.getDistance();
       cooldown = weapon.getCooldown();
     } else { // aka hand
-      damage = 1;
-      max_distance = 5;
-      max_angle = Math.PI;
-      cooldown = 0.3;
+      damage = Hand.getDamage(rand);
+      max_distance = Hand.DISTANCE;
+      max_angle = Hand.ANGLE;
+      cooldown = Hand.getCooldown(rand);
     }
     Vector2d v2 = new Vector2d(pos, Main.player.getPos());
 
     if (v2.length() < max_distance && Vector2d.angle(Utility.getDirectionVector(dir), v2) < max_angle) {
-      Main.player.damage((int)damage);
+      Main.player.damage(damage);
       attack_timer = 0;
     }
   }

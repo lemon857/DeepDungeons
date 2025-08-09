@@ -22,6 +22,7 @@ import com.deepdungeons.game.mobs.Skeleton;
 import com.deepdungeons.game.utils.Point;
 import com.deepdungeons.game.utils.Vector2d;
 import com.deepdungeons.game.weapons.CloseRangeWeapon;
+import com.deepdungeons.game.weapons.Hand;
 import com.deepdungeons.game.weapons.Knife;
 
 // ! WARNING ! 
@@ -310,9 +311,9 @@ public class Main extends ApplicationAdapter {
         }
       } else if (player.getItem() == null) { // aka hand
         if (timer >= cooldown) {
-          if (current_room.tryHitMob(player.getPos(), player.getDirection(), 1, 5, Math.PI)) {
+          if (current_room.tryHitMob(player.getPos(), player.getDirection(), Hand.getDamage(rand), Hand.DISTANCE, Hand.ANGLE)) {
             debug_info[DEBUG_LINE_INFO].setText("Hitted");
-            cooldown = 0.3;
+            cooldown = Hand.getCooldown(rand);
             timer = 0;
           } else {
             debug_info[DEBUG_LINE_INFO].setText("No hit");
@@ -330,7 +331,7 @@ public class Main extends ApplicationAdapter {
 
     // [DEBUG] Self damage
     if (Gdx.input.isKeyJustPressed(Input.Keys.G)) {
-      player.damage(1);
+      player.damage(0.5);
     }
     
     // [DEBUG] Self treat
