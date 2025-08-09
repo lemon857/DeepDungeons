@@ -258,8 +258,8 @@ public class Room {
     for (int i = 0; i < mobs.size(); ++i) {
       Vector2d v2 = new Vector2d(player_pos, mobs.get(i).getPos());
 
-      if (v2.lenght() > max_distance) {
-        System.out.println("[" + i + "] Too far: " + v2.lenght());
+      if (v2.length() > max_distance) {
+        System.out.println("[" + i + "] Too far: " + v2.length());
         continue;
       }
       if (Vector2d.angle(dir, v2) > max_angle) {

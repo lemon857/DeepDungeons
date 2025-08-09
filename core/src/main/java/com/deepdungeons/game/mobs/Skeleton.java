@@ -3,8 +3,7 @@ package com.deepdungeons.game.mobs;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
-import com.deepdungeons.game.Room;
-import com.deepdungeons.game.utils.Point;
+import com.deepdungeons.game.utils.Utility;
 import com.deepdungeons.game.utils.Vector2d;
 
 public class Skeleton extends Mob {
@@ -15,35 +14,58 @@ public class Skeleton extends Mob {
   public static final double MAX_HP_LOW = 1;
   public static final double MAX_HP_HIGH = 3;
 
-  private static final Point START_BORDER = Point.sum(Room.START_BORDER, new Point(1, 1));
-  private static final Point END_BORDER = Point.sub(Room.END_BORDER, new Point(WIDTH, HEIGHT));
-
   private static final Color COLOR = new Color(0.7f, 0.7f, 0.7f, 0.7f);
-  private static final double SPEED = 50f; // TODO: use random speed
+  private static final double SPEED = 25f; // TODO: use random speed
+
+  private Vector2d current_move_dir;
 
   public Skeleton(Vector2d pos) {
-    super(Mob.Tier.Humble);
+    super(Mob.Tier.Humble, SPEED);
     this.pos = pos;
-    this.size = new Vector2d(WIDTH, HEIGHT);
     this.health_points = rand.nextDouble(MAX_HP_LOW, MAX_HP_HIGH + 1);
+    setSize(WIDTH, HEIGHT);
     generateImage();
+    current_move_dir = Utility.getRandomDirectionVector(rand);
   }
 
   @Override
   public final void update(double delta) {
-    if (rand.nextInt(10000) < 700) {
-      int dir = rand.nextInt(4);
-      switch(dir) {
-      case 0: pos.y -= delta * SPEED; break;
-      case 1: pos.x += delta * SPEED; break;
-      case 2: pos.y += delta * SPEED; break;
-      case 3: pos.x -= delta * SPEED; break;
+    if (rand.nextInt(10000) < 2000) {
+      if (rand.nextInt(10000) < 3000) {
+        Vector2d del = Utility.getRandomDirectionVector(rand);
+        current_move_dir = Vector2d.sum(current_move_dir,
+        Vector2d.mul(del, 0.25));
+        current_move_dir.normalize();
       }
-      if (pos.x < START_BORDER.x) pos.x = START_BORDER.x;
-      else if (pos.x > END_BORDER.x) pos.x = END_BORDER.x;
 
-      if (pos.y < START_BORDER.y) pos.y = START_BORDER.y;
-      else if (pos.y > END_BORDER.y) pos.y = END_BORDER.y;
+      Vector2d move = Vector2d.mul(current_move_dir, delta * speed);
+       
+      pos.x += move.x;
+      pos.y += move.y;
+
+      if (pos.x < start_border.x) {
+        pos.x = start_border.x;
+        if (rand.nextInt(10000) < 3000) current_move_dir.x = -current_move_dir.x * rand.nextDouble(speed * delta);
+        current_move_dir.normalize();
+      }
+      else if (pos.x > end_border.x) {
+        pos.x = end_border.x;
+        if (rand.nextInt(10000) < 3000) current_move_dir.x = -current_move_dir.x * rand.nextDouble(speed * delta);
+        current_move_dir.normalize();
+      }
+
+      if (pos.y < start_border.y) {
+        pos.y = start_border.y;
+        if (rand.nextInt(10000) < 3000) current_move_dir.y = -current_move_dir.y * rand.nextDouble(speed * delta);
+        current_move_dir.normalize();
+      }
+      else if (pos.y > end_border.y) {
+        pos.y = end_border.y;
+        if (rand.nextInt(10000) < 3000) current_move_dir.y = -current_move_dir.y * rand.nextDouble(speed * delta);
+        current_move_dir.normalize();
+      }
+
+      dir = Utility.getTranslateDirection(move.x, move.y);
     }
   }
   

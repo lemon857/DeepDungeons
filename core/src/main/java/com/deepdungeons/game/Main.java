@@ -46,7 +46,7 @@ public class Main extends ApplicationAdapter {
   private Room current_room;
 
   private Player player;
-  private boolean is_die;
+  private boolean is_pause;
   private double timer;
   private double cooldown;
 
@@ -139,6 +139,11 @@ public class Main extends ApplicationAdapter {
     die_tip.setFontScale(3);
     stage.addActor(die_tip);
 
+    debug_info[DEBUG_LINE_ITEM_NAME].setPosition(DEBUG_START.x, 100);
+    
+    debug_info[DEBUG_LINE_ITEM_NAME].setColor(1, 0, 1, 1);
+    debug_info[DEBUG_LINE_ITEM_NAME].setFontScale(3);
+
     start();
   }
 
@@ -156,9 +161,9 @@ public class Main extends ApplicationAdapter {
     generate_key_chance = 10;
     new_room.addItem(key);
 
-    new_room.addMob(new Skeleton(new Vector2d(Room.START_BORDER.x + 15, Room.START_BORDER.y + 20)));
-    new_room.addMob(new Skeleton(new Vector2d(Room.START_BORDER.x + 35, Room.START_BORDER.y + 23)));
-    new_room.addMob(new Skeleton(new Vector2d(Room.START_BORDER.x + 23, Room.START_BORDER.y + 35)));
+    new_room.addMob(new Skeleton(new Vector2d(Room.START_BORDER.x + Room.WIDTH / 2, Room.START_BORDER.y + Room.HEIGHT / 2)));
+    //new_room.addMob(new Skeleton(new Vector2d(Room.START_BORDER.x + 35, Room.START_BORDER.y + 23)));
+    //new_room.addMob(new Skeleton(new Vector2d(Room.START_BORDER.x + 23, Room.START_BORDER.y + 35)));
 
     new_room.addItem(new Knife(new Point(Room.START_BORDER.x + 10, Room.START_BORDER.y + 10)));
 
@@ -172,13 +177,13 @@ public class Main extends ApplicationAdapter {
     current_room = rooms.get(current_room_pos);
     debug_info[DEBUG_LINE_ROOM_POS].setText("Room X: " + current_room_pos.x + " Y: " + current_room_pos.y);
 
-    debug_info[DEBUG_LINE_ITEM_NAME].setPosition(DEBUG_START.x, 100);
+    debug_info[DEBUG_LINE_ITEM_NAME].setText("");
 
     req_door_id = -1;
     timer = 0;
     cooldown = 0;
     show_item_info = false;
-    is_die = false;
+    is_pause = false;
   }
 
   @Override
@@ -189,11 +194,20 @@ public class Main extends ApplicationAdapter {
   }
 
   private void input() {
-    if (is_die) {
+    if (is_pause) {
       if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
         start();
       }
+      
+      if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+        is_pause = false;
+      }
+
       return;
+    }
+
+    if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+      is_pause = true;
     }
     float speed = 40f;
     float delta = Gdx.graphics.getDeltaTime();
@@ -302,20 +316,6 @@ public class Main extends ApplicationAdapter {
       }
     }
 
-    // Get item info
-    if (Gdx.input.isKeyJustPressed(Input.Keys.I)) {
-      show_item_info = !show_item_info;
-      if (current_room.distanceToNearestItem(player.getCenterPos()) < Room.PICK_UP_MAX_DISTANCE && show_item_info) {
-        Item item = current_room.getNearestItem(player.getCenterPos());
-        debug_info[DEBUG_LINE_ITEM_NAME].setColor(1, 0, 1, 1);
-        debug_info[DEBUG_LINE_ITEM_NAME].setFontScale(3);
-        debug_info[DEBUG_LINE_ITEM_NAME].setVisible(true);
-        debug_info[DEBUG_LINE_ITEM_NAME].setText(item.getName());
-      } else {
-        debug_info[DEBUG_LINE_ITEM_NAME].setVisible(false);
-      }
-    }
-
     // [DEBUG] Spawn new mob
     if (Gdx.input.isKeyJustPressed(Input.Keys.T)) {
       current_room.addMob(new Skeleton(new Vector2d(player.getPos())));
@@ -353,7 +353,8 @@ public class Main extends ApplicationAdapter {
   }
 
   private void logic() {
-    if (is_die) return;
+    if (is_pause) return;
+    
     double delta = Gdx.graphics.getDeltaTime();
     player.update(delta);
     current_room.update(delta);
@@ -364,15 +365,21 @@ public class Main extends ApplicationAdapter {
     Point pos = new Point(player.getPos());
 
     debug_info[DEBUG_LINE_PLAYER_POS].setText("Player X: " + pos.x + " Y: " + pos.y);
-    if (current_room.distanceToNearestItem(player.getCenterPos()) > Room.PICK_UP_MAX_DISTANCE) {
+
+    if (current_room.distanceToNearestItem(player.getCenterPos()) > Room.PICK_UP_MAX_DISTANCE && show_item_info) {
       debug_info[DEBUG_LINE_ITEM_NAME].setVisible(false);
       show_item_info = false;
+    } else if (current_room.distanceToNearestItem(player.getCenterPos()) <= Room.PICK_UP_MAX_DISTANCE && !show_item_info) {
+      Item item = current_room.getNearestItem(player.getCenterPos());
+      debug_info[DEBUG_LINE_ITEM_NAME].setVisible(true);
+      debug_info[DEBUG_LINE_ITEM_NAME].setText(item.getName());
+      show_item_info = true;
     }
 
     if (player.isDie()) {
       die_info.setVisible(true);
       die_tip.setVisible(true);
-      is_die = true;
+      is_pause = true;
     }
   }
 

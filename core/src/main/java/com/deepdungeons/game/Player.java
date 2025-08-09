@@ -35,8 +35,6 @@ public class Player {
   private static final Color DEAD_HEALTH_COLOR = new Color(0.8f, 0.5f, 0.65f, 1f);
   private static final Color EYE_COLOR = new Color(0, 0, 0, 1);
 
-  private static final double HALF_SQUARE_SUM = Math.sqrt(2)/2;
-
   private static final int WHITE_IN_HEART_MASK = -1;
 
   private static final double HUNGER_DAMAGE_COOLDOWN = 2.5;
@@ -72,22 +70,6 @@ public class Player {
   private int thirsty_points;
 
   private double timer;
-
-  public static Vector2d GetDirectionVector(Direction dir) {
-    Vector2d delta = new Vector2d();
-    switch (dir) {
-      case Up: delta.y = 1; break;
-      case Right: delta.x = 1; break;
-      case Down: delta.y = -1; break;
-      case Left: delta.x = -1; break;
-      case UpLeft: delta.x = -HALF_SQUARE_SUM; delta.y = HALF_SQUARE_SUM; break;
-      case UpRight: delta.x = HALF_SQUARE_SUM; delta.y = HALF_SQUARE_SUM; break;
-      case DownLeft: delta.x = -HALF_SQUARE_SUM; delta.y = -HALF_SQUARE_SUM; break;
-      case DownRight: delta.x = HALF_SQUARE_SUM; delta.y = -HALF_SQUARE_SUM; break;
-      default: break;
-    }
-    return delta;
-  }
 
   public Player(int x, int y) {
     this.rand = new Random();
@@ -315,29 +297,8 @@ public class Player {
     if (pos.y < START_BORDER.y) pos.y = START_BORDER.y;
     else if (pos.y > END_BORDER.y) pos.y = END_BORDER.y;
 
-    if (x > 0) {
-      if (y > 0) {
-        dir = Direction.UpRight;
-      } else if (y < 0) {
-        dir = Direction.DownRight;
-      } else {
-        dir = Direction.Right;
-      }
-    } else if (x < 0) {
-      if (y > 0) {
-        dir = Direction.UpLeft;
-      } else if (y < 0) {
-        dir = Direction.DownLeft;
-      } else {
-        dir = Direction.Left;
-      }
-    } else {
-      if (y > 0) {
-        dir = Direction.Up;
-      } else if (y < 0) {
-        dir = Direction.Down;
-      }
-    } 
+    dir = Utility.getTranslateDirection(x, y);
+    
     non_actual = true;
   }
 
@@ -393,7 +354,7 @@ public class Player {
   }
 
   public Vector2d getDirection() {
-    return GetDirectionVector(dir);
+    return Utility.getDirectionVector(dir);
   }
 
   public boolean isDie() {

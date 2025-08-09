@@ -29,8 +29,14 @@ public class Vector2d {
     this.y = point.y;
   }
 
-  public double lenght() {
+  public double length() {
     return Math.sqrt((x) * (x) + (y) * (y));
+  }
+
+  public void normalize() {
+    double len = length();
+    x /= len;
+    y /= len;
   }
 
   public static Vector2d sum(Vector2d a, Vector2d b) {
@@ -55,6 +61,6 @@ public class Vector2d {
     return Math.sqrt((b.x - a.x) * (b.x - a.x) + (b.y - a.y) * (b.y - a.y));
   }
   public static double angle(Vector2d a, Vector2d b) {
-    return Math.acos((a.x * b.x + a.y * b.y) / (a.lenght() * b.lenght()));
+    return Math.acos((a.x * b.x + a.y * b.y) / (a.length() * b.length()));
   }
 }
