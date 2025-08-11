@@ -1,5 +1,6 @@
 package com.deepdungeons.game.items;
 
+import java.util.HashMap;
 import java.util.Random;
 
 import com.badlogic.gdx.graphics.Pixmap;
@@ -9,6 +10,36 @@ import com.deepdungeons.game.Room;
 import com.deepdungeons.game.utils.Vector2d;
 
 public class Item {
+  private static HashMap<String, Item> static_items;
+
+  public static void initStaticItems() {
+    static_items = new HashMap<>();
+  }
+
+  public static void addStaticItem(String name, Item item) {
+    static_items.put(name, item);
+  }
+
+  public static Item getStaticItem(String name) {
+    Item item = static_items.get(name).clone();
+    if (item == null) {
+      System.err.println("Item " + name + " is not found");
+      return null;
+    }
+    item.generateRandomPos();
+    return item;
+  }
+
+  public static Item getStaticItem(String name, Vector2d pos) {
+    Item item = static_items.get(name).clone();
+    if (item == null) {
+      System.err.println("Item " + name + " is not found");
+      return null;
+    }
+    item.pos = pos;
+    return item;
+  }
+
   protected Pixmap image;
 
   protected Texture texture;
@@ -49,9 +80,9 @@ public class Item {
 
   public void update(double delta) {}
 
-  public final void generateRandomPos() {
-    pos.x = rand.nextDouble(size.x + Room.START_BORDER.x + 1, Room.END_BORDER.x - size.x - 1);
-    pos.y = rand.nextDouble(Room.START_BORDER.y + size.y + 1, Room.END_BORDER.y - size.y - 1);
+  public Item clone() {
+    Item item = new Item(type, tier, name);
+    return item;
   }
 
   protected void generateImage() {
@@ -66,6 +97,11 @@ public class Item {
     } else {
       batch.draw(texture, (float)pos.x, (float)pos.y + (float)size.y, (float)size.x, -(float)size.y);
     }
+  }
+
+  public final void generateRandomPos() {
+    pos.x = rand.nextDouble(size.x + Room.START_BORDER.x + 1, Room.END_BORDER.x - size.x - 1);
+    pos.y = rand.nextDouble(Room.START_BORDER.y + size.y + 1, Room.END_BORDER.y - size.y - 1);
   }
 
   public final Pixmap getImage() {

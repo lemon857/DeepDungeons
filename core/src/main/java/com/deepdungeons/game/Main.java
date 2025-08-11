@@ -83,11 +83,6 @@ public class Main extends ApplicationAdapter {
   private static final int DEBUG_LINE_ROOM_POS = 4;
   private static final int DEBUG_LINE_ITEM_NAME = 5;
 
-  public static CommonItemForCraft[] static_items;
-  public static final int BONE_ITEM = 0;
-  public static final int ROPE_ITEM = 1;
-  public static final int LEATHER_ITEM = 2;
-
   @Override
   public void create() {
     rand = new Random();
@@ -119,10 +114,11 @@ public class Main extends ApplicationAdapter {
       }
     });
 
-    static_items = new CommonItemForCraft[3];
-    static_items[BONE_ITEM] = new CommonItemForCraft("bone.png", "bone");
-    static_items[ROPE_ITEM] = new CommonItemForCraft("rope.png", "rope");
-    static_items[LEATHER_ITEM] = new CommonItemForCraft("leather.png", "leather");
+    Item.initStaticItems();
+    Item.addStaticItem("forcraft/bone", new CommonItemForCraft("bone.png", "bone"));
+    Item.addStaticItem("forcraft/rope", new CommonItemForCraft("rope.png", "rope"));
+    Item.addStaticItem("forcraft/leather", new CommonItemForCraft("leather.png", "leather"));
+    Item.addStaticItem("weapons/knife", new Knife());
 
     Skin skin = new Skin(Gdx.files.internal("ui/uiskin.json"));
 
@@ -174,16 +170,16 @@ public class Main extends ApplicationAdapter {
     for (int i = 0; i < count_new_mobs; ++i) {
       Mob mob = new Skeleton();
       if (rand.nextInt(10000) < 800) {
-        mob.pickUpItem(new Knife());
+        mob.pickUpItem("weapons/knife");
       }
       new_room.addMob(mob);
     }
 
-    new_room.addItem(new Knife());
+    new_room.addItem("weapons/knife");
 
-    new_room.addItem(new CommonItemForCraft(static_items[BONE_ITEM]));
-    new_room.addItem(new CommonItemForCraft(static_items[ROPE_ITEM]));
-    new_room.addItem(new CommonItemForCraft(static_items[LEATHER_ITEM]));
+    new_room.addItem("forcraft/bone");
+    new_room.addItem("forcraft/rope");
+    new_room.addItem("forcraft/leather");
 
     current_room_pos = new_room.getPos();
     rooms.put(current_room_pos, new_room);
@@ -491,7 +487,11 @@ public class Main extends ApplicationAdapter {
         if (rand.nextInt(10000) < 7500 + (4 - new_room.getDoorsCount()) * 250) { // have items
           int count_new_items = rand.nextInt(3 + (int)Math.ceil(player.useLuck(1, -1)));
           for (int i = 0; i < count_new_items; ++i) {
-            new_room.addItem(new CommonItemForCraft(static_items[rand.nextInt(3)]));
+            switch(rand.nextInt(3)) {
+            case 0: new_room.addItem("forcraft/leater");
+            case 1: new_room.addItem("forcraft/rope");
+            default: new_room.addItem("forcraft/bone");
+            }
           }
         }
       }

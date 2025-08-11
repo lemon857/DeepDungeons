@@ -14,7 +14,6 @@ public class CommonItemForCraft extends Item {
     this.size = new Vector2d(this.image.getWidth(), this.image.getHeight());
     this.pos = new Vector2d();
     this.is_texture_from_file = true;
-    generateRandomPos();
   }
 
   public CommonItemForCraft(String path_to_texture, String name, Vector2d pos) {
@@ -26,33 +25,28 @@ public class CommonItemForCraft extends Item {
     this.is_texture_from_file = true;
   }
 
-  public CommonItemForCraft(Pixmap map, String name, Vector2d pos) {
+  public CommonItemForCraft(Pixmap map, String name) {
     super(Type.ForCraft, Tier.Common, name);
-    this.pos = pos;
+    this.pos = new Vector2d();
     this.image = new Pixmap(map.getPixels());
     this.texture = new Texture(this.image);
     this.size = new Vector2d(this.image.getWidth(), this.image.getHeight());
   }
 
-  public CommonItemForCraft(CommonItemForCraft other) {
-    super(Type.ForCraft, Tier.Common, other.getName());
-    this.pos = new Vector2d();
-    this.size = other.size;
-    this.is_texture_from_file = other.is_texture_from_file;
-    this.image = new Pixmap(other.image.getWidth(), other.image.getHeight(), other.image.getFormat());
-    this.image.drawPixmap(other.image, 0, 0);
-    this.texture = new Texture(this.image);
-
-    generateRandomPos();
-  }
-
-  public CommonItemForCraft(CommonItemForCraft other, Vector2d pos) {
-    super(Type.ForCraft, Tier.Common, other.getName());
+  public CommonItemForCraft(Pixmap map, String name, Vector2d pos) {
+    super(Type.ForCraft, Tier.Common, name);
     this.pos = pos;
-    this.size = other.size;
-    this.is_texture_from_file = other.is_texture_from_file;
-    this.image = new Pixmap(other.image.getWidth(), other.image.getHeight(), other.image.getFormat());
-    this.image.drawPixmap(other.image, 0, 0);
+    this.image = new Pixmap(map.getWidth(), map.getHeight(), map.getFormat());
+    this.image.drawPixmap(map, 0, 0);
     this.texture = new Texture(this.image);
+    this.size = new Vector2d(this.image.getWidth(), this.image.getHeight());
+  }
+  
+  @Override
+  public Item clone() {
+    CommonItemForCraft item = new CommonItemForCraft(getImage(), getName(), this.pos);
+    item.is_texture_from_file = this.is_texture_from_file;
+
+    return item;
   }
 }

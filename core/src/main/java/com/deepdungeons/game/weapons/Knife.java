@@ -20,7 +20,6 @@ public class Knife extends Item implements CloseRangeWeapon {
     this.pos = new Vector2d();
     this.size = new Vector2d(WIDTH, HEIGHT);
 
-    generateRandomPos();
     generateImage();
   }
 
@@ -48,6 +47,13 @@ public class Knife extends Item implements CloseRangeWeapon {
     image.drawPixel(1, 6);
 
     texture = new Texture(image);
+  }
+
+  @Override
+  public Item clone() {
+    Knife item = new Knife(this.pos);
+
+    return item;
   }
 
   @Override

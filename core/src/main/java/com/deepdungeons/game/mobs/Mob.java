@@ -133,6 +133,11 @@ public class Mob {
     generateInventoryTexture();
   }
 
+  public void pickUpItem(String static_name) {
+    inventory = Item.getStaticItem(static_name);
+    generateInventoryTexture();
+  }
+
   public final void draw(SpriteBatch batch) {
     batch.draw(texture, (float)pos.x, (float)pos.y + (float)size.y, (float)size.x, -(float)size.y);
     if (inventory != null) {

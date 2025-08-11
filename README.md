@@ -51,6 +51,7 @@ S  | Go down
 D  | Go right
 E  | Use (pick up, put down, open locked door)
 Space  | Attack
+Esc | Pause menu
 *Debug features*
 T  | Spawn new skeleton *(for debug)*
 G  | Self-damage *(for debug)*

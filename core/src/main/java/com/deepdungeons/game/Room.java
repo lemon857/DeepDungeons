@@ -188,6 +188,10 @@ public class Room {
     items.add(item);
   }
 
+  public void addItem(String static_name) {
+    items.add(Item.getStaticItem(static_name));
+  }
+
   public Item grabItem() {
     items.remove(can_grab_item);
     return can_grab_item;
