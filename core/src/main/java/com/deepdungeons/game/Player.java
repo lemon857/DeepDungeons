@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.deepdungeons.game.items.Edible;
 import com.deepdungeons.game.items.Item;
 import com.deepdungeons.game.utils.Direction;
 import com.deepdungeons.game.utils.Point;
@@ -298,6 +299,19 @@ public class Player {
 
   public boolean isDropAvailable() {
     return inventory != null;
+  }
+
+  public void tryUseEdibleItem() {
+    if (inventory == null) return;
+    if (inventory.getType() == Item.Type.Food) {
+      saturation(((Edible)inventory).getPoints());
+      inventory = null;
+
+    } else if (inventory.getType() == Item.Type.Drink) {
+      drink(((Edible)inventory).getPoints());
+      inventory = null;
+
+    }
   }
 
   public Item dropItem() {

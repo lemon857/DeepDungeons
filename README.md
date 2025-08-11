@@ -16,10 +16,12 @@ Luck is ... variable, which is indirectly can change game probabilities
 ## Items description
 
 Items have a four tiers: `common`, `uncommon`, `startling`, `incredible`  
-Now game have five items - key, knife, bone, rope, leather  
+Now game have five items - key, knife, bone, rope, leather, candy, meat, bottle of water, cup of tea  
 key have unique color which open only one locked door  
 knife is a base weapon  
 bone, rope and leather - common items for craft  
+candy, meat - food  
+bottle of water, cup of tea - drinks  
 
 ## Mobs description
 
@@ -50,6 +52,7 @@ A  | Go left
 S  | Go down
 D  | Go right
 E  | Use (pick up, put down, open locked door)
+Y  | Eat and drink
 Space  | Attack
 Esc | Pause menu
 *Debug features*

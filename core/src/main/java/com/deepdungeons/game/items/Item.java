@@ -62,7 +62,7 @@ public class Item {
   private final String name;
 
   public enum Type {
-    None, Key, Weapon, ForCraft
+    None, Key, Weapon, ForCraft, Food, Drink
   }
 
   public enum Tier {

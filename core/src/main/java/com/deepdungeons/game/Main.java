@@ -14,7 +14,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.deepdungeons.game.items.CommonItemForCraft;
+import com.deepdungeons.game.items.ItemForCraft;
+import com.deepdungeons.game.items.Edible;
 import com.deepdungeons.game.items.Item;
 import com.deepdungeons.game.items.Key;
 import com.deepdungeons.game.mobs.Mob;
@@ -115,9 +116,16 @@ public class Main extends ApplicationAdapter {
     });
 
     Item.initStaticItems();
-    Item.addStaticItem("forcraft/bone", new CommonItemForCraft("bone.png", "bone"));
-    Item.addStaticItem("forcraft/rope", new CommonItemForCraft("rope.png", "rope"));
-    Item.addStaticItem("forcraft/leather", new CommonItemForCraft("leather.png", "leather"));
+    Item.addStaticItem("forcraft/bone", new ItemForCraft(Item.Tier.Common, "bone.png", "bone"));
+    Item.addStaticItem("forcraft/rope", new ItemForCraft(Item.Tier.Common, "rope.png", "rope"));
+    Item.addStaticItem("forcraft/leather", new ItemForCraft(Item.Tier.Common, "leather.png", "leather"));
+
+    Item.addStaticItem("foods/candy", new Edible(Item.Tier.Common, "candy.png", "candy", false, 2));
+    Item.addStaticItem("foods/meat", new Edible(Item.Tier.Uncommon, "meat.png", "meat", false, 5));
+
+    Item.addStaticItem("drinks/bottle_of_water", new Edible(Item.Tier.Common, "bottle_of_water.png", "bottle of water", true, 4));
+    Item.addStaticItem("drinks/cup_of_tea", new Edible(Item.Tier.Uncommon, "cup_of_tea.png", "cup of tea", true, 7));
+
     Item.addStaticItem("weapons/knife", new Knife());
 
     Skin skin = new Skin(Gdx.files.internal("ui/uiskin.json"));
@@ -180,6 +188,12 @@ public class Main extends ApplicationAdapter {
     new_room.addItem("forcraft/bone");
     new_room.addItem("forcraft/rope");
     new_room.addItem("forcraft/leather");
+
+    new_room.addItem("foods/candy");
+    new_room.addItem("foods/meat");
+
+    new_room.addItem("drinks/bottle_of_water");
+    new_room.addItem("drinks/cup_of_tea");
 
     current_room_pos = new_room.getPos();
     rooms.put(current_room_pos, new_room);
@@ -272,7 +286,7 @@ public class Main extends ApplicationAdapter {
     // Use (pick up, put down, open door)
     if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
       if (req_door_id != -1) {
-        if (Point.distance(player.getCenterPos(), Room.GetDoorPosition(req_door_id)) < 7 && player.getItem() instanceof Key) {
+        if (Point.distance(player.getCenterPos(), Room.GetDoorPosition(req_door_id)) < 7 && player.getItem().getType() == Item.Type.Key) {
           if (current_room.tryUnlockDoor(req_door_id, ((Key)player.getItem()).getKey())) {
             current_room.generateBackground();
             req_door_id = -1;
@@ -303,10 +317,15 @@ public class Main extends ApplicationAdapter {
       }
     }
 
+    // Eat and drink
+    if (Gdx.input.isKeyJustPressed(Input.Keys.Y)) {
+      player.tryUseEdibleItem();
+    }
+
     timer += delta;
     // Attack
     if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
-      if (player.getItem() instanceof CloseRangeWeapon) {
+      if (player.getItem().getType() == Item.Type.Weapon) {
         if (timer >= cooldown) {
           CloseRangeWeapon weapon = (CloseRangeWeapon)player.getItem();
           if (current_room.tryHitMob(player.getPos(), player.getDirection(), 
