@@ -51,6 +51,7 @@ public class Room {
   //private Texture debug_texture;
 
   private boolean non_actual;
+  private boolean is_fight;
 
   private final ArrayList<Item> items;
 
@@ -60,7 +61,12 @@ public class Room {
 
   private final boolean[] doors;
   private final int[] lock_doors;
+  private final int[] before_block_doors;
+
   private final Color[] lock_doors_color;
+  private final Color[] before_block_doors_color;
+
+  private static final Color block_door_color = new Color(1f, 0f, 0.2f, 1f);
 
   private final Random rand;
 
@@ -94,8 +100,11 @@ public class Room {
 
     this.doors = new boolean[] {false, false, false, false};
     this.lock_doors = new int[] {0, 0, 0, 0};
+    this.before_block_doors = new int[] {0, 0, 0, 0};
     this.lock_doors_color = new Color[4];
+    this.before_block_doors_color = new Color[4];
     this.non_actual = true;
+    this.is_fight = false;
     this.items = new ArrayList<>();
     this.mobs = new ArrayList<>();
 
@@ -142,8 +151,15 @@ public class Room {
 
   public void lockAllDoors() {
     for (int i = 0; i < MAX_DOORS_COUNT; ++i) {
-      lock_doors[i] = rand.nextInt();
-      lock_doors_color[i] = new Color(rand.nextFloat(1), rand.nextFloat(1), rand.nextFloat(1), 1);
+      if (lock_doors[i] != 0) {
+        before_block_doors[i] = lock_doors[i];
+        before_block_doors_color[i] = lock_doors_color[i];
+
+      } else {
+        before_block_doors[i] = 0;
+      }
+      lock_doors[i] = -1;
+      lock_doors_color[i] = block_door_color;
     }
     non_actual = true;
   }
@@ -159,7 +175,13 @@ public class Room {
 
   public void unlockAllDoors() {
     for (int i = 0; i < MAX_DOORS_COUNT; ++i) {
-      lock_doors[i] = 0;
+      if (before_block_doors[i] == 0) {
+        lock_doors[i] = 0;
+      } else {
+        lock_doors[i] = before_block_doors[i];
+        lock_doors_color[i] = before_block_doors_color[i];
+        before_block_doors[i] = 0;
+      }
     }
     non_actual = true;
   }
@@ -178,6 +200,19 @@ public class Room {
       generateBackground();
       non_actual = false;
     }
+
+    if (!mobs.isEmpty() && !is_fight) {
+      is_fight = true;
+      lockAllDoors();
+    }
+    if (mobs.isEmpty() && is_fight) {
+      is_fight = false;
+      unlockAllDoors();
+    }
+  }
+
+  public boolean isFight() {
+    return is_fight;
   }
 
   public void addMob(Mob mob) {
@@ -258,11 +293,11 @@ public class Room {
       Vector2d v2 = new Vector2d(player_pos, mobs.get(i).getPos());
 
       if (v2.length() > max_distance) {
-        System.out.println("[" + i + "] Too far: " + v2.length());
+        // System.out.println("[" + i + "] Too far: " + v2.length());
         continue;
       }
       if (Vector2d.angle(dir, v2) > max_angle) {
-        System.out.println("[" + i + "] Too much angle: " + Vector2d.angle(dir, v2));
+        // System.out.println("[" + i + "] Too much angle: " + Vector2d.angle(dir, v2));
         continue;
       }
 

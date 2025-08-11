@@ -69,6 +69,10 @@ public class Mob {
   protected Point start_border;
   protected Point end_border;
 
+  protected double attack_anim_timer;
+  protected boolean attack_anim_play;
+  protected static final double attack_anim_time = 0.1;
+
   private final int id;
 
   private static int current_id = 1;
@@ -88,10 +92,17 @@ public class Mob {
     this.cooldown = 0;
     this.attack_timer = 0;
     this.dir = Direction.Undefined;
+    this.attack_anim_timer = attack_anim_time + 1;
+    this.attack_anim_play = false;
   }
 
   public void update(double delta) {
     attack_timer += delta;
+    if (attack_anim_timer >= attack_anim_time) {
+      size.y = size.y / 0.9;
+    } else {
+      attack_anim_timer += delta;
+    }
   }
   protected void generateImage() {
     image = new Pixmap(1, 1, Pixmap.Format.RGB888);
@@ -126,6 +137,12 @@ public class Mob {
   public final void generateRandomPos() {
     pos.x = rand.nextDouble(size.x + Room.START_BORDER.x + 1, Room.END_BORDER.x - size.x - 1);
     pos.y = rand.nextDouble(Room.START_BORDER.y + size.y + 1, Room.END_BORDER.y - size.y - 1);
+  }
+
+  public void startAttackAnim() {
+    attack_anim_timer = 0;
+    attack_anim_play = true;
+    size.y *= 0.9;
   }
 
   public final void setSize(double width, double height) {
@@ -182,8 +199,8 @@ public class Mob {
     }
   }
 
-  protected void attack() {
-    if (attack_timer < cooldown) return;
+  protected boolean attack() {
+    if (attack_timer < cooldown) return false;
     double max_distance = 0;
     double max_angle = 0;
     double damage = 0;
@@ -204,7 +221,9 @@ public class Mob {
     if (v2.length() < max_distance && Vector2d.angle(Utility.getDirectionVector(dir), v2) < max_angle) {
       Main.player.damage(damage);
       attack_timer = 0;
+      return true;
     }
+    return false;
   }
 
   // True if it dead

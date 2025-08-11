@@ -37,6 +37,14 @@ public class DefaultMob extends Mob {
   @Override
   public final void update(double delta) {
     attack_timer += delta;
+
+    if (attack_anim_timer >= attack_anim_time && attack_anim_play) {
+      size.y /= 0.9;
+      attack_anim_play = false;
+    } else if (attack_anim_play) {
+      attack_anim_timer += delta;
+    }
+
     if (rand.nextInt(10000) < 2000) {
       if (rand.nextInt(10000) < 3000) {
         Vector2d del = Utility.getRandomDirectionVector(rand);
@@ -76,7 +84,9 @@ public class DefaultMob extends Mob {
     }
 
     if (rand.nextInt(10000) < 1000) {
-      attack();
+      if (attack()) {
+        startAttackAnim();
+      }
     }
   }
 

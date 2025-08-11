@@ -1,57 +1,42 @@
 package com.deepdungeons.game.weapons;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.deepdungeons.game.items.Item;
 import com.deepdungeons.game.utils.Vector2d;
 
 public class Knife extends Item implements CloseRangeWeapon {
-
-  public static final int WIDTH = 4;
-  public static final int HEIGHT = 7;
-
   public static final double DISTANCE = 8.5;
   public static final double ANGLE = Math.PI / 2.0;
   public static final double DAMAGE = 2;
   public static final double COOLDOWN = 0.5;
 
-  public Knife() {
+  private static final double SIZE_KOEF = 0.7;
+
+  public Knife(String path_to_texture) {
     super(Item.Type.Weapon, Item.Tier.Common, "knife");
     this.pos = new Vector2d();
-    this.size = new Vector2d(WIDTH, HEIGHT);
-
-    generateImage();
+    this.image = new Pixmap(Gdx.files.internal(path_to_texture));
+    this.texture = new Texture(image);
+    this.size = new Vector2d(this.image.getWidth() * SIZE_KOEF, this.image.getHeight() * SIZE_KOEF);
+    this.is_texture_from_file = true;
   }
 
-  public Knife(Vector2d pos) {
+  public Knife(Pixmap map) {
     super(Item.Type.Weapon, Item.Tier.Common, "knife");
-    this.pos = pos;
-    this.size = new Vector2d(WIDTH, HEIGHT);
-
-    generateImage();
-  }
- 
-  @Override
-  protected final void generateImage() {
-    image = new Pixmap(WIDTH, HEIGHT, Pixmap.Format.RGBA8888);
-
-    image.setColor(1, 1, 1, 1);
-    
-    image.drawPixel(0, 0);
-    image.drawPixel(0, 1);
-    image.drawPixel(1, 1);
-    image.drawPixel(1, 2);
-    image.drawPixel(2, 3);
-    image.drawPixel(2,4);
-    image.drawPixel(2, 5);
-    image.drawPixel(1, 6);
-
-    texture = new Texture(image);
+    this.pos = new Vector2d();
+    this.image = new Pixmap(map.getWidth(), map.getHeight(), map.getFormat());
+    this.image.drawPixmap(map, 0, 0);
+    this.texture = new Texture(image);
+    this.size = new Vector2d(this.image.getWidth() * SIZE_KOEF, this.image.getHeight() * SIZE_KOEF);
   }
 
   @Override
   public Item clone() {
-    Knife item = new Knife(this.pos);
+    Knife item = new Knife(this.image);
+    item.pos = new Vector2d(this.pos);
+    item.is_texture_from_file = this.is_texture_from_file;
 
     return item;
   }

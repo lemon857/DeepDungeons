@@ -49,6 +49,12 @@ public class Player {
   private final Random rand;
 
   private final Vector2d pos;
+  private final Vector2d size;
+
+  private double attack_anim_timer;
+  private boolean attack_anim_play;
+  private static final double attack_anim_time = 0.1;
+
   private Texture image;
 
   private Texture inventory_texture;
@@ -84,6 +90,9 @@ public class Player {
   public Player() {
     this.rand = new Random();
     this.pos = new Vector2d();
+    this.size = new Vector2d(WIDTH, HEIGHT);
+    this.attack_anim_timer = attack_anim_time + 1;
+    this.attack_anim_play = false;;
     this.dir = Direction.Up;
     this.non_actual = false;
     this.health_points = MAX_HP;
@@ -314,6 +323,12 @@ public class Player {
     }
   }
 
+  public void startAttackAnim() {
+    attack_anim_timer = 0;
+    attack_anim_play = true;
+    size.y *= 0.9;
+  }
+
   public Item dropItem() {
     Item res = inventory;
     inventory = null;
@@ -378,12 +393,19 @@ public class Player {
         fast_attack_thirsty_timer = 0;
       }
     }
+
+    if (attack_anim_timer >= attack_anim_time && attack_anim_play) {
+      size.y = HEIGHT;
+      attack_anim_play = false;
+    } else if (attack_anim_play) {
+      attack_anim_timer += delta;
+    }
   }
 
   public void draw(SpriteBatch batch) {
     // correct coords for Pixmap
-    batch.draw(image, (float)pos.x, (float)pos.y + (float)HEIGHT,
-    (float)WIDTH, -(float)HEIGHT);
+    batch.draw(image, (float)pos.x, (float)pos.y + (float)size.y,
+    (float)size.x, -(float)size.y);
     if (inventory != null) {
       if (inventory.isTextureFromFile()) {
         batch.draw(inventory_texture, (float)pos.x + WIDTH * 0.7f, (float)pos.y + HEIGHT * 0.65f, 

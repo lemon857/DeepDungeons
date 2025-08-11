@@ -126,7 +126,7 @@ public class Main extends ApplicationAdapter {
     Item.addStaticItem("drinks/bottle_of_water", new Edible(Item.Tier.Common, "items/bottle_of_water.png", "bottle of water", true, 4));
     Item.addStaticItem("drinks/cup_of_tea", new Edible(Item.Tier.Uncommon, "items/cup_of_tea.png", "cup of tea", true, 7));
 
-    Item.addStaticItem("weapons/knife", new Knife());
+    Item.addStaticItem("weapons/knife", new Knife("weapons/knife.png"));
 
     Mob.initStaticMobs();
     Mob.addStaticMob("mobs/skeleton", new DefaultMob("mobs/skeleton.png", 25, 1, 3));
@@ -332,6 +332,7 @@ public class Main extends ApplicationAdapter {
         if (timer >= cooldown) {
           if (current_room.tryHitMob(player.getPos(), player.getDirection(), 
             Hand.getDamage(rand) * player.getStrength(), Hand.DISTANCE, Hand.ANGLE)) {
+            player.startAttackAnim();
             debug_info[DEBUG_LINE_INFO].setText("Hitted");
             cooldown = Hand.getCooldown(rand) / player.getAttackSpeed();
             timer = 0;
@@ -346,6 +347,7 @@ public class Main extends ApplicationAdapter {
           CloseRangeWeapon weapon = (CloseRangeWeapon)player.getItem();
           if (current_room.tryHitMob(player.getPos(), player.getDirection(), 
             weapon.getDamage() * player.getStrength(), weapon.getDistance(), weapon.getAngle())) {
+            player.startAttackAnim();
             debug_info[DEBUG_LINE_INFO].setText("Hitted");
             cooldown = weapon.getCooldown() / player.getAttackSpeed();
             timer = 0;
@@ -501,7 +503,7 @@ public class Main extends ApplicationAdapter {
         for (int i = 0; i < count_new_mobs; ++i) {
           Mob mob = Mob.getStaticMob("mobs/skeleton");
           if (rand.nextInt(10000) < 800 + (int)Math.floor(player.useLuck(100, -100))) {
-            mob.pickUpItem(new Knife());
+            mob.pickUpItem("weapons/knife");
           }
           new_room.addMob(mob);
         }
