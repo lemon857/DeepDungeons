@@ -1,5 +1,6 @@
 package com.deepdungeons.game.mobs;
 
+import java.util.HashMap;
 import java.util.Random;
 
 import com.badlogic.gdx.graphics.Pixmap;
@@ -16,6 +17,36 @@ import com.deepdungeons.game.weapons.CloseRangeWeapon;
 import com.deepdungeons.game.weapons.Hand;
 
 public class Mob {
+  private static HashMap<String, Mob> static_mobs;
+
+  public static void initStaticMobs() {
+    static_mobs = new HashMap<>();
+  }
+
+  public static void addStaticMob(String name, Mob mob) {
+    static_mobs.put(name, mob);
+  }
+
+  public static Mob getStaticMob(String name) {
+    Mob mob = static_mobs.get(name).clone();
+    if (mob == null) {
+      System.err.println("Mob " + name + " is not found");
+      return null;
+    }
+    mob.generateRandomPos();
+    return mob;
+  }
+
+  public static Mob getStaticMob(String name, Vector2d pos) {
+    Mob mob = static_mobs.get(name).clone();
+    if (mob == null) {
+      System.err.println("Item " + name + " is not found");
+      return null;
+    }
+    mob.pos = pos;
+    return mob;
+  }
+
   protected Pixmap image;
 
   protected Vector2d pos;
@@ -30,7 +61,7 @@ public class Mob {
   protected Texture inventory_texture;
 
   protected double attack_timer;
-  private double cooldown;
+  protected double cooldown;
 
   protected final Random rand;
 
@@ -139,9 +170,9 @@ public class Mob {
   }
 
   public final void draw(SpriteBatch batch) {
-    batch.draw(texture, (float)pos.x, (float)pos.y + (float)size.y, (float)size.x, -(float)size.y);
+    batch.draw(texture, (float)pos.x, (float)pos.y, (float)size.x, (float)size.y);
     if (inventory != null) {
-      if (inventory.isTExtureFromFile()) {
+      if (inventory.isTextureFromFile()) {
         batch.draw(inventory_texture, (float)pos.x + (float)size.x * 0.7f, (float)pos.y + (float)size.y * 0.65f, 
         (float)inventory.getSize().x * 0.6f, (float)inventory.getSize().y * 0.6f);
       } else {
@@ -180,6 +211,17 @@ public class Mob {
   public boolean damage(double dmg) {
     health_points -= dmg;
     return health_points <= 0;
+  }
+
+  public Mob clone() {
+    Mob mob = new Mob(this.tier, this.speed);
+
+    mob.health_points = this.health_points;
+    mob.cooldown = this.cooldown;
+    mob.attack_timer = this.attack_timer;
+    mob.dir = this.dir;
+
+    return mob;
   }
 
   @Override

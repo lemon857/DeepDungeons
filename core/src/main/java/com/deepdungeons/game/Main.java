@@ -18,8 +18,8 @@ import com.deepdungeons.game.items.ItemForCraft;
 import com.deepdungeons.game.items.Edible;
 import com.deepdungeons.game.items.Item;
 import com.deepdungeons.game.items.Key;
+import com.deepdungeons.game.mobs.DefaultMob;
 import com.deepdungeons.game.mobs.Mob;
-import com.deepdungeons.game.mobs.Skeleton;
 import com.deepdungeons.game.utils.Point;
 import com.deepdungeons.game.utils.Vector2d;
 import com.deepdungeons.game.weapons.CloseRangeWeapon;
@@ -116,17 +116,20 @@ public class Main extends ApplicationAdapter {
     });
 
     Item.initStaticItems();
-    Item.addStaticItem("forcraft/bone", new ItemForCraft(Item.Tier.Common, "bone.png", "bone"));
-    Item.addStaticItem("forcraft/rope", new ItemForCraft(Item.Tier.Common, "rope.png", "rope"));
-    Item.addStaticItem("forcraft/leather", new ItemForCraft(Item.Tier.Common, "leather.png", "leather"));
+    Item.addStaticItem("forcraft/bone", new ItemForCraft(Item.Tier.Common, "items/bone.png", "bone"));
+    Item.addStaticItem("forcraft/rope", new ItemForCraft(Item.Tier.Common, "items/rope.png", "rope"));
+    Item.addStaticItem("forcraft/leather", new ItemForCraft(Item.Tier.Common, "items/leather.png", "leather"));
 
-    Item.addStaticItem("foods/candy", new Edible(Item.Tier.Common, "candy.png", "candy", false, 2));
-    Item.addStaticItem("foods/meat", new Edible(Item.Tier.Uncommon, "meat.png", "meat", false, 5));
+    Item.addStaticItem("foods/candy", new Edible(Item.Tier.Common, "items/candy.png", "candy", false, 2));
+    Item.addStaticItem("foods/meat", new Edible(Item.Tier.Uncommon, "items/meat.png", "meat", false, 5));
 
-    Item.addStaticItem("drinks/bottle_of_water", new Edible(Item.Tier.Common, "bottle_of_water.png", "bottle of water", true, 4));
-    Item.addStaticItem("drinks/cup_of_tea", new Edible(Item.Tier.Uncommon, "cup_of_tea.png", "cup of tea", true, 7));
+    Item.addStaticItem("drinks/bottle_of_water", new Edible(Item.Tier.Common, "items/bottle_of_water.png", "bottle of water", true, 4));
+    Item.addStaticItem("drinks/cup_of_tea", new Edible(Item.Tier.Uncommon, "items/cup_of_tea.png", "cup of tea", true, 7));
 
     Item.addStaticItem("weapons/knife", new Knife());
+
+    Mob.initStaticMobs();
+    Mob.addStaticMob("mobs/skeleton", new DefaultMob("mobs/skeleton.png", 25, 1, 3));
 
     Skin skin = new Skin(Gdx.files.internal("ui/uiskin.json"));
 
@@ -176,7 +179,7 @@ public class Main extends ApplicationAdapter {
     int count_new_mobs = rand.nextInt(10);
 
     for (int i = 0; i < count_new_mobs; ++i) {
-      Mob mob = new Skeleton();
+      Mob mob = Mob.getStaticMob("mobs/skeleton");
       if (rand.nextInt(10000) < 800) {
         mob.pickUpItem("weapons/knife");
       }
@@ -325,7 +328,20 @@ public class Main extends ApplicationAdapter {
     timer += delta;
     // Attack
     if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
-      if (player.getItem().getType() == Item.Type.Weapon) {
+      if (player.getItem() == null) { // aka hand
+        if (timer >= cooldown) {
+          if (current_room.tryHitMob(player.getPos(), player.getDirection(), 
+            Hand.getDamage(rand) * player.getStrength(), Hand.DISTANCE, Hand.ANGLE)) {
+            debug_info[DEBUG_LINE_INFO].setText("Hitted");
+            cooldown = Hand.getCooldown(rand) / player.getAttackSpeed();
+            timer = 0;
+          } else {
+            debug_info[DEBUG_LINE_INFO].setText("No hit");
+          }
+        } else {
+          debug_info[DEBUG_LINE_INFO].setText("Time left: " + (cooldown - timer));
+        }
+      } else if (player.getItem().getType() == Item.Type.Weapon) {
         if (timer >= cooldown) {
           CloseRangeWeapon weapon = (CloseRangeWeapon)player.getItem();
           if (current_room.tryHitMob(player.getPos(), player.getDirection(), 
@@ -339,25 +355,12 @@ public class Main extends ApplicationAdapter {
         } else {
           debug_info[DEBUG_LINE_INFO].setText("Time left: " + (cooldown - timer));
         }
-      } else if (player.getItem() == null) { // aka hand
-        if (timer >= cooldown) {
-          if (current_room.tryHitMob(player.getPos(), player.getDirection(), 
-            Hand.getDamage(rand) * player.getStrength(), Hand.DISTANCE, Hand.ANGLE)) {
-            debug_info[DEBUG_LINE_INFO].setText("Hitted");
-            cooldown = Hand.getCooldown(rand) / player.getAttackSpeed();
-            timer = 0;
-          } else {
-            debug_info[DEBUG_LINE_INFO].setText("No hit");
-          }
-        } else {
-          debug_info[DEBUG_LINE_INFO].setText("Time left: " + (cooldown - timer));
-        }
       }
     }
 
     // [DEBUG] Spawn new mob
     if (Gdx.input.isKeyJustPressed(Input.Keys.T)) {
-      current_room.addMob(new Skeleton(new Vector2d(player.getPos())));
+      current_room.addMob(Mob.getStaticMob("mobs/skeleton", new Vector2d(player.getPos())));
     }
 
     // [DEBUG] Self damage
@@ -496,7 +499,7 @@ public class Main extends ApplicationAdapter {
         int count_new_mobs = rand.nextInt(10 + (int)Math.floor(player.useLuck(5, -5)));
 
         for (int i = 0; i < count_new_mobs; ++i) {
-          Mob mob = new Skeleton();
+          Mob mob = Mob.getStaticMob("mobs/skeleton");
           if (rand.nextInt(10000) < 800 + (int)Math.floor(player.useLuck(100, -100))) {
             mob.pickUpItem(new Knife());
           }

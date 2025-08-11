@@ -128,7 +128,7 @@ public class Item {
     return pos;
   }
 
-  public final boolean isTExtureFromFile() {
+  public final boolean isTextureFromFile() {
     return is_texture_from_file;
   }
 

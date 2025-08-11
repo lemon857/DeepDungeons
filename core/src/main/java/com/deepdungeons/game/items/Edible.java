@@ -8,12 +8,13 @@ import com.deepdungeons.game.utils.Vector2d;
 // Food or drink
 public class Edible extends Item {
   private final int points;
+  private static final double SIZE_KOEF = 0.5;
 
   public Edible(Tier tier, String path_to_texture, String name, boolean is_drink, int points) {
     super(is_drink ? Type.Drink : Type.Food, tier, name);
     this.image = new Pixmap(Gdx.files.internal(path_to_texture));
     this.texture = new Texture(this.image);
-    this.size = new Vector2d(this.image.getWidth(), this.image.getHeight());
+    this.size = new Vector2d(this.image.getWidth() * SIZE_KOEF, this.image.getHeight() * SIZE_KOEF);
     this.pos = new Vector2d();
     this.is_texture_from_file = true;
     this.points = points;
@@ -25,7 +26,7 @@ public class Edible extends Item {
     this.image = new Pixmap(map.getWidth(), map.getHeight(), map.getFormat());
     this.image.drawPixmap(map, 0, 0);
     this.texture = new Texture(this.image);
-    this.size = new Vector2d(this.image.getWidth(), this.image.getHeight());
+    this.size = new Vector2d(this.image.getWidth() * SIZE_KOEF, this.image.getHeight() * SIZE_KOEF);
     this.points = points;
   }
 

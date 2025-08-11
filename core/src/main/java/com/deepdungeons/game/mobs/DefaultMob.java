@@ -1,41 +1,36 @@
 package com.deepdungeons.game.mobs;
 
-import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.deepdungeons.game.utils.Direction;
 import com.deepdungeons.game.utils.Utility;
 import com.deepdungeons.game.utils.Vector2d;
 
-public class Skeleton extends Mob {
-
-  public static final int WIDTH = 7;
-  public static final int HEIGHT = 7;
-
-  public static final double MAX_HP_LOW = 1;
-  public static final double MAX_HP_HIGH = 3;
-
-  private static final Color COLOR = new Color(0.7f, 0.7f, 0.7f, 0.7f);
-  private static final double SPEED = 25f; // TODO: use random speed
+public class DefaultMob extends Mob {
 
   private Vector2d current_move_dir;
 
-  public Skeleton() {
-    super(Mob.Tier.Humble, SPEED);
-    this.health_points = rand.nextDouble(MAX_HP_LOW, MAX_HP_HIGH + 1);
+  public DefaultMob(String path_to_texture, double speed, double min_hp, double max_hp) {
+    super(Mob.Tier.Humble, speed);
+    this.health_points = rand.nextDouble(min_hp, max_hp + 1);
     this.pos = new Vector2d();
-    setSize(WIDTH, HEIGHT);
+    this.image = new Pixmap(Gdx.files.internal(path_to_texture));
+    this.texture = new Texture(image);
+    setSize(image.getWidth() / 3, image.getHeight() / 3);
     generateRandomPos();
-    generateImage();
     current_move_dir = Utility.getRandomDirectionVector(rand);
   }
-  
-  public Skeleton(Vector2d pos) {
-    super(Mob.Tier.Humble, SPEED);
-    this.pos = pos;
-    this.health_points = rand.nextDouble(MAX_HP_LOW, MAX_HP_HIGH + 1);
-    setSize(WIDTH, HEIGHT);
-    generateImage();
+
+  public DefaultMob(Pixmap map, double speed, double min_hp, double max_hp) {
+    super(Mob.Tier.Humble, speed);
+    this.health_points = rand.nextDouble(min_hp, max_hp + 1);
+    this.pos = new Vector2d();
+    this.image = new Pixmap(map.getWidth(), map.getHeight(), map.getFormat());
+    this.image.drawPixmap(map, 0, 0);
+    this.texture = new Texture(image);
+    setSize(image.getWidth() / 3, image.getHeight() / 3);
+    generateRandomPos();
     current_move_dir = Utility.getRandomDirectionVector(rand);
   }
 
@@ -84,30 +79,16 @@ public class Skeleton extends Mob {
       attack();
     }
   }
-  
-  @Override
-  protected final void generateImage() {
-    image = new Pixmap(WIDTH, HEIGHT, Pixmap.Format.RGBA8888);
-    image.setColor(COLOR);
-    image.fillCircle(WIDTH / 2, HEIGHT / 2, WIDTH / 2);
-
-    texture = new Texture(image);
-  }
 
   @Override
-  public boolean damage(double dmg) {
-    health_points -= dmg;
-    for (int i = 0; i < 2; ++i) {
-      int x = rand.nextInt(0, WIDTH);
-      int y = rand.nextInt(0, HEIGHT);
-      while (image.getPixel(x, y) == 0) {
-        x = rand.nextInt(0, WIDTH);
-        y = rand.nextInt(0, HEIGHT);
-      }
-      image.setColor(0, 0, 0, 1);
-      image.drawPixel(x, y);
-    }
-    texture = new Texture(image);
-    return health_points <= 0;
+  public Mob clone() {
+    DefaultMob mob = new DefaultMob(image, speed, health_points, health_points);
+    
+    mob.health_points = this.health_points;
+    mob.cooldown = this.cooldown;
+    mob.attack_timer = this.attack_timer;
+    mob.dir = this.dir;
+
+    return mob;
   }
 }

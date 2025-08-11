@@ -385,12 +385,12 @@ public class Player {
     batch.draw(image, (float)pos.x, (float)pos.y + (float)HEIGHT,
     (float)WIDTH, -(float)HEIGHT);
     if (inventory != null) {
-      if (inventory.isTExtureFromFile()) {
+      if (inventory.isTextureFromFile()) {
         batch.draw(inventory_texture, (float)pos.x + WIDTH * 0.7f, (float)pos.y + HEIGHT * 0.65f, 
-        (float)inventory.getSize().x * 0.6f, (float)inventory.getSize().y * 0.6f);
+        (float)inventory.getSize().x * 0.8f, (float)inventory.getSize().y * 0.8f);
       } else {
-        batch.draw(inventory_texture, (float)pos.x + WIDTH * 0.7f, (float)pos.y + HEIGHT * 0.65f + (float)inventory.getSize().y * 0.6f, 
-        (float)inventory.getSize().x * 0.6f, (float)inventory.getSize().y * -0.6f);
+        batch.draw(inventory_texture, (float)pos.x + WIDTH * 0.7f, (float)pos.y + HEIGHT * 0.65f + (float)inventory.getSize().y * 0.8f, 
+        (float)inventory.getSize().x * 0.8f, (float)inventory.getSize().y * -0.8f);
       }
     }
     batch.draw(health_texture, 1, Room.SCREEN_HEIGHT - 1, WIDTH * 4, -HEIGHT * 3);
