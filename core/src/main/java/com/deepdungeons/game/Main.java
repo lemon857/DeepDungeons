@@ -18,14 +18,13 @@ import com.deepdungeons.game.items.ItemForCraft;
 import com.deepdungeons.game.items.Edible;
 import com.deepdungeons.game.items.Item;
 import com.deepdungeons.game.items.Key;
-import com.deepdungeons.game.mobs.DefaultMob;
+import com.deepdungeons.game.mobs.DefaultEnemy;
 import com.deepdungeons.game.mobs.Mob;
 import com.deepdungeons.game.utils.LootTable;
 import com.deepdungeons.game.utils.Point;
 import com.deepdungeons.game.utils.Vector2d;
 import com.deepdungeons.game.weapons.CloseRangeWeapon;
 import com.deepdungeons.game.weapons.Hand;
-import com.deepdungeons.game.weapons.Knife;
 
 // ! WARNING ! 
 // IDK why, start coords on Pixmap located at Up-Left corner,
@@ -119,21 +118,26 @@ public class Main extends ApplicationAdapter {
     Item.initStaticItems();
     Item.addStaticItem("special/key", new Key("items/key.png"));
 
-    Item.addStaticItem("forcraft/bone", new ItemForCraft(Item.Tier.Common, "items/bone.png", "bone"));
-    Item.addStaticItem("forcraft/rope", new ItemForCraft(Item.Tier.Common, "items/rope.png", "rope"));
-    Item.addStaticItem("forcraft/leather", new ItemForCraft(Item.Tier.Common, "items/leather.png", "leather"));
+    Item.addStaticItem("forcraft/bone", new ItemForCraft("items/bone.png", Item.Tier.Common, "bone"));
+    Item.addStaticItem("forcraft/rope", new ItemForCraft("items/rope.png", Item.Tier.Common, "rope"));
+    Item.addStaticItem("forcraft/leather", new ItemForCraft("items/leather.png", Item.Tier.Common, "leather"));
 
-    Item.addStaticItem("foods/candy", new Edible(Item.Tier.Common, "items/candy.png", "candy", false, 2));
-    Item.addStaticItem("foods/meat", new Edible(Item.Tier.Uncommon, "items/meat.png", "meat", false, 5));
+    Item.addStaticItem("foods/candy", new Edible("items/candy.png", Item.Tier.Common, "candy", false, 2));
+    Item.addStaticItem("foods/meat", new Edible("items/meat.png", Item.Tier.Uncommon, "meat", false, 5));
 
-    Item.addStaticItem("drinks/bottle_of_water", new Edible(Item.Tier.Common, "items/bottle_of_water.png", "bottle of water", true, 4));
-    Item.addStaticItem("drinks/cup_of_tea", new Edible(Item.Tier.Uncommon, "items/cup_of_tea.png", "cup of tea", true, 7));
+    Item.addStaticItem("drinks/bottle_of_water", new Edible("items/bottle_of_water.png", Item.Tier.Common, "bottle of water", true, 4));
+    Item.addStaticItem("drinks/cup_of_tea", new Edible("items/cup_of_tea.png", Item.Tier.Uncommon, "cup of tea", true, 7));
 
-    Item.addStaticItem("weapons/knife", new Knife("weapons/knife.png"));
+    Item.addStaticItem("weapons/knife", new CloseRangeWeapon("weapons/knife.png", "knife", 0.8, 5, Math.PI / 2, 2, 0.5));
+
+    Item.addStaticItem("weapons/bone_baton", new CloseRangeWeapon("weapons/bone_baton.png", "bone baton", 1.2, 7, Math.PI / 2, 1.5, 0.6));
 
     Mob.initStaticMobs();
-    Mob.addStaticMob("mobs/skeleton", new DefaultMob("mobs/skeleton.png", 25, 1, 3,
+    Mob.addStaticMob("mobs/skeleton", new DefaultEnemy("mobs/skeleton.png", 25, 1, 3,
      new LootTable(new String[][]{{}, {"forcraft/bone"}, {"forcraft/rope"}}, new double[]{0.8, 0.15, 0.05})));
+
+     Mob.addStaticMob("mobs/zombie", new DefaultEnemy("mobs/zombie.png", 20, 2, 3,
+      new LootTable(new String[][]{{}, {"forcraft/leather"}, {"forcraft/rope"}}, new double[]{0.8, 0.15, 0.05})));
 
     Skin skin = new Skin(Gdx.files.internal("ui/uiskin.json"));
 
@@ -183,13 +187,23 @@ public class Main extends ApplicationAdapter {
     int count_new_mobs = rand.nextInt(10);
 
     for (int i = 0; i < count_new_mobs; ++i) {
-      Mob mob = Mob.getStaticMob("mobs/skeleton");
-      if (rand.nextInt(10000) < 800) {
+      Mob mob;
+      if (rand.nextInt(10000) < 5000) {   
+        mob = Mob.getStaticMob("mobs/skeleton");
+      } else {
+        mob = Mob.getStaticMob("mobs/zombie");
+      }
+
+      int r = rand.nextInt(10000);
+      if (r < 800) {
+        mob.pickUpItem("weapons/bone_baton");
+      } else if (r < 1000) {
         mob.pickUpItem("weapons/knife");
       }
       new_room.addMob(mob);
     }
 
+    new_room.addItem("weapons/bone_baton");
     new_room.addItem("weapons/knife");
 
     new_room.addItem("forcraft/bone");
@@ -292,7 +306,7 @@ public class Main extends ApplicationAdapter {
     
     // Use (pick up, put down, open door)
     if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
-      if (req_door_id != -1) {
+      if (req_door_id != -1 && player.getItem() != null) {
         if (Point.distance(player.getCenterPos(), Room.GetDoorPosition(req_door_id)) < 7 && player.getItem().getType() == Item.Type.Key) {
           if (current_room.tryUnlockDoor(req_door_id, ((Key)player.getItem()).getKey())) {
             current_room.generateBackground();
@@ -506,7 +520,12 @@ public class Main extends ApplicationAdapter {
         int count_new_mobs = rand.nextInt(10 + (int)Math.floor(player.useLuck(5, -5)));
 
         for (int i = 0; i < count_new_mobs; ++i) {
-          Mob mob = Mob.getStaticMob("mobs/skeleton");
+          Mob mob;
+          if (rand.nextInt(10000) < 5000) {   
+            mob = Mob.getStaticMob("mobs/skeleton");
+          } else {
+            mob = Mob.getStaticMob("mobs/zombie");
+          }
           if (rand.nextInt(10000) < 800 + (int)Math.floor(player.useLuck(100, -100))) {
             mob.pickUpItem("weapons/knife");
           }

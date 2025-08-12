@@ -3,6 +3,7 @@ package com.deepdungeons.game.mobs;
 import java.util.HashMap;
 import java.util.Random;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -86,7 +87,7 @@ public class Mob {
     Humble, General, Wicked, Aggressive
   }
 
-  public Mob(Tier tier, double speed, LootTable table) {
+  public Mob(Tier tier, double speed, LootTable table, String path_to_texture) {
     this.tier = tier;
     this.speed = speed;
     this.table = table;
@@ -98,6 +99,25 @@ public class Mob {
     this.dir = Direction.Undefined;
     this.attack_anim_timer = attack_anim_time + 1;
     this.attack_anim_play = false;
+    this.image = new Pixmap(Gdx.files.internal(path_to_texture));
+    this.texture = new Texture(image);
+  }
+
+  public Mob(Tier tier, double speed, LootTable table, Pixmap map) {
+    this.tier = tier;
+    this.speed = speed;
+    this.table = table;
+    this.id = current_id;
+    ++current_id;
+    this.rand = new Random();
+    this.cooldown = 0;
+    this.attack_timer = 0;
+    this.dir = Direction.Undefined;
+    this.attack_anim_timer = attack_anim_time + 1;
+    this.attack_anim_play = false;
+    this.image = new Pixmap(map.getWidth(), map.getHeight(), map.getFormat());
+    this.image.drawPixmap(map, 0, 0);
+    this.texture = new Texture(image);
   }
 
   public void update(double delta) {
@@ -108,6 +128,11 @@ public class Mob {
       attack_anim_timer += delta;
     }
   }
+
+  protected void updateSize(double koef) {
+    setSize(this.image.getWidth() * koef, this.image.getHeight() * koef);
+  }
+
   protected void generateImage() {
     image = new Pixmap(1, 1, Pixmap.Format.RGB888);
 
@@ -247,7 +272,7 @@ public class Mob {
   }
 
   public Mob clone() {
-    Mob mob = new Mob(this.tier, this.speed, this.table);
+    Mob mob = new Mob(this.tier, this.speed, this.table, image);
 
     mob.health_points = this.health_points;
     mob.cooldown = this.cooldown;

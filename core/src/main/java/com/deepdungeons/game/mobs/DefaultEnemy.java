@@ -1,36 +1,33 @@
 package com.deepdungeons.game.mobs;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Texture;
 import com.deepdungeons.game.utils.Direction;
 import com.deepdungeons.game.utils.LootTable;
 import com.deepdungeons.game.utils.Utility;
 import com.deepdungeons.game.utils.Vector2d;
 
-public class DefaultMob extends Mob {
+public class DefaultEnemy extends Mob {
 
   private Vector2d current_move_dir;
 
-  public DefaultMob(String path_to_texture, double speed, double min_hp, double max_hp, LootTable table) {
-    super(Mob.Tier.Humble, speed, table);
+  private static final double SIZE_KOEF = 0.4;
+
+  public DefaultEnemy(String path_to_texture, double speed, double min_hp, double max_hp, LootTable table) {
+    super(Mob.Tier.Humble, speed, table, path_to_texture);
     this.health_points = rand.nextDouble(min_hp, max_hp + 1);
     this.pos = new Vector2d();
-    this.image = new Pixmap(Gdx.files.internal(path_to_texture));
-    this.texture = new Texture(image);
-    setSize(image.getWidth() / 3, image.getHeight() / 3);
+
+    updateSize(SIZE_KOEF);
     generateRandomPos();
     current_move_dir = Utility.getRandomDirectionVector(rand);
   }
 
-  public DefaultMob(Pixmap map, double speed, double min_hp, double max_hp, LootTable table) {
-    super(Mob.Tier.Humble, speed, table);
+  public DefaultEnemy(Pixmap map, double speed, double min_hp, double max_hp, LootTable table) {
+    super(Mob.Tier.Humble, speed, table, map);
     this.health_points = rand.nextDouble(min_hp, max_hp + 1);
     this.pos = new Vector2d();
-    this.image = new Pixmap(map.getWidth(), map.getHeight(), map.getFormat());
-    this.image.drawPixmap(map, 0, 0);
-    this.texture = new Texture(image);
-    setSize(image.getWidth() / 3, image.getHeight() / 3);
+
+    updateSize(SIZE_KOEF);
     generateRandomPos();
     current_move_dir = Utility.getRandomDirectionVector(rand);
   }
@@ -93,12 +90,7 @@ public class DefaultMob extends Mob {
 
   @Override
   public Mob clone() {
-    DefaultMob mob = new DefaultMob(image, speed, health_points, health_points, getTable());
-    
-    mob.health_points = this.health_points;
-    mob.cooldown = this.cooldown;
-    mob.attack_timer = this.attack_timer;
-    mob.dir = this.dir;
+    DefaultEnemy mob = new DefaultEnemy(image, speed, health_points, health_points, getTable());
 
     return mob;
   }

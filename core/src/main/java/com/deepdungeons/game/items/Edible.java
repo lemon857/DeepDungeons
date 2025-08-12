@@ -8,7 +8,7 @@ public class Edible extends Item {
   private final int points;
   private static final double SIZE_KOEF = 0.5;
 
-  public Edible(Tier tier, String path_to_texture, String name, boolean is_drink, int points) {
+  public Edible(String path_to_texture, Tier tier, String name, boolean is_drink, int points) {
     super(is_drink ? Type.Drink : Type.Food, tier, name, path_to_texture);
     this.pos = new Vector2d();
     this.is_texture_from_file = true;
@@ -16,7 +16,7 @@ public class Edible extends Item {
     updateSize(SIZE_KOEF);
   }
 
-  public Edible(Tier tier, Pixmap map, String name, boolean is_drink, int points) {
+  public Edible(Pixmap map, Tier tier, String name, boolean is_drink, int points) {
     super(is_drink ? Type.Drink : Type.Food, tier, name, map);
     this.pos = new Vector2d();
     this.points = points;
@@ -29,7 +29,7 @@ public class Edible extends Item {
 
   @Override
   public Item clone() {
-    Edible item = new Edible(getTier(), getImage(), getName(), getType() == Type.Drink, points);
+    Edible item = new Edible(getImage(), getTier(), getName(), getType() == Type.Drink, points);
     item.is_texture_from_file = this.is_texture_from_file;
 
     return item;

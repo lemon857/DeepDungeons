@@ -1,7 +1,7 @@
 package com.deepdungeons.game.weapons;
 
 public interface Weapon {
-  double getCooldown(); // s
+  double getCooldown();
   double getDamage();
   Type getWeaponType();
 
