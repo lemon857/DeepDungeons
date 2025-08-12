@@ -302,6 +302,12 @@ public class Room {
       }
 
       if (mobs.get(i).damage(damage)) {
+        Item item = mobs.get(i).getDrop();
+        if (item != null) {
+          System.out.println("Drop!");
+          item.setCenterPos(mobs.get(i).getPos());
+          items.add(item);
+        }
         mobs.remove(i);
       }
       return true; // Hit only one mob

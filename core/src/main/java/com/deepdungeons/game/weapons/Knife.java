@@ -9,7 +9,7 @@ import com.deepdungeons.game.utils.Vector2d;
 public class Knife extends Item implements CloseRangeWeapon {
   public static final double DISTANCE = 8.5;
   public static final double ANGLE = Math.PI / 2.0;
-  public static final double DAMAGE = 2;
+  public static final double DAMAGE = 10;
   public static final double COOLDOWN = 0.5;
 
   private static final double SIZE_KOEF = 0.7;

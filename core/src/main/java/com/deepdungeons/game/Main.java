@@ -20,7 +20,9 @@ import com.deepdungeons.game.items.Item;
 import com.deepdungeons.game.items.Key;
 import com.deepdungeons.game.mobs.DefaultMob;
 import com.deepdungeons.game.mobs.Mob;
+import com.deepdungeons.game.utils.LootTable;
 import com.deepdungeons.game.utils.Point;
+import com.deepdungeons.game.utils.Utility;
 import com.deepdungeons.game.utils.Vector2d;
 import com.deepdungeons.game.weapons.CloseRangeWeapon;
 import com.deepdungeons.game.weapons.Hand;
@@ -129,7 +131,8 @@ public class Main extends ApplicationAdapter {
     Item.addStaticItem("weapons/knife", new Knife("weapons/knife.png"));
 
     Mob.initStaticMobs();
-    Mob.addStaticMob("mobs/skeleton", new DefaultMob("mobs/skeleton.png", 25, 1, 3));
+    Mob.addStaticMob("mobs/skeleton", new DefaultMob("mobs/skeleton.png", 25, 1, 3,
+     new LootTable(new String[][]{{}, {"forcraft/bone"}, {"forcraft/rope"}}, new double[]{0.8, 0.15, 0.05})));
 
     Skin skin = new Skin(Gdx.files.internal("ui/uiskin.json"));
 
@@ -512,7 +515,7 @@ public class Main extends ApplicationAdapter {
           int count_new_items = rand.nextInt(3 + (int)Math.ceil(player.useLuck(1, -1)));
           for (int i = 0; i < count_new_items; ++i) {
             switch(rand.nextInt(3)) {
-            case 0: new_room.addItem("forcraft/leater");
+            case 0: new_room.addItem("forcraft/leather");
             case 1: new_room.addItem("forcraft/rope");
             default: new_room.addItem("forcraft/bone");
             }

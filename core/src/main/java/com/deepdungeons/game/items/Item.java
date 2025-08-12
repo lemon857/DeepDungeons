@@ -21,23 +21,25 @@ public class Item {
   }
 
   public static Item getStaticItem(String name) {
-    Item item = static_items.get(name).clone();
+    Item item = static_items.get(name);
     if (item == null) {
-      System.err.println("Item " + name + " is not found");
+      System.err.println("[Error] Item " + name + " is not found");
       return null;
     }
-    item.generateRandomPos();
-    return item;
+    Item res = item.clone();
+    res.generateRandomPos();
+    return res;
   }
 
   public static Item getStaticItem(String name, Vector2d pos) {
-    Item item = static_items.get(name).clone();
+    Item item = static_items.get(name);
     if (item == null) {
-      System.err.println("Item " + name + " is not found");
+      System.err.println("[Error] Item " + name + " is not found");
       return null;
     }
-    item.pos = pos;
-    return item;
+    Item res = item.clone();
+    res.pos = pos;
+    return res;
   }
 
   protected Pixmap image;

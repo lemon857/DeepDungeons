@@ -71,6 +71,20 @@ public class Utility {
     return getDirectionVector(getRandomDirection(rand));
   }
 
+  public static int getRandomWeightedNumber(Random rand, double[] weights) {
+    double res = rand.nextDouble();
+    double low = 0;
+    double high = 0;
+    for (int i = 0; i < weights.length; ++i) {
+      low = high;
+      high += weights[i];
+      if (res >= low && res < high) {
+        return i;
+      }
+    }
+    return 0;
+  }
+
   public static Pixmap replacePixelsColor(Pixmap map, Color src_color, Color new_color) {
     for (int i = 0; i < map.getWidth(); ++i) {
       for (int j = 0; j < map.getHeight(); ++j) {

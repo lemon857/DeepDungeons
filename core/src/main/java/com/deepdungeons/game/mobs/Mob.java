@@ -10,6 +10,7 @@ import com.deepdungeons.game.Main;
 import com.deepdungeons.game.Room;
 import com.deepdungeons.game.items.Item;
 import com.deepdungeons.game.utils.Direction;
+import com.deepdungeons.game.utils.LootTable;
 import com.deepdungeons.game.utils.Point;
 import com.deepdungeons.game.utils.Utility;
 import com.deepdungeons.game.utils.Vector2d;
@@ -73,6 +74,8 @@ public class Mob {
   protected boolean attack_anim_play;
   protected static final double attack_anim_time = 0.1;
 
+  private final LootTable table;
+
   private final int id;
 
   private static int current_id = 1;
@@ -83,9 +86,10 @@ public class Mob {
     Humble, General, Wicked, Aggressive
   }
 
-  public Mob(Tier tier, double speed) {
+  public Mob(Tier tier, double speed, LootTable table) {
     this.tier = tier;
     this.speed = speed;
+    this.table = table;
     this.id = current_id;
     ++current_id;
     this.rand = new Random();
@@ -199,6 +203,12 @@ public class Mob {
     }
   }
 
+  public final Item getDrop() {
+    if (table == null) return null;
+    
+    return table.nextItem();
+  }
+
   protected boolean attack() {
     if (attack_timer < cooldown) return false;
     double max_distance = 0;
@@ -226,6 +236,10 @@ public class Mob {
     return false;
   }
 
+  protected LootTable getTable() {
+    return table;
+  }
+
   // True if it dead
   public boolean damage(double dmg) {
     health_points -= dmg;
@@ -233,7 +247,7 @@ public class Mob {
   }
 
   public Mob clone() {
-    Mob mob = new Mob(this.tier, this.speed);
+    Mob mob = new Mob(this.tier, this.speed, this.table);
 
     mob.health_points = this.health_points;
     mob.cooldown = this.cooldown;

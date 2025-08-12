@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.deepdungeons.game.utils.Direction;
+import com.deepdungeons.game.utils.LootTable;
 import com.deepdungeons.game.utils.Utility;
 import com.deepdungeons.game.utils.Vector2d;
 
@@ -11,8 +12,8 @@ public class DefaultMob extends Mob {
 
   private Vector2d current_move_dir;
 
-  public DefaultMob(String path_to_texture, double speed, double min_hp, double max_hp) {
-    super(Mob.Tier.Humble, speed);
+  public DefaultMob(String path_to_texture, double speed, double min_hp, double max_hp, LootTable table) {
+    super(Mob.Tier.Humble, speed, table);
     this.health_points = rand.nextDouble(min_hp, max_hp + 1);
     this.pos = new Vector2d();
     this.image = new Pixmap(Gdx.files.internal(path_to_texture));
@@ -22,8 +23,8 @@ public class DefaultMob extends Mob {
     current_move_dir = Utility.getRandomDirectionVector(rand);
   }
 
-  public DefaultMob(Pixmap map, double speed, double min_hp, double max_hp) {
-    super(Mob.Tier.Humble, speed);
+  public DefaultMob(Pixmap map, double speed, double min_hp, double max_hp, LootTable table) {
+    super(Mob.Tier.Humble, speed, table);
     this.health_points = rand.nextDouble(min_hp, max_hp + 1);
     this.pos = new Vector2d();
     this.image = new Pixmap(map.getWidth(), map.getHeight(), map.getFormat());
@@ -92,7 +93,7 @@ public class DefaultMob extends Mob {
 
   @Override
   public Mob clone() {
-    DefaultMob mob = new DefaultMob(image, speed, health_points, health_points);
+    DefaultMob mob = new DefaultMob(image, speed, health_points, health_points, getTable());
     
     mob.health_points = this.health_points;
     mob.cooldown = this.cooldown;
