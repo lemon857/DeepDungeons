@@ -3,6 +3,7 @@ package com.deepdungeons.game.items;
 import java.util.HashMap;
 import java.util.Random;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -71,26 +72,39 @@ public class Item {
     Common, Uncommon, Startling, Incredible
   }
 
-  protected Item(Type type, Tier tier, String name) {
+  protected Item(Type type, Tier tier, String name, String path_to_texture) {
     this.type = type;
     this.tier = tier;
     this.name = name;
     this.id = current_id;
     ++current_id;
     this.rand = new Random();
+    this.image = new Pixmap(Gdx.files.internal(path_to_texture));
+    this.texture = new Texture(this.image);
+    this.is_texture_from_file = true;
+  }
+
+  protected Item(Type type, Tier tier, String name, Pixmap map) {
+    this.type = type;
+    this.tier = tier;
+    this.name = name;
+    this.id = current_id;
+    ++current_id;
+    this.rand = new Random();
+    this.image = new Pixmap(map.getWidth(), map.getHeight(), map.getFormat());
+    this.image.drawPixmap(map, 0, 0);
+    this.texture = new Texture(this.image);
+  }
+
+  protected void updateSize(double koef) {
+    this.size = new Vector2d(this.image.getWidth() * koef, this.image.getHeight() * koef);
   }
 
   public void update(double delta) {}
 
   public Item clone() {
-    Item item = new Item(type, tier, name);
+    Item item = new Item(type, tier, name, image);
     return item;
-  }
-
-  protected void generateImage() {
-    image = new Pixmap(1, 1, Pixmap.Format.RGB888);
-
-    texture = new Texture(image);
   }
 
   public final void draw(SpriteBatch batch) {

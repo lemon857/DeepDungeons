@@ -3,34 +3,36 @@ package com.deepdungeons.game.items;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
+import com.deepdungeons.game.utils.Utility;
 import com.deepdungeons.game.utils.Vector2d;
 
 public class Key extends Item {
-  public static final int WIDTH = 8;
-  public static final int HEIGHT = 4;
+  private static final double SIZE_KOEF = 0.8;
 
-  private final int key;
-  private final Color color;
+  private int key;
 
-  public Key(int key, Color color) {
-    super(Item.Type.Key, Item.Tier.Common,  "key");
-    this.key = key;
-    this.color = color;
+  public Key(String path_to_texture) {
+    super(Item.Type.Key, Item.Tier.Common,  "key", path_to_texture);
+    this.key = 0;
     this.pos = new Vector2d();
-    this.size = new Vector2d(WIDTH, HEIGHT);
+    updateSize(SIZE_KOEF);
 
     generateRandomPos();
-    generateImage();
   }
 
-  public Key(int key, Color color, Vector2d pos) {
-    super(Item.Type.Key, Item.Tier.Common,  "key");
+  public Key(Pixmap map) {
+    super(Item.Type.Key, Item.Tier.Common,  "key", map);
+    this.key = 0;
+    this.pos = new Vector2d();
+    updateSize(SIZE_KOEF);
+    generateRandomPos();
+  }
+
+  public void setParams(int key, Color color) {
     this.key = key;
-    this.color = color;
-    this.pos = pos;
-    this.size = new Vector2d(WIDTH, HEIGHT);
-    
-    generateImage();
+
+    this.image = Utility.replacePixelsColor(image, Color.WHITE, color);
+    this.texture = new Texture(this.image);
   }
 
   public int getKey() {
@@ -38,31 +40,11 @@ public class Key extends Item {
   }
 
   @Override
-  protected final void generateImage() {
-    image = new Pixmap(WIDTH, HEIGHT, Pixmap.Format.RGBA8888);
+  public Item clone() {
+    Key item = new Key(image);
+    item.is_texture_from_file = this.is_texture_from_file;
 
-    image.setColor(1, 1, 1, 1);
-
-    image.drawPixel(1, 0);
-    image.drawPixel(2, 0);
-
-    image.drawPixel(1, 3);
-    image.drawPixel(2, 3);
-
-    image.drawPixel(0, 1);
-    image.drawPixel(0, 2);
-
-    image.drawPixel(3, 1);
-    image.drawPixel(3, 2);
-
-    image.drawLine(4, 2, 7, 2);
-
-    image.setColor(color);
-
-    image.drawPixel(5, 1);
-    image.drawPixel(6, 1);
-    
-    texture = new Texture(image);
+    return item;
   }
 
   @Override

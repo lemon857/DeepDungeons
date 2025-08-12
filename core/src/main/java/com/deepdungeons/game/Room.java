@@ -145,8 +145,11 @@ public class Room {
     lock_doors_color[door_id] = new Color(rand.nextFloat(1), rand.nextFloat(1), rand.nextFloat(1), 1);
 
     non_actual = true;
-  
-    return new Key(lock_doors[door_id], lock_doors_color[door_id]);
+
+    Key res = (Key)Item.getStaticItem("special/key");
+
+    res.setParams(lock_doors[door_id], lock_doors_color[door_id]);
+    return res;
   }
 
   public void lockAllDoors() {

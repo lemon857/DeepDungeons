@@ -22,7 +22,6 @@ import com.deepdungeons.game.mobs.DefaultMob;
 import com.deepdungeons.game.mobs.Mob;
 import com.deepdungeons.game.utils.LootTable;
 import com.deepdungeons.game.utils.Point;
-import com.deepdungeons.game.utils.Utility;
 import com.deepdungeons.game.utils.Vector2d;
 import com.deepdungeons.game.weapons.CloseRangeWeapon;
 import com.deepdungeons.game.weapons.Hand;
@@ -118,6 +117,8 @@ public class Main extends ApplicationAdapter {
     });
 
     Item.initStaticItems();
+    Item.addStaticItem("special/key", new Key("items/key.png"));
+
     Item.addStaticItem("forcraft/bone", new ItemForCraft(Item.Tier.Common, "items/bone.png", "bone"));
     Item.addStaticItem("forcraft/rope", new ItemForCraft(Item.Tier.Common, "items/rope.png", "rope"));
     Item.addStaticItem("forcraft/leather", new ItemForCraft(Item.Tier.Common, "items/leather.png", "leather"));
@@ -296,6 +297,7 @@ public class Main extends ApplicationAdapter {
           if (current_room.tryUnlockDoor(req_door_id, ((Key)player.getItem()).getKey())) {
             current_room.generateBackground();
             req_door_id = -1;
+            player.dropItem(); // Remove key
           }
         } else {
           req_door_id = -1;

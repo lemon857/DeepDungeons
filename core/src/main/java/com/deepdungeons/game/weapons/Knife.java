@@ -1,35 +1,27 @@
 package com.deepdungeons.game.weapons;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Texture;
 import com.deepdungeons.game.items.Item;
 import com.deepdungeons.game.utils.Vector2d;
 
 public class Knife extends Item implements CloseRangeWeapon {
   public static final double DISTANCE = 8.5;
   public static final double ANGLE = Math.PI / 2.0;
-  public static final double DAMAGE = 10;
+  public static final double DAMAGE = 2;
   public static final double COOLDOWN = 0.5;
 
   private static final double SIZE_KOEF = 0.7;
 
   public Knife(String path_to_texture) {
-    super(Item.Type.Weapon, Item.Tier.Common, "knife");
+    super(Item.Type.Weapon, Item.Tier.Common, "knife", path_to_texture);
     this.pos = new Vector2d();
-    this.image = new Pixmap(Gdx.files.internal(path_to_texture));
-    this.texture = new Texture(image);
-    this.size = new Vector2d(this.image.getWidth() * SIZE_KOEF, this.image.getHeight() * SIZE_KOEF);
-    this.is_texture_from_file = true;
+    updateSize(SIZE_KOEF);
   }
 
   public Knife(Pixmap map) {
-    super(Item.Type.Weapon, Item.Tier.Common, "knife");
+    super(Item.Type.Weapon, Item.Tier.Common, "knife", map);
     this.pos = new Vector2d();
-    this.image = new Pixmap(map.getWidth(), map.getHeight(), map.getFormat());
-    this.image.drawPixmap(map, 0, 0);
-    this.texture = new Texture(image);
-    this.size = new Vector2d(this.image.getWidth() * SIZE_KOEF, this.image.getHeight() * SIZE_KOEF);
+    updateSize(SIZE_KOEF);
   }
 
   @Override
