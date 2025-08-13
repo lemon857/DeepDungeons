@@ -150,6 +150,10 @@ public class Mob {
   public final double getHealthPoints() {
     return id;
   }
+  
+  public final Vector2d getCenterPos() {
+    return Vector2d.sum(pos, Vector2d.div(size, 2));
+  }
 
   public final Vector2d getPos() {
     return pos;

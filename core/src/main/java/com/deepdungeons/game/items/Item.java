@@ -148,7 +148,6 @@ public class Item {
     return is_texture_from_file;
   }
 
-  // For text drawing
   public final Vector2d getCenterPos() {
     return Vector2d.sum(pos, Vector2d.div(size, 2));
   }

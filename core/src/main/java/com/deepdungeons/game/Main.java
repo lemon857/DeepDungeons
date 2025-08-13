@@ -128,9 +128,9 @@ public class Main extends ApplicationAdapter {
     Item.addStaticItem("drinks/bottle_of_water", new Edible("items/bottle_of_water.png", Item.Tier.Common, "bottle of water", true, 4));
     Item.addStaticItem("drinks/cup_of_tea", new Edible("items/cup_of_tea.png", Item.Tier.Uncommon, "cup of tea", true, 7));
 
-    Item.addStaticItem("weapons/knife", new CloseRangeWeapon("weapons/knife.png", "knife", 0.8, 5, Math.PI / 2, 2, 0.5));
+    Item.addStaticItem("weapons/knife", new CloseRangeWeapon("weapons/knife.png", "knife", 0.8, 4.7, Math.PI / 2, 2, 0.5, false));
 
-    Item.addStaticItem("weapons/bone_baton", new CloseRangeWeapon("weapons/bone_baton.png", "bone baton", 1.2, 7, Math.PI / 2, 1.5, 0.6));
+    Item.addStaticItem("weapons/bone_baton", new CloseRangeWeapon("weapons/bone_baton.png", "bone baton", 1.2, 6.3, Math.PI / 3, 1.5, 1, true));
 
     Mob.initStaticMobs();
     Mob.addStaticMob("mobs/skeleton", new DefaultEnemy("mobs/skeleton.png", 25, 1, 3,
@@ -184,24 +184,24 @@ public class Main extends ApplicationAdapter {
     generate_key_chance = 10;
     new_room.addItem(key);
 
-    int count_new_mobs = rand.nextInt(10);
+    // int count_new_mobs = rand.nextInt(10);
 
-    for (int i = 0; i < count_new_mobs; ++i) {
-      Mob mob;
-      if (rand.nextInt(10000) < 5000) {   
-        mob = Mob.getStaticMob("mobs/skeleton");
-      } else {
-        mob = Mob.getStaticMob("mobs/zombie");
-      }
+    // for (int i = 0; i < count_new_mobs; ++i) {
+    //   Mob mob;
+    //   if (rand.nextInt(10000) < 5000) {   
+    //     mob = Mob.getStaticMob("mobs/skeleton");
+    //   } else {
+    //     mob = Mob.getStaticMob("mobs/zombie");
+    //   }
 
-      int r = rand.nextInt(10000);
-      if (r < 800) {
-        mob.pickUpItem("weapons/bone_baton");
-      } else if (r < 1000) {
-        mob.pickUpItem("weapons/knife");
-      }
-      new_room.addMob(mob);
-    }
+    //   int r = rand.nextInt(10000);
+    //   if (r < 800) {
+    //     mob.pickUpItem("weapons/bone_baton");
+    //   } else if (r < 1000) {
+    //     mob.pickUpItem("weapons/knife");
+    //   }
+    //   new_room.addMob(mob);
+    // }
 
     new_room.addItem("weapons/bone_baton");
     new_room.addItem("weapons/knife");
@@ -349,8 +349,8 @@ public class Main extends ApplicationAdapter {
     if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
       if (player.getItem() == null) { // aka hand
         if (timer >= cooldown) {
-          if (current_room.tryHitMob(player.getPos(), player.getDirection(), 
-            Hand.getDamage(rand) * player.getStrength(), Hand.DISTANCE, Hand.ANGLE)) {
+          if (current_room.tryHitMob(player.getCenterPos(), player.getDirection(), 
+            Hand.getDamage(rand) * player.getStrength(), Hand.DISTANCE, Hand.ANGLE, player.getSizeOffset(), false)) {
             player.startAttackAnim();
             debug_info[DEBUG_LINE_INFO].setText("Hitted");
             cooldown = Hand.getCooldown(rand) / player.getAttackSpeed();
@@ -364,8 +364,8 @@ public class Main extends ApplicationAdapter {
       } else if (player.getItem().getType() == Item.Type.Weapon) {
         if (timer >= cooldown) {
           CloseRangeWeapon weapon = (CloseRangeWeapon)player.getItem();
-          if (current_room.tryHitMob(player.getPos(), player.getDirection(), 
-            weapon.getDamage() * player.getStrength(), weapon.getDistance(), weapon.getAngle())) {
+          if (current_room.tryHitMob(player.getCenterPos(), player.getDirection(), 
+            weapon.getDamage() * player.getStrength(), weapon.getDistance(), weapon.getAngle(), player.getSizeOffset(), weapon.isAllowSplash())) {
             player.startAttackAnim();
             debug_info[DEBUG_LINE_INFO].setText("Hitted");
             cooldown = weapon.getCooldown() / player.getAttackSpeed();
@@ -423,7 +423,7 @@ public class Main extends ApplicationAdapter {
     current_room.update(delta);
     //debug_info[DEBUG_LINE_DISTANCE].setText("Dis to door: " + Point.distance(player.getCenterPos(), Room.GetDoorPosition(req_door_id)));
     //debug_info[DEBUG_LINE_DISTANCE].setText("Dis to item: " + current_room.distanceToNearestItem(player.getCenterPos()));
-    debug_info[DEBUG_LINE_DISTANCE].setText("Dis to mob: " + current_room.distanceToNearestMob(player.getCenterPos()));
+    debug_info[DEBUG_LINE_DISTANCE].setText("Dis to mob: " + (current_room.distanceToNearestMob(player.getCenterPos()) - player.getSizeOffset()));
     debug_info[DEBUG_LINE_ANGLE].setText("Angle to mob: " + current_room.angleToNearestMob(player.getCenterPos(), player.getDirection()));
     Point pos = new Point(player.getPos());
 

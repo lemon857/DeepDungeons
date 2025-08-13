@@ -267,7 +267,7 @@ public class Room {
   public double distanceToNearestMob(Vector2d cur_pos) {
     double res = 50;
     for (Mob mob : mobs) {
-      res = Math.min(res, Vector2d.distance(cur_pos, mob.getPos()));
+      res = Math.min(res, Vector2d.distance(cur_pos, mob.getCenterPos()));
     }
     return res;
   }
@@ -278,7 +278,7 @@ public class Room {
     int current_mob = -1;
 
     for (int i = 0; i < mobs.size(); ++i) {
-      if (Vector2d.distance(cur_pos, mobs.get(i).getPos()) == distance) {
+      if (Vector2d.distance(cur_pos, mobs.get(i).getCenterPos()) == distance) {
         current_mob = i;
         break;
       }
@@ -286,17 +286,18 @@ public class Room {
 
     if (current_mob == -1) return -1;
 
-    Vector2d v2 = new Vector2d(cur_pos, mobs.get(current_mob).getPos());
+    Vector2d v2 = new Vector2d(cur_pos, mobs.get(current_mob).getCenterPos());
 
     return Vector2d.angle(dir, v2);
   }
 
-  public boolean  tryHitMob(Vector2d player_pos, Vector2d dir, double damage, double max_distance, double max_angle) {
+  public boolean tryHitMob(Vector2d player_pos, Vector2d dir, double damage, double max_distance, double max_angle, double offset, boolean allow_splash) {
     for (int i = 0; i < mobs.size(); ++i) {
-      Vector2d v2 = new Vector2d(player_pos, mobs.get(i).getPos());
+      Vector2d v2 = new Vector2d(player_pos, mobs.get(i).getCenterPos());
 
-      if (v2.length() > max_distance) {
-        // System.out.println("[" + i + "] Too far: " + v2.length());
+      double dis = Vector2d.distance(player_pos, mobs.get(i).getCenterPos());
+      if (dis - offset > max_distance) {
+        // System.out.println("[" + i + "] Too far: " + (dis - offset));
         continue;
       }
       if (Vector2d.angle(dir, v2) > max_angle) {
@@ -308,12 +309,14 @@ public class Room {
         Item item = mobs.get(i).getDrop();
         if (item != null) {
           System.out.println("Drop!");
-          item.setCenterPos(mobs.get(i).getPos());
+          item.setCenterPos(mobs.get(i).getCenterPos());
           items.add(item);
         }
         mobs.remove(i);
       }
-      return true; // Hit only one mob
+      if (!allow_splash) {
+        return true; // Hit only one mob
+      }
     }
     return false;
   }

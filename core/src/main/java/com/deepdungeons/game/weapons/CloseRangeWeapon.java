@@ -9,9 +9,10 @@ public class CloseRangeWeapon extends Item implements Weapon {
   public double angle;
   public double damage;
   public double cooldown;
+  public boolean allow_splash;
   private final double size_koef;
 
-  public CloseRangeWeapon(String path_to_texture, String name, double size_koef, double distance, double angle, double damage, double cooldown) {
+  public CloseRangeWeapon(String path_to_texture, String name, double size_koef, double distance, double angle, double damage, double cooldown, boolean allow_splash) {
     super(Item.Type.Weapon, Item.Tier.Common, name, path_to_texture);
     this.pos = new Vector2d();
     this.distance = distance;
@@ -19,10 +20,11 @@ public class CloseRangeWeapon extends Item implements Weapon {
     this.angle = angle;
     this.cooldown = cooldown;
     this.size_koef = size_koef;
+    this.allow_splash = allow_splash;
     updateSize(size_koef);
   }
 
-  public CloseRangeWeapon(Pixmap map, String name, double size_koef, double distance, double angle, double damage, double cooldown) {
+  public CloseRangeWeapon(Pixmap map, String name, double size_koef, double distance, double angle, double damage, double cooldown, boolean allow_splash) {
     super(Item.Type.Weapon, Item.Tier.Common, name, map);
     this.pos = new Vector2d();
     this.distance = distance;
@@ -30,12 +32,13 @@ public class CloseRangeWeapon extends Item implements Weapon {
     this.angle = angle;
     this.cooldown = cooldown;
     this.size_koef = size_koef;
+    this.allow_splash = allow_splash;
     updateSize(size_koef);
   }
 
   @Override
   public Item clone() {
-    CloseRangeWeapon item = new CloseRangeWeapon(this.image, getName(), size_koef, distance, angle, damage, cooldown);
+    CloseRangeWeapon item = new CloseRangeWeapon(this.image, getName(), size_koef, distance, angle, damage, cooldown, allow_splash);
     item.pos = new Vector2d(this.pos);
     item.is_texture_from_file = this.is_texture_from_file;
 
@@ -58,6 +61,11 @@ public class CloseRangeWeapon extends Item implements Weapon {
   @Override
   public double getCooldown() {
     return cooldown;
+  }
+
+  @Override
+  public boolean isAllowSplash() {
+    return allow_splash;
   }
 
   @Override

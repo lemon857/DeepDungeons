@@ -465,6 +465,10 @@ public class Player {
     return Utility.getDirectionVector(dir);
   }
 
+  public double getSizeOffset() {
+    return size.length() / 2.0;
+  }
+
   public boolean isDie() {
     return health_points <= 0;
   }
