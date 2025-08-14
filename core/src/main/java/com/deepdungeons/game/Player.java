@@ -20,6 +20,7 @@ public class Player {
   public static final int MAX_HP = 30;
   public static final int MAX_FP = 25;
   public static final int MAX_TP = 25;
+  private static final int MIN_TP = 0;
 
   public static final int EYE_DOWN = (HEIGHT / 2) - 1;
   public static final int EYE_UP = HEIGHT - EYE_DOWN - 1;
@@ -41,6 +42,15 @@ public class Player {
   private static final double HUNGER_DAMAGE_COOLDOWN = 3;
   private static final double STRENGTH_HUNGER_COOLDOWN = 4;
   private static final double FAST_ATTACK_THIRSTY_COOLDOWN = 5;
+
+  private static final double MAX_MOVE_SPEED = 40;
+  private static final double MIN_MOVE_SPEED = 20;
+
+  private static final double MAX_THIRSTY_DISTANCE = Room.WIDTH * 10;
+  private static final double MIN_THIRSTY_DISTANCED = Room.WIDTH * 6;
+
+  private double next_thirsty_distance;
+  private double current_walked_distance;
 
   private double hunger_damage_timer;
   private double strength_hunger_timer;
@@ -107,6 +117,9 @@ public class Player {
     this.hunger_damage_timer = 0;
     this.strength_hunger_timer = 0;
     this.fast_attack_thirsty_timer = 0;
+
+    this.next_thirsty_distance = rand.nextDouble(MIN_THIRSTY_DISTANCED, MAX_THIRSTY_DISTANCE) + useLuck(-2.0 * Room.WIDTH, 2.0 * Room.WIDTH);
+    this.current_walked_distance = 0;
 
     generateRandomPos();
 
@@ -339,6 +352,8 @@ public class Player {
     translate(vector.x, vector.y);
   }
   public void translate(double x, double y) {
+    Vector2d old_pos = new Vector2d(pos);
+
     pos.x += x;
     pos.y += y;
 
@@ -347,6 +362,13 @@ public class Player {
 
     if (pos.y < START_BORDER.y) pos.y = START_BORDER.y;
     else if (pos.y > END_BORDER.y) pos.y = END_BORDER.y;
+
+    current_walked_distance += Vector2d.distance(old_pos, pos);
+    if (current_walked_distance >= next_thirsty_distance) {
+      thirst(rand.nextInt(2, 5));
+      next_thirsty_distance = rand.nextDouble(MIN_THIRSTY_DISTANCED, MAX_THIRSTY_DISTANCE) + useLuck(-2.0 * Room.WIDTH, 2.0 * Room.WIDTH);
+      current_walked_distance = 0;
+    }
 
     if (Utility.getTranslateDirection(x, y) != Direction.Undefined) dir = Utility.getTranslateDirection(x, y);
     
@@ -373,7 +395,7 @@ public class Player {
     if (food_points == 0) {
       hunger_damage_timer += delta;
       if (hunger_damage_timer >= HUNGER_DAMAGE_COOLDOWN) {
-        damage(1);
+        damage(rand.nextInt(0, 3));
         hunger_damage_timer = 0;
       }
     }
@@ -381,7 +403,7 @@ public class Player {
     if (strength > 1) {
       strength_hunger_timer += delta;
       if (strength_hunger_timer >= STRENGTH_HUNGER_COOLDOWN) {
-        hunger(1);
+        hunger(rand.nextInt(0, 3));
         strength_hunger_timer = 0;
       }
     }
@@ -389,7 +411,7 @@ public class Player {
     if (attack_speed > 1) {
       fast_attack_thirsty_timer += delta;
       if (fast_attack_thirsty_timer >= FAST_ATTACK_THIRSTY_COOLDOWN) {
-        thirst(1);
+        thirst(rand.nextInt(0, 3));
         fast_attack_thirsty_timer = 0;
       }
     }
@@ -453,6 +475,13 @@ public class Player {
     return rand.nextDouble(luck * Math.abs(negativeMax)) * Math.signum(negativeMax);
   }
 
+  public int useLuck(int negativeMax, int positiveMax) {
+    if (luck == 0) return 0;
+    else if (luck > 0) return rand.nextInt((int)Math.floor(luck * Math.abs(positiveMax))) * (int)Math.signum(positiveMax);
+
+    return rand.nextInt((int)Math.floor(luck * Math.abs(negativeMax))) * (int)Math.signum(negativeMax);
+  }
+
   public Vector2d getPos() {
     return pos;
   }
@@ -491,6 +520,11 @@ public class Player {
     }
 
     System.out.println("[damage] HP: " + health_points);
+
+    if (rand.nextInt(10000) < 1000 + useLuck(200, -200)) {
+      hunger(rand.nextInt(2, 5));
+    }
+
     return health_points <= 0;
   }
   private void simple_damage(double delta) {
@@ -620,6 +654,10 @@ public class Player {
       health_map.drawPixmap(full_food_point, 2 + i * 4, HEIGHT + 2);
     }
     health_texture = new Texture(health_map);
+
+    if (rand.nextInt(10000) < 1000 + useLuck(200, -200)) {
+      thirst(rand.nextInt(2, 5));
+    }
   }
 
   // Decrease food points
@@ -646,6 +684,8 @@ public class Player {
       health_map.drawPixmap(full_thirsty_point, 2 + i * 4, 2);
     }
     health_texture = new Texture(health_map);
+
+    move_speed = Utility.mapRange(Math.ceil(thirsty_points / 5.0), MIN_TP / 5, MAX_TP / 5, MIN_MOVE_SPEED, MAX_MOVE_SPEED);
   }
 
   // Decrease thirsty points
@@ -659,5 +699,7 @@ public class Player {
       health_map.drawPixmap(empty_thirsty_point, 2 + i * 4, 2);
     }
     health_texture = new Texture(health_map);
+
+    move_speed = Utility.mapRange(Math.ceil(thirsty_points / 5.0), MIN_TP / 5, MAX_TP / 5, MIN_MOVE_SPEED, MAX_MOVE_SPEED);
   }
 }

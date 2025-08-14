@@ -526,7 +526,7 @@ public class Main extends ApplicationAdapter {
           } else {
             mob = Mob.getStaticMob("mobs/zombie");
           }
-          if (rand.nextInt(10000) < 800 + (int)Math.floor(player.useLuck(100, -100))) {
+          if (rand.nextInt(10000) < 800 + player.useLuck(100, -100)) {
             mob.pickUpItem("weapons/knife");
           }
           new_room.addMob(mob);

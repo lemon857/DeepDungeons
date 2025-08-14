@@ -105,4 +105,8 @@ public class Utility {
     Color color = new Color(color1);
     return "R: " + color.r + " G: " + color.g + " B: " + color.b + " A: " + color.a;
   }
+
+  public static double mapRange(double value, double start, double end, double start_res, double end_res) {
+    return start_res + (((end_res - start_res) / (end - start)) * (value - start));
+  }
 }
