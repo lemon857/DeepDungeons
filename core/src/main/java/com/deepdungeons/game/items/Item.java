@@ -65,7 +65,7 @@ public class Item {
   private final String name;
 
   public enum Type {
-    None, Key, Weapon, ForCraft, Food, Drink
+    None, Key, Weapon, ForCraft, Food, Drink, Coin
   }
 
   public enum Tier {

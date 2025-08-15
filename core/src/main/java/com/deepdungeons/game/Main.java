@@ -15,6 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.deepdungeons.game.items.ItemForCraft;
+import com.deepdungeons.game.items.Coin;
 import com.deepdungeons.game.items.Edible;
 import com.deepdungeons.game.items.Item;
 import com.deepdungeons.game.items.Key;
@@ -60,6 +61,8 @@ public class Main extends ApplicationAdapter {
 
   private Label pause_info_label;
   private Label pause_tip_label;
+
+  private Label coins_label;
 
   private static final String die_message = "YOU DIED";
   private static final String die_tip = "Press SPACE to restart";
@@ -117,6 +120,7 @@ public class Main extends ApplicationAdapter {
 
     Item.initStaticItems();
     Item.addStaticItem("special/key", new Key("items/key.png"));
+    Item.addStaticItem("special/coin", new Coin("items/coin.png"));
 
     Item.addStaticItem("forcraft/bone", new ItemForCraft("items/bone.png", Item.Tier.Common, "bone"));
     Item.addStaticItem("forcraft/rope", new ItemForCraft("items/rope.png", Item.Tier.Common, "rope"));
@@ -162,6 +166,12 @@ public class Main extends ApplicationAdapter {
     pause_tip_label.setFontScale(3);
     stage.addActor(pause_tip_label);
 
+    coins_label = new Label("0", skin);
+    coins_label.setPosition(1460, 970);
+    coins_label.setColor(1, 1, 0.2f, 1);
+    coins_label.setFontScale(2);
+    stage.addActor(coins_label);
+
     debug_info[DEBUG_LINE_ITEM_NAME].setPosition(DEBUG_START.x, 100);
     
     debug_info[DEBUG_LINE_ITEM_NAME].setColor(1, 0, 1, 1);
@@ -202,6 +212,10 @@ public class Main extends ApplicationAdapter {
     //   }
     //   new_room.addMob(mob);
     // }
+
+    new_room.addItem("special/coin");
+    new_room.addItem("special/coin");
+    new_room.addItem("special/coin");
 
     new_room.addItem("weapons/bone_baton");
     new_room.addItem("weapons/knife");
@@ -325,6 +339,7 @@ public class Main extends ApplicationAdapter {
             current_room.addItem(item);
           }
           player.pickupItem(current_room.grabItem());
+          coins_label.setText(player.getCoinsCount());
           debug_info[DEBUG_LINE_INFO].setText("Grabbed!");
           
         } else {
@@ -535,10 +550,11 @@ public class Main extends ApplicationAdapter {
         if (rand.nextInt(10000) < 7500 + (4 - new_room.getDoorsCount()) * 250) { // have items
           int count_new_items = rand.nextInt(3 + (int)Math.ceil(player.useLuck(1, -1)));
           for (int i = 0; i < count_new_items; ++i) {
-            switch(rand.nextInt(3)) {
+            switch(rand.nextInt(4)) {
             case 0: new_room.addItem("forcraft/leather");
             case 1: new_room.addItem("forcraft/rope");
-            default: new_room.addItem("forcraft/bone");
+            case 2: new_room.addItem("forcraft/bone");
+            default: new_room.addItem("special/coin");
             }
           }
         }

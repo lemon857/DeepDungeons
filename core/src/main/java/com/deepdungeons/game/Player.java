@@ -88,6 +88,8 @@ public class Player {
 
   private Item inventory;
 
+  private int money;
+
   private double health_points;
   private int food_points;
   private int thirsty_points;
@@ -108,6 +110,8 @@ public class Player {
     this.health_points = MAX_HP;
     this.food_points = MAX_FP;
     this.thirsty_points = MAX_TP;
+
+    this.money = 0;
 
     this.move_speed = 40;
     this.attack_speed = 1;
@@ -315,6 +319,10 @@ public class Player {
   }
 
   public void pickupItem(Item item) {
+    if (item.getType() == Item.Type.Coin) {
+      ++money;
+      return;
+    }
     inventory = item;
     generateInventoryTexture();
   }
@@ -384,6 +392,18 @@ public class Player {
     pos.y = y;
     if (pos.y < START_BORDER.y) pos.y = START_BORDER.y;
     else if (pos.y > END_BORDER.y) pos.y = END_BORDER.y;
+  }
+
+  // true if success
+  public boolean trySpendMoney(int count) {
+    if (count > money) return false;
+
+    money -= count;
+    return true;
+  }
+
+  public int getCoinsCount() {
+    return money;
   }
 
   public void update(double delta) {
