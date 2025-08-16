@@ -119,28 +119,28 @@ public class Main extends ApplicationAdapter {
     });
 
     Item.initStaticItems();
-    Item.addStaticItem("special/key", new Key("items/key.png"));
-    Item.addStaticItem("special/coin", new Coin("items/coin.png"));
+    Item.addStaticItem("special/key", new Key("textures/items/key.png"));
+    Item.addStaticItem("special/coin", new Coin("textures/items/coin.png", "sounds/coin.mp3"));
 
-    Item.addStaticItem("forcraft/bone", new ItemForCraft("items/bone.png", Item.Tier.Common, "bone"));
-    Item.addStaticItem("forcraft/rope", new ItemForCraft("items/rope.png", Item.Tier.Common, "rope"));
-    Item.addStaticItem("forcraft/leather", new ItemForCraft("items/leather.png", Item.Tier.Common, "leather"));
+    Item.addStaticItem("forcraft/bone", new ItemForCraft("textures/items/bone.png", Item.Tier.Common, "bone"));
+    Item.addStaticItem("forcraft/rope", new ItemForCraft("textures/items/rope.png", Item.Tier.Common, "rope"));
+    Item.addStaticItem("forcraft/leather", new ItemForCraft("textures/items/leather.png", Item.Tier.Common, "leather"));
 
-    Item.addStaticItem("foods/candy", new Edible("items/candy.png", Item.Tier.Common, "candy", false, 2));
-    Item.addStaticItem("foods/meat", new Edible("items/meat.png", Item.Tier.Uncommon, "meat", false, 5));
+    Item.addStaticItem("foods/candy", new Edible("textures/items/candy.png", Item.Tier.Common, "candy", false, 2));
+    Item.addStaticItem("foods/meat", new Edible("textures/items/meat.png", Item.Tier.Uncommon, "meat", false, 5));
 
-    Item.addStaticItem("drinks/bottle_of_water", new Edible("items/bottle_of_water.png", Item.Tier.Common, "bottle of water", true, 4));
-    Item.addStaticItem("drinks/cup_of_tea", new Edible("items/cup_of_tea.png", Item.Tier.Uncommon, "cup of tea", true, 7));
+    Item.addStaticItem("drinks/bottle_of_water", new Edible("textures/items/bottle_of_water.png", Item.Tier.Common, "bottle of water", true, 4));
+    Item.addStaticItem("drinks/cup_of_tea", new Edible("textures/items/cup_of_tea.png", Item.Tier.Uncommon, "cup of tea", true, 7));
 
-    Item.addStaticItem("weapons/knife", new CloseRangeWeapon("weapons/knife.png", "knife", 0.8, 4.7, Math.PI / 2, 2, 0.5, false));
+    Item.addStaticItem("weapons/knife", new CloseRangeWeapon("textures/weapons/knife.png", "sounds/knife.mp3", "knife", 0.8, 4.7, Math.PI / 2, 2, 0.5, false));
 
-    Item.addStaticItem("weapons/bone_baton", new CloseRangeWeapon("weapons/bone_baton.png", "bone baton", 1.2, 6.3, Math.PI / 3, 1.5, 1, true));
+    Item.addStaticItem("weapons/bone_baton", new CloseRangeWeapon("textures/weapons/bone_baton.png", "sounds/baton.mp3", "bone baton", 1.2, 6.3, Math.PI / 3, 1.5, 1, true));
 
     Mob.initStaticMobs();
-    Mob.addStaticMob("mobs/skeleton", new DefaultEnemy("mobs/skeleton.png", 25, 1, 3,
+    Mob.addStaticMob("mobs/skeleton", new DefaultEnemy("textures/mobs/skeleton.png", 25, 1, 3,
      new LootTable(new String[][]{{}, {"forcraft/bone"}, {"forcraft/rope"}}, new double[]{0.8, 0.15, 0.05})));
 
-     Mob.addStaticMob("mobs/zombie", new DefaultEnemy("mobs/zombie.png", 20, 2, 3,
+     Mob.addStaticMob("mobs/zombie", new DefaultEnemy("textures/mobs/zombie.png", 20, 2, 3,
       new LootTable(new String[][]{{}, {"forcraft/leather"}, {"forcraft/rope"}}, new double[]{0.8, 0.15, 0.05})));
 
     Skin skin = new Skin(Gdx.files.internal("ui/uiskin.json"));
@@ -367,11 +367,11 @@ public class Main extends ApplicationAdapter {
           if (current_room.tryHitMob(player.getCenterPos(), player.getDirection(), 
             Hand.getDamage(rand) * player.getStrength(), Hand.DISTANCE, Hand.ANGLE, player.getSizeOffset(), false)) {
             player.startAttackAnim();
-            debug_info[DEBUG_LINE_INFO].setText("Hitted");
+            debug_info[DEBUG_LINE_INFO].setText("Hand Hitted");
             cooldown = Hand.getCooldown(rand) / player.getAttackSpeed();
             timer = 0;
           } else {
-            debug_info[DEBUG_LINE_INFO].setText("No hit");
+            debug_info[DEBUG_LINE_INFO].setText("No hand hit");
           }
         } else {
           debug_info[DEBUG_LINE_INFO].setText("Time left: " + (cooldown - timer));
@@ -382,11 +382,11 @@ public class Main extends ApplicationAdapter {
           if (current_room.tryHitMob(player.getCenterPos(), player.getDirection(), 
             weapon.getDamage() * player.getStrength(), weapon.getDistance(), weapon.getAngle(), player.getSizeOffset(), weapon.isAllowSplash())) {
             player.startAttackAnim();
-            debug_info[DEBUG_LINE_INFO].setText("Hitted");
+            debug_info[DEBUG_LINE_INFO].setText("Weapon Hitted");
             cooldown = weapon.getCooldown() / player.getAttackSpeed();
             timer = 0;
           } else {
-            debug_info[DEBUG_LINE_INFO].setText("No hit");
+            debug_info[DEBUG_LINE_INFO].setText("No weapon hit");
           }
         } else {
           debug_info[DEBUG_LINE_INFO].setText("Time left: " + (cooldown - timer));
@@ -529,7 +529,7 @@ public class Main extends ApplicationAdapter {
         }
       }
 
-      int type_room = rand.nextInt(10); // 0-1 - empty room, 2-5 - room with enemies, 6-9 - room with items
+      int type_room = rand.nextInt(10); // 0-1 - empty room, 2-5 - room with enemies, 6-9 - room with textures/items
 
       if (type_room > 1 && type_room < 6) {
         int count_new_mobs = rand.nextInt(10 + (int)Math.floor(player.useLuck(5, -5)));
@@ -542,7 +542,7 @@ public class Main extends ApplicationAdapter {
             mob = Mob.getStaticMob("mobs/zombie");
           }
           if (rand.nextInt(10000) < 800 + player.useLuck(100, -100)) {
-            mob.pickUpItem("weapons/knife");
+            mob.pickUpItem("textures/weapons/knife");
           }
           new_room.addMob(mob);
         }

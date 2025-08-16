@@ -334,6 +334,11 @@ public class Room {
     }
   }
 
+  public void dispose() {
+    items.clear();
+    mobs.clear();
+  }
+
   public void generateBackground() {
     Pixmap map = new Pixmap(WIDTH, HEIGHT, Pixmap.Format.RGB888);
 

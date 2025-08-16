@@ -1,5 +1,7 @@
 package com.deepdungeons.game.weapons;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.deepdungeons.game.items.Item;
 import com.deepdungeons.game.utils.Vector2d;
@@ -12,7 +14,7 @@ public class CloseRangeWeapon extends Item implements Weapon {
   public boolean allow_splash;
   private final double size_koef;
 
-  public CloseRangeWeapon(String path_to_texture, String name, double size_koef, double distance, double angle, double damage, double cooldown, boolean allow_splash) {
+  public CloseRangeWeapon(String path_to_texture, String path_to_sound, String name, double size_koef, double distance, double angle, double damage, double cooldown, boolean allow_splash) {
     super(Item.Type.Weapon, Item.Tier.Common, name, path_to_texture);
     this.pos = new Vector2d();
     this.distance = distance;
@@ -21,10 +23,11 @@ public class CloseRangeWeapon extends Item implements Weapon {
     this.cooldown = cooldown;
     this.size_koef = size_koef;
     this.allow_splash = allow_splash;
+    this.sound = Gdx.audio.newSound(Gdx.files.internal(path_to_sound));
     updateSize(size_koef);
   }
 
-  public CloseRangeWeapon(Pixmap map, String name, double size_koef, double distance, double angle, double damage, double cooldown, boolean allow_splash) {
+  public CloseRangeWeapon(Pixmap map, Sound sound, String name, double size_koef, double distance, double angle, double damage, double cooldown, boolean allow_splash) {
     super(Item.Type.Weapon, Item.Tier.Common, name, map);
     this.pos = new Vector2d();
     this.distance = distance;
@@ -33,12 +36,13 @@ public class CloseRangeWeapon extends Item implements Weapon {
     this.cooldown = cooldown;
     this.size_koef = size_koef;
     this.allow_splash = allow_splash;
+    this.sound = sound;
     updateSize(size_koef);
   }
 
   @Override
   public Item clone() {
-    CloseRangeWeapon item = new CloseRangeWeapon(this.image, getName(), size_koef, distance, angle, damage, cooldown, allow_splash);
+    CloseRangeWeapon item = new CloseRangeWeapon(this.image, this.sound, getName(), size_koef, distance, angle, damage, cooldown, allow_splash);
     item.pos = new Vector2d(this.pos);
     item.is_texture_from_file = this.is_texture_from_file;
 

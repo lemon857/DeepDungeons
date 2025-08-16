@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Random;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -52,6 +53,8 @@ public class Item {
 
   protected boolean is_texture_from_file = false;
   
+  protected Sound sound;
+
   protected final Random rand;
 
   private final int id;
@@ -82,6 +85,7 @@ public class Item {
     this.image = new Pixmap(Gdx.files.internal(path_to_texture));
     this.texture = new Texture(this.image);
     this.is_texture_from_file = true;
+    this.sound = null;
   }
 
   protected Item(Type type, Tier tier, String name, Pixmap map) {
@@ -94,6 +98,7 @@ public class Item {
     this.image = new Pixmap(map.getWidth(), map.getHeight(), map.getFormat());
     this.image.drawPixmap(map, 0, 0);
     this.texture = new Texture(this.image);
+    this.sound = null;
   }
 
   protected void updateSize(double koef) {
@@ -186,6 +191,18 @@ public class Item {
     if (pos.y < Room.START_BORDER.y + 1) {
       pos.y = Room.START_BORDER.y + 1;
     }
+  }
+
+  public final void playSound() {
+    if (sound == null) {
+      System.err.println("[Item] Sound is null!");
+      return;
+    }
+    sound.play();
+  }
+
+  public void dispose() {
+    if (sound != null) sound.dispose();
   }
 
   @Override

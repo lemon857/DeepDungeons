@@ -321,6 +321,7 @@ public class Player {
   public void pickupItem(Item item) {
     if (item.getType() == Item.Type.Coin) {
       ++money;
+      item.playSound();
       return;
     }
     inventory = item;
@@ -348,6 +349,7 @@ public class Player {
     attack_anim_timer = 0;
     attack_anim_play = true;
     size.y *= 0.9;
+    if (inventory != null) inventory.playSound();
   }
 
   public Item dropItem() {
