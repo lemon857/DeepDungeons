@@ -150,7 +150,7 @@ public class Mob {
   public final double getHealthPoints() {
     return id;
   }
-  
+
   public final Vector2d getCenterPos() {
     return Vector2d.sum(pos, Vector2d.div(size, 2));
   }
@@ -243,12 +243,14 @@ public class Mob {
     double max_distance = 0;
     double max_angle = 0;
     double damage = 0;
+    boolean is_hand = true;
     if (inventory instanceof CloseRangeWeapon) {
       CloseRangeWeapon weapon = (CloseRangeWeapon)inventory;
       damage = weapon.getDamage();
       max_angle = weapon.getAngle();
       max_distance = weapon.getDistance();
       cooldown = weapon.getCooldown();
+      is_hand = false;
     } else { // aka hand
       damage = Hand.getDamage(rand);
       max_distance = Hand.DISTANCE;
@@ -259,6 +261,11 @@ public class Mob {
 
     if (v2.length() < max_distance && Vector2d.angle(Utility.getDirectionVector(dir), v2) < max_angle) {
       Main.player.damage(damage);
+      if (is_hand) {
+        Hand.playSound();
+      } else {
+        inventory.playSound();
+      }
       attack_timer = 0;
       return true;
     }

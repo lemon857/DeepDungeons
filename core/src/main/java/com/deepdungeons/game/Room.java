@@ -3,6 +3,8 @@ package com.deepdungeons.game;
 import java.util.ArrayList;
 import java.util.Random;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
@@ -49,6 +51,9 @@ public class Room {
   private Texture background_texture;
 
   //private Texture debug_texture;
+
+  private Sound doors_close;
+  private Sound doors_open;
 
   private boolean non_actual;
   private boolean is_fight;
@@ -108,6 +113,8 @@ public class Room {
     this.items = new ArrayList<>();
     this.mobs = new ArrayList<>();
 
+    this.doors_close = Gdx.audio.newSound(Gdx.files.internal("sounds/doors_close.mp3"));
+    this.doors_open = Gdx.audio.newSound(Gdx.files.internal("sounds/doors_open.mp3"));
     // Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGB888);
     // pixmap.setColor(1, 1, 1, 1);
     // pixmap.drawPixel(0, 0);
@@ -153,6 +160,7 @@ public class Room {
   }
 
   public void lockAllDoors() {
+    doors_close.play();
     for (int i = 0; i < MAX_DOORS_COUNT; ++i) {
       if (lock_doors[i] != 0) {
         before_block_doors[i] = lock_doors[i];
@@ -177,6 +185,7 @@ public class Room {
   }
 
   public void unlockAllDoors() {
+    doors_open.play();
     for (int i = 0; i < MAX_DOORS_COUNT; ++i) {
       if (before_block_doors[i] == 0) {
         lock_doors[i] = 0;
@@ -292,6 +301,7 @@ public class Room {
   }
 
   public boolean tryHitMob(Vector2d player_pos, Vector2d dir, double damage, double max_distance, double max_angle, double offset, boolean allow_splash) {
+    boolean is_hit = false;
     for (int i = 0; i < mobs.size(); ++i) {
       Vector2d v2 = new Vector2d(player_pos, mobs.get(i).getCenterPos());
 
@@ -316,9 +326,11 @@ public class Room {
       }
       if (!allow_splash) {
         return true; // Hit only one mob
+      } else {
+        is_hit = true;
       }
     }
-    return false;
+    return is_hit;
   }
 
   public void draw(SpriteBatch batch) {
@@ -337,6 +349,8 @@ public class Room {
   public void dispose() {
     items.clear();
     mobs.clear();
+    doors_close.dispose();
+    doors_open.dispose();
   }
 
   public void generateBackground() {

@@ -2,6 +2,9 @@ package com.deepdungeons.game.weapons;
 
 import java.util.Random;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
+
 public final class Hand {
   protected static final double MIN_DAMAGE = 0.5;
   protected static final double MAX_DAMAGE = 1.1;
@@ -13,11 +16,21 @@ public final class Hand {
 
   public static final double ANGLE = Math.PI;
 
+  private static Sound sound;
+
   public static final double getDamage(Random rand) {
     return rand.nextDouble(MIN_DAMAGE, MAX_DAMAGE);
   }
 
   public static final double getCooldown(Random rand) {
     return rand.nextDouble(MIN_COOLDOWN, MAX_COOLDOWN);
+  }
+
+  public static final void initSound(String path) {
+    sound = Gdx.audio.newSound(Gdx.files.internal(path));
+  }
+
+  public static final void playSound() {
+    sound.play();
   }
 }

@@ -118,6 +118,8 @@ public class Main extends ApplicationAdapter {
       }
     });
 
+    Hand.initSound("sounds/hand.mp3");
+
     Item.initStaticItems();
     Item.addStaticItem("special/key", new Key("textures/items/key.png"));
     Item.addStaticItem("special/coin", new Coin("textures/items/coin.png", "sounds/coin.mp3"));
@@ -369,6 +371,7 @@ public class Main extends ApplicationAdapter {
             player.startAttackAnim();
             debug_info[DEBUG_LINE_INFO].setText("Hand Hitted");
             cooldown = Hand.getCooldown(rand) / player.getAttackSpeed();
+            Hand.playSound();
             timer = 0;
           } else {
             debug_info[DEBUG_LINE_INFO].setText("No hand hit");
