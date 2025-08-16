@@ -55,6 +55,8 @@ public class Room {
   private Sound doors_close;
   private Sound doors_open;
 
+  private Sound drop_sound;
+
   private boolean non_actual;
   private boolean is_fight;
 
@@ -115,6 +117,7 @@ public class Room {
 
     this.doors_close = Gdx.audio.newSound(Gdx.files.internal("sounds/doors_close.mp3"));
     this.doors_open = Gdx.audio.newSound(Gdx.files.internal("sounds/doors_open.mp3"));
+    this.drop_sound = Gdx.audio.newSound(Gdx.files.internal("sounds/drop.mp3"));
     // Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGB888);
     // pixmap.setColor(1, 1, 1, 1);
     // pixmap.drawPixel(0, 0);
@@ -318,7 +321,7 @@ public class Room {
       if (mobs.get(i).damage(damage)) {
         Item item = mobs.get(i).getDrop();
         if (item != null) {
-          System.out.println("Drop!");
+          drop_sound.play();
           item.setCenterPos(mobs.get(i).getCenterPos());
           items.add(item);
         }
@@ -351,6 +354,7 @@ public class Room {
     mobs.clear();
     doors_close.dispose();
     doors_open.dispose();
+    drop_sound.dispose();
   }
 
   public void generateBackground() {

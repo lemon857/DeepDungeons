@@ -119,9 +119,10 @@ public class Main extends ApplicationAdapter {
     });
 
     Hand.initSound("sounds/hand.mp3");
+    Edible.setSounds("sounds/eating.mp3", "sounds/drinking.mp3");
 
     Item.initStaticItems();
-    Item.addStaticItem("special/key", new Key("textures/items/key.png"));
+    Item.addStaticItem("special/key", new Key("textures/items/key.png", "sounds/use_key.mp3"));
     Item.addStaticItem("special/coin", new Coin("textures/items/coin.png", "sounds/coin.mp3"));
 
     Item.addStaticItem("forcraft/bone", new ItemForCraft("textures/items/bone.png", Item.Tier.Common, "bone"));
@@ -327,7 +328,8 @@ public class Main extends ApplicationAdapter {
           if (current_room.tryUnlockDoor(req_door_id, ((Key)player.getItem()).getKey())) {
             current_room.generateBackground();
             req_door_id = -1;
-            player.dropItem(); // Remove key
+            Item item = player.dropItem(); // Remove key
+            item.playSound();
           }
         } else {
           req_door_id = -1;

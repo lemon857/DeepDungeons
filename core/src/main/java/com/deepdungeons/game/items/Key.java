@@ -1,5 +1,7 @@
 package com.deepdungeons.game.items;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
@@ -11,19 +13,21 @@ public class Key extends Item {
 
   private int key;
 
-  public Key(String path_to_texture) {
+  public Key(String path_to_texture, String path_to_sound) {
     super(Item.Type.Key, Item.Tier.Common,  "key", path_to_texture);
     this.key = 0;
     this.pos = new Vector2d();
+    this.sound = Gdx.audio.newSound(Gdx.files.internal(path_to_sound));
     updateSize(SIZE_KOEF);
 
     generateRandomPos();
   }
 
-  public Key(Pixmap map) {
+  public Key(Pixmap map, Sound sound) {
     super(Item.Type.Key, Item.Tier.Common,  "key", map);
     this.key = 0;
     this.pos = new Vector2d();
+    this.sound = sound;
     updateSize(SIZE_KOEF);
     generateRandomPos();
   }
@@ -41,7 +45,7 @@ public class Key extends Item {
 
   @Override
   public Item clone() {
-    Key item = new Key(image);
+    Key item = new Key(image, sound);
     item.is_texture_from_file = this.is_texture_from_file;
 
     return item;

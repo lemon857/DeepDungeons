@@ -336,12 +336,13 @@ public class Player {
     if (inventory == null) return;
     if (inventory.getType() == Item.Type.Food) {
       saturation(((Edible)inventory).getPoints());
+      inventory.playSound();
       inventory = null;
 
     } else if (inventory.getType() == Item.Type.Drink) {
       drink(((Edible)inventory).getPoints());
+      inventory.playSound();
       inventory = null;
-
     }
   }
 
