@@ -5,6 +5,7 @@ import java.util.Random;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.deepdungeons.game.items.Edible;
 import com.deepdungeons.game.items.Item;
@@ -22,8 +23,8 @@ public class Player {
   public static final int MAX_TP = 25;
   private static final int MIN_TP = 0;
 
-  public static final int EYE_DOWN = (HEIGHT / 2) - 1;
-  public static final int EYE_UP = HEIGHT - EYE_DOWN - 1;
+  public static final int EYE_UP = (HEIGHT / 2) - 1;
+  public static final int EYE_DOWN = HEIGHT - EYE_UP - 1;
   public static final int EYE_MIDDLE = EYE_DOWN + (EYE_UP - EYE_DOWN) / 2;
 
   public static final int EYE_LEFT = (WIDTH / 2) - 1;
@@ -31,6 +32,8 @@ public class Player {
 
   private static final Point START_BORDER = Point.sum(Room.START_BORDER, new Point(1, 1));
   private static final Point END_BORDER = Point.sub(Room.END_BORDER, new Point(WIDTH, HEIGHT));
+
+  private static final Color DAMAGE_COLOR = new Color(1f, 0.7f, 0.7f, 0.7f);
 
   private static final Color COLOR = new Color(0.8f, 0.7f, 0.9f, 0.7f);
   private static final Color HEALTH_COLOR = new Color(1f, 0f, 0.2f, 1f);
@@ -63,9 +66,13 @@ public class Player {
 
   private double attack_anim_timer;
   private boolean attack_anim_play;
-  private static final double attack_anim_time = 0.1;
+  private static final double attack_anim_time = 0.2;
 
-  private Texture image;
+  protected double damage_anim_timer;
+  protected boolean damage_anim_play;
+  protected static final double damage_anim_time = 0.25;
+
+  private Sprite sprite;
 
   private Texture inventory_texture;
 
@@ -103,6 +110,8 @@ public class Player {
     this.rand = new Random();
     this.pos = new Vector2d();
     this.size = new Vector2d(WIDTH, HEIGHT);
+    this.damage_anim_timer = damage_anim_time + 1;
+    this.damage_anim_play = false;
     this.attack_anim_timer = attack_anim_time + 1;
     this.attack_anim_play = false;;
     this.dir = Direction.Up;
@@ -125,8 +134,6 @@ public class Player {
     this.next_thirsty_distance = rand.nextDouble(MIN_THIRSTY_DISTANCED, MAX_THIRSTY_DISTANCE) + useLuck(-2.0 * Room.WIDTH, 2.0 * Room.WIDTH);
     this.current_walked_distance = 0;
 
-    generateRandomPos();
-
     Pixmap map = new Pixmap(18, 6, Pixmap.Format.RGBA8888);
     inventory_texture = new Texture(map);
 
@@ -143,10 +150,23 @@ public class Player {
     generatePlayerImage();
     generateInventoryTexture();
     generateHealthTexture();
+
+    generateRandomPos();
+    updateSpritePos();
+    this.sprite.setSize(WIDTH, HEIGHT);
   }
   public final void generateRandomPos() {
     pos.x = rand.nextDouble(WIDTH + Room.START_BORDER.x + 1, Room.END_BORDER.x - WIDTH - 1);
     pos.y = rand.nextDouble(Room.START_BORDER.y + HEIGHT + 1, Room.END_BORDER.y - HEIGHT - 1);
+    updateSpritePos();
+  }
+
+  private void updateSpritePos() {
+    sprite.setPosition((float)pos.x, (float)pos.y);
+  }
+
+  protected void updateSpriteSize() {
+    sprite.setSize((float)size.x, (float)size.y);
   }
 
   private void generatePlayerImage() {
@@ -191,7 +211,10 @@ public class Player {
         break;
     }
 
-    image = new Texture(map);
+    if (sprite == null) sprite = new Sprite(new Texture(map));
+    sprite.getTexture().draw(map, 0, 0);
+
+    if (damage_anim_play) sprite.setColor(DAMAGE_COLOR);
   }
 
   private void generateInventoryTexture() {
@@ -350,6 +373,7 @@ public class Player {
     attack_anim_timer = 0;
     attack_anim_play = true;
     size.y *= 0.9;
+    updateSpriteSize();
     if (inventory != null) inventory.playSound();
   }
 
@@ -381,7 +405,10 @@ public class Player {
       current_walked_distance = 0;
     }
 
-    if (Utility.getTranslateDirection(x, y) != Direction.Undefined) dir = Utility.getTranslateDirection(x, y);
+    if (Utility.getTranslateDirection(x, y) != Direction.Undefined) {
+      dir = Utility.getTranslateDirection(x, y);
+      updateSpritePos();
+    }
     
     non_actual = true;
   }
@@ -390,11 +417,15 @@ public class Player {
     pos.x = x;
     if (pos.x < START_BORDER.x) pos.x = START_BORDER.x;
     else if (pos.x > END_BORDER.x) pos.x = END_BORDER.x;
+
+    updateSpritePos();
   }
   public void setY(int y) {
     pos.y = y;
     if (pos.y < START_BORDER.y) pos.y = START_BORDER.y;
     else if (pos.y > END_BORDER.y) pos.y = END_BORDER.y;
+
+    updateSpritePos();
   }
 
   // true if success
@@ -441,16 +472,28 @@ public class Player {
 
     if (attack_anim_timer >= attack_anim_time && attack_anim_play) {
       size.y = HEIGHT;
+      updateSpriteSize();
       attack_anim_play = false;
     } else if (attack_anim_play) {
       attack_anim_timer += delta;
+    }
+
+    if (damage_anim_play) {
+      damage_anim_timer += delta;
+      if (damage_anim_timer >= damage_anim_time) {
+        // change color of mob to default
+        sprite.setColor(1, 1, 1, 1);
+        damage_anim_play = false;
+      }
     }
   }
 
   public void draw(SpriteBatch batch) {
     // correct coords for Pixmap
-    batch.draw(image, (float)pos.x, (float)pos.y + (float)size.y,
-    (float)size.x, -(float)size.y);
+    updateSpritePos();;
+    sprite.draw(batch);
+    //batch.draw(image, (float)pos.x, (float)pos.y + (float)size.y,
+    //(float)size.x, -(float)size.y);
     if (inventory != null) {
       if (inventory.isTextureFromFile()) {
         batch.draw(inventory_texture, (float)pos.x + WIDTH * 0.7f, (float)pos.y + HEIGHT * 0.65f, 
@@ -528,6 +571,10 @@ public class Player {
   // True if it dead
   public boolean damage(double dmg) {
     if (health_points < 0) return true;
+
+    sprite.setColor(DAMAGE_COLOR);
+    damage_anim_play = true;
+    damage_anim_timer = 0;
 
     int i;
     for (i = 0; i < Math.floor(dmg); ++i) {

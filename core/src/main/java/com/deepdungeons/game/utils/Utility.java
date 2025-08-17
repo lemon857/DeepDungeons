@@ -96,6 +96,50 @@ public class Utility {
     }
     return map;
   }
+  
+  public static Pixmap replacePixelsExcludeColor(Pixmap map, Color exclude_color, Color new_color) {
+    for (int i = 0; i < map.getWidth(); ++i) {
+      for (int j = 0; j < map.getHeight(); ++j) {
+        if (!isEqualColorsWithoutAlpha(map.getPixel(i, j), exclude_color)) {
+          map.setColor(new_color);
+          map.drawPixel(i, j);
+        }
+      }
+    }
+    return map;
+  }
+
+  public static Pixmap addPixelsColor(Pixmap map, Color src_color, float r, float g, float b) {
+    for (int i = 0; i < map.getWidth(); ++i) {
+      for (int j = 0; j < map.getHeight(); ++j) {
+        if (isEqualColorsWithoutAlpha(map.getPixel(i, j), src_color)) {
+          Color new_color = new Color(map.getPixel(i, j));
+          new_color.r = Math.max(0, Math.min(1, new_color.r + r));
+          new_color.g = Math.max(0, Math.min(1, new_color.g + g));
+          new_color.b = Math.max(0, Math.min(1, new_color.b + b));
+          map.setColor(new_color);
+          map.drawPixel(i, j);
+        }
+      }
+    }
+    return map;
+  }
+
+  public static Pixmap addPixelsExcludeColor(Pixmap map, Color exclude_color, float r, float g, float b) {
+    for (int i = 0; i < map.getWidth(); ++i) {
+      for (int j = 0; j < map.getHeight(); ++j) {
+        if (!isEqualColorsWithoutAlpha(map.getPixel(i, j), exclude_color)) {
+          Color new_color = new Color(map.getPixel(i, j));
+          new_color.r = Math.max(0, Math.min(1, new_color.r + r));
+          new_color.g = Math.max(0, Math.min(1, new_color.g + g));
+          new_color.b = Math.max(0, Math.min(1, new_color.b + b));
+          map.setColor(new_color);
+          map.drawPixel(i, j);
+        }
+      }
+    }
+    return map;
+  }
 
   public static boolean isEqualColorsWithoutAlpha(int color1, Color color2) {
     Color color = new Color(color1);

@@ -34,14 +34,7 @@ public class DefaultEnemy extends Mob {
 
   @Override
   public final void update(double delta) {
-    attack_timer += delta;
-
-    if (attack_anim_timer >= attack_anim_time && attack_anim_play) {
-      size.y /= 0.9;
-      attack_anim_play = false;
-    } else if (attack_anim_play) {
-      attack_anim_timer += delta;
-    }
+    updateTimers(delta);
 
     if (rand.nextInt(10000) < 2000) {
       if (rand.nextInt(10000) < 3000) {
@@ -78,7 +71,10 @@ public class DefaultEnemy extends Mob {
         current_move_dir.normalize();
       }
 
-      if (Utility.getTranslateDirection(move.x, move.y) != Direction.Undefined) dir = Utility.getTranslateDirection(move.x, move.y);
+      if (Utility.getTranslateDirection(move.x, move.y) != Direction.Undefined) {
+        updateSpritePos();
+        dir = Utility.getTranslateDirection(move.x, move.y);
+      }
     }
 
     if (rand.nextInt(10000) < 1000) {

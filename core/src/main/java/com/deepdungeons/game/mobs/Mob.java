@@ -4,8 +4,10 @@ import java.util.HashMap;
 import java.util.Random;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.deepdungeons.game.Main;
 import com.deepdungeons.game.Room;
@@ -46,8 +48,11 @@ public class Mob {
       return null;
     }
     mob.pos = pos;
+    mob.updateSpritePos();
     return mob;
   }
+
+  private static final Color DAMAGE_COLOR = new Color(1f, 0.7f, 0.7f, 0.7f);
 
   protected Pixmap image;
 
@@ -55,7 +60,7 @@ public class Mob {
   protected Direction dir;
   protected double speed;
 
-  protected Texture texture;
+  private Sprite sprite;
 
   protected double health_points;
 
@@ -73,7 +78,11 @@ public class Mob {
 
   protected double attack_anim_timer;
   protected boolean attack_anim_play;
-  protected static final double attack_anim_time = 0.1;
+  protected static final double attack_anim_time = 0.2;
+
+  protected double damage_anim_timer;
+  protected boolean damage_anim_play;
+  protected static final double damage_anim_time = 0.25;
 
   private final LootTable table;
 
@@ -97,10 +106,12 @@ public class Mob {
     this.cooldown = 0;
     this.attack_timer = 0;
     this.dir = Direction.Undefined;
+    this.damage_anim_timer = damage_anim_time + 1;
+    this.damage_anim_play = false;
     this.attack_anim_timer = attack_anim_time + 1;
     this.attack_anim_play = false;
     this.image = new Pixmap(Gdx.files.internal(path_to_texture));
-    this.texture = new Texture(image);
+    this.sprite = new Sprite(new Texture(image));
   }
 
   public Mob(Tier tier, double speed, LootTable table, Pixmap map) {
@@ -113,19 +124,37 @@ public class Mob {
     this.cooldown = 0;
     this.attack_timer = 0;
     this.dir = Direction.Undefined;
+    this.damage_anim_timer = damage_anim_time + 1;
+    this.damage_anim_play = false;
     this.attack_anim_timer = attack_anim_time + 1;
     this.attack_anim_play = false;
     this.image = new Pixmap(map.getWidth(), map.getHeight(), map.getFormat());
     this.image.drawPixmap(map, 0, 0);
-    this.texture = new Texture(image);
+    this.sprite = new Sprite(new Texture(image));
+  }
+  public void update(double delta) {
+    updateTimers(delta);
   }
 
-  public void update(double delta) {
+  public final void updateTimers(double delta) {
     attack_timer += delta;
-    if (attack_anim_timer >= attack_anim_time) {
-      size.y = size.y / 0.9;
-    } else {
+
+    if (attack_anim_play) {
       attack_anim_timer += delta;
+      if (attack_anim_timer >= attack_anim_time) {
+        size.y = size.y / 0.9;
+        updateSpriteSize();
+        attack_anim_play = false;
+      }
+    }
+
+    if (damage_anim_play) {
+      damage_anim_timer += delta;
+      if (damage_anim_timer >= damage_anim_time) {
+        // change color of mob to default
+        sprite.setColor(1, 1, 1, 1);
+        damage_anim_play = false;
+      }
     }
   }
 
@@ -133,10 +162,18 @@ public class Mob {
     setSize(this.image.getWidth() * koef, this.image.getHeight() * koef);
   }
 
+  protected void updateSpritePos() {
+    sprite.setPosition((float)pos.x, (float)pos.y);
+  }
+
+  protected void updateSpriteSize() {
+    sprite.setSize((float)size.x, (float)size.y);
+  }
+
   protected void generateImage() {
     image = new Pixmap(1, 1, Pixmap.Format.RGB888);
 
-    texture = new Texture(image);
+    sprite = new Sprite(new Texture(image));
   }
 
   public final int getId() {
@@ -170,18 +207,21 @@ public class Mob {
   public final void generateRandomPos() {
     pos.x = rand.nextDouble(size.x + Room.START_BORDER.x + 1, Room.END_BORDER.x - size.x - 1);
     pos.y = rand.nextDouble(Room.START_BORDER.y + size.y + 1, Room.END_BORDER.y - size.y - 1);
+    updateSpritePos();
   }
 
   public void startAttackAnim() {
     attack_anim_timer = 0;
     attack_anim_play = true;
     size.y *= 0.9;
+    updateSpriteSize();
   }
 
   public final void setSize(double width, double height) {
     start_border = Point.sum(Room.START_BORDER, new Point(1, 1));
     end_border = Point.sub(Room.END_BORDER, new Point((int)Math.ceil(width), (int)Math.ceil(height)));
     size = new Vector2d(width, height);
+    updateSpriteSize();
   }
   public final void translate(Vector2d vector) {
     translate(vector.x, vector.y);
@@ -220,7 +260,8 @@ public class Mob {
   }
 
   public final void draw(SpriteBatch batch) {
-    batch.draw(texture, (float)pos.x, (float)pos.y, (float)size.x, (float)size.y);
+    updateSpritePos();
+    sprite.draw(batch);
     if (inventory != null) {
       if (inventory.isTextureFromFile()) {
         batch.draw(inventory_texture, (float)pos.x + (float)size.x * 0.7f, (float)pos.y + (float)size.y * 0.65f, 
@@ -278,6 +319,10 @@ public class Mob {
 
   // True if it dead
   public boolean damage(double dmg) {
+    // change color of mob to red
+    sprite.setColor(DAMAGE_COLOR);
+    damage_anim_play = true;
+    damage_anim_timer = 0;
     health_points -= dmg;
     return health_points <= 0;
   }
