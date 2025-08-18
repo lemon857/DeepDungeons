@@ -12,8 +12,8 @@ public class DefaultEnemy extends Mob {
 
   private static final double SIZE_KOEF = 0.4;
 
-  public DefaultEnemy(String path_to_texture, double speed, double min_hp, double max_hp, LootTable table) {
-    super(Mob.Tier.Humble, speed, table, path_to_texture);
+  public DefaultEnemy(String path_to_texture, double move_speed, double attack_speed, double strength, double min_hp, double max_hp, LootTable table) {
+    super(Mob.Tier.Humble, move_speed, attack_speed, strength, table, path_to_texture);
     this.health_points = rand.nextDouble(min_hp, max_hp + 1);
     this.pos = new Vector2d();
 
@@ -22,8 +22,8 @@ public class DefaultEnemy extends Mob {
     current_move_dir = Utility.getRandomDirectionVector(rand);
   }
 
-  public DefaultEnemy(Pixmap map, double speed, double min_hp, double max_hp, LootTable table) {
-    super(Mob.Tier.Humble, speed, table, map);
+  public DefaultEnemy(Pixmap map, double move_speed, double attack_speed, double strength, double min_hp, double max_hp, LootTable table) {
+    super(Mob.Tier.Humble, move_speed, attack_speed, strength, table, map);
     this.health_points = rand.nextDouble(min_hp, max_hp + 1);
     this.pos = new Vector2d();
 
@@ -44,30 +44,30 @@ public class DefaultEnemy extends Mob {
         current_move_dir.normalize();
       }
 
-      Vector2d move = Vector2d.mul(current_move_dir, delta * speed);
+      Vector2d move = Vector2d.mul(current_move_dir, delta * getMoveSpeed());
        
       pos.x += move.x;
       pos.y += move.y;
 
       if (pos.x < start_border.x) {
         pos.x = start_border.x;
-        if (rand.nextInt(10000) < 3000) current_move_dir.x = -current_move_dir.x * rand.nextDouble(speed * delta);
+        if (rand.nextInt(10000) < 3000) current_move_dir.x = -current_move_dir.x * rand.nextDouble(getMoveSpeed() * delta);
         current_move_dir.normalize();
       }
       else if (pos.x > end_border.x) {
         pos.x = end_border.x;
-        if (rand.nextInt(10000) < 3000) current_move_dir.x = -current_move_dir.x * rand.nextDouble(speed * delta);
+        if (rand.nextInt(10000) < 3000) current_move_dir.x = -current_move_dir.x * rand.nextDouble(getMoveSpeed() * delta);
         current_move_dir.normalize();
       }
 
       if (pos.y < start_border.y) {
         pos.y = start_border.y;
-        if (rand.nextInt(10000) < 3000) current_move_dir.y = -current_move_dir.y * rand.nextDouble(speed * delta);
+        if (rand.nextInt(10000) < 3000) current_move_dir.y = -current_move_dir.y * rand.nextDouble(getMoveSpeed() * delta);
         current_move_dir.normalize();
       }
       else if (pos.y > end_border.y) {
         pos.y = end_border.y;
-        if (rand.nextInt(10000) < 3000) current_move_dir.y = -current_move_dir.y * rand.nextDouble(speed * delta);
+        if (rand.nextInt(10000) < 3000) current_move_dir.y = -current_move_dir.y * rand.nextDouble(getMoveSpeed() * delta);
         current_move_dir.normalize();
       }
 
@@ -86,7 +86,7 @@ public class DefaultEnemy extends Mob {
 
   @Override
   public Mob clone() {
-    DefaultEnemy mob = new DefaultEnemy(image, speed, health_points, health_points, getTable());
+    DefaultEnemy mob = new DefaultEnemy(image, getMoveSpeed(), getAttackSpeed(), getStrength(), health_points, health_points, getTable());
 
     return mob;
   }

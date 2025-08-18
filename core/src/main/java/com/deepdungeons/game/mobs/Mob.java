@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.deepdungeons.game.Character;
 import com.deepdungeons.game.Main;
 import com.deepdungeons.game.Room;
 import com.deepdungeons.game.items.Item;
@@ -20,7 +21,7 @@ import com.deepdungeons.game.utils.Vector2d;
 import com.deepdungeons.game.weapons.CloseRangeWeapon;
 import com.deepdungeons.game.weapons.Hand;
 
-public class Mob {
+public class Mob extends Character {
   private static HashMap<String, Mob> static_mobs;
 
   public static void initStaticMobs() {
@@ -58,7 +59,6 @@ public class Mob {
 
   protected Vector2d pos;
   protected Direction dir;
-  protected double speed;
 
   private Sprite sprite;
 
@@ -96,9 +96,10 @@ public class Mob {
     Humble, General, Wicked, Aggressive
   }
 
-  public Mob(Tier tier, double speed, LootTable table, String path_to_texture) {
+  public Mob(Tier tier, double move_speed, double attack_speed, double strength, LootTable table, String path_to_texture) {
+    super(move_speed, attack_speed, strength);
+
     this.tier = tier;
-    this.speed = speed;
     this.table = table;
     this.id = current_id;
     ++current_id;
@@ -114,9 +115,10 @@ public class Mob {
     this.sprite = new Sprite(new Texture(image));
   }
 
-  public Mob(Tier tier, double speed, LootTable table, Pixmap map) {
+  public Mob(Tier tier, double move_speed, double attack_speed, double strength, LootTable table, Pixmap map) {
+    super(move_speed, attack_speed, strength);
+
     this.tier = tier;
-    this.speed = speed;
     this.table = table;
     this.id = current_id;
     ++current_id;
@@ -328,7 +330,7 @@ public class Mob {
   }
 
   public Mob clone() {
-    Mob mob = new Mob(this.tier, this.speed, this.table, image);
+    Mob mob = new Mob(this.tier, getMoveSpeed(), getAttackSpeed(), getStrength(), this.table, image);
 
     mob.health_points = this.health_points;
     mob.cooldown = this.cooldown;

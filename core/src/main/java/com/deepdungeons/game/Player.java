@@ -14,14 +14,18 @@ import com.deepdungeons.game.utils.Point;
 import com.deepdungeons.game.utils.Utility;
 import com.deepdungeons.game.utils.Vector2d;
 
-public class Player {
+public class Player extends Character{
   public static final int WIDTH = 7;
   public static final int HEIGHT = 7;
 
   public static final int MAX_HP = 30;
   public static final int MAX_FP = 25;
   public static final int MAX_TP = 25;
-  private static final int MIN_TP = 0;
+  // private static final int MIN_TP = 0;
+
+  private static final int MOVE_SPEED = 40;
+  private static final int ATTCAK_SPEED = 1;
+  private static final int STRENGTH = 1;
 
   public static final int EYE_UP = (HEIGHT / 2) - 1;
   public static final int EYE_DOWN = HEIGHT - EYE_UP - 1;
@@ -43,11 +47,11 @@ public class Player {
   private static final int WHITE_IN_HEART_MASK = -1;
 
   private static final double HUNGER_DAMAGE_COOLDOWN = 3;
-  private static final double STRENGTH_HUNGER_COOLDOWN = 4;
-  private static final double FAST_ATTACK_THIRSTY_COOLDOWN = 5;
+  // private static final double STRENGTH_HUNGER_COOLDOWN = 4;
+  // private static final double FAST_ATTACK_THIRSTY_COOLDOWN = 5;
 
-  private static final double MAX_MOVE_SPEED = 40;
-  private static final double MIN_MOVE_SPEED = 20;
+  // private static final double MAX_MOVE_SPEED = 40;
+  // private static final double MIN_MOVE_SPEED = 20;
 
   private static final double MAX_THIRSTY_DISTANCE = Room.WIDTH * 10;
   private static final double MIN_THIRSTY_DISTANCED = Room.WIDTH * 6;
@@ -56,8 +60,8 @@ public class Player {
   private double current_walked_distance;
 
   private double hunger_damage_timer;
-  private double strength_hunger_timer;
-  private double fast_attack_thirsty_timer;
+  // private double strength_hunger_timer;
+  // private double fast_attack_thirsty_timer;
 
   private final Random rand;
 
@@ -101,12 +105,11 @@ public class Player {
   private int food_points;
   private int thirsty_points;
 
-  private double move_speed;
-  private double attack_speed;
-  private double strength;
   private double luck;
 
   public Player() {
+    super(MOVE_SPEED, ATTCAK_SPEED, STRENGTH);
+
     this.rand = new Random();
     this.pos = new Vector2d();
     this.size = new Vector2d(WIDTH, HEIGHT);
@@ -122,14 +125,11 @@ public class Player {
 
     this.money = 0;
 
-    this.move_speed = 40;
-    this.attack_speed = 1;
-    this.strength = 1;
     this.luck = 0;
 
     this.hunger_damage_timer = 0;
-    this.strength_hunger_timer = 0;
-    this.fast_attack_thirsty_timer = 0;
+    // this.strength_hunger_timer = 0;
+    // this.fast_attack_thirsty_timer = 0;
 
     this.next_thirsty_distance = rand.nextDouble(MIN_THIRSTY_DISTANCED, MAX_THIRSTY_DISTANCE) + useLuck(-2.0 * Room.WIDTH, 2.0 * Room.WIDTH);
     this.current_walked_distance = 0;
@@ -454,21 +454,21 @@ public class Player {
       }
     }
 
-    if (strength > 1) {
-      strength_hunger_timer += delta;
-      if (strength_hunger_timer >= STRENGTH_HUNGER_COOLDOWN) {
-        hunger(rand.nextInt(0, 3));
-        strength_hunger_timer = 0;
-      }
-    }
+    // if (strength > 1) {
+    //   strength_hunger_timer += delta;
+    //   if (strength_hunger_timer >= STRENGTH_HUNGER_COOLDOWN) {
+    //     hunger(rand.nextInt(0, 3));
+    //     strength_hunger_timer = 0;
+    //   }
+    // }
 
-    if (attack_speed > 1) {
-      fast_attack_thirsty_timer += delta;
-      if (fast_attack_thirsty_timer >= FAST_ATTACK_THIRSTY_COOLDOWN) {
-        thirst(rand.nextInt(0, 3));
-        fast_attack_thirsty_timer = 0;
-      }
-    }
+    // if (attack_speed > 1) {
+    //   fast_attack_thirsty_timer += delta;
+    //   if (fast_attack_thirsty_timer >= FAST_ATTACK_THIRSTY_COOLDOWN) {
+    //     thirst(rand.nextInt(0, 3));
+    //     fast_attack_thirsty_timer = 0;
+    //   }
+    // }
 
     if (attack_anim_timer >= attack_anim_time && attack_anim_play) {
       size.y = HEIGHT;
@@ -505,33 +505,9 @@ public class Player {
     }
     batch.draw(health_texture, 1, Room.SCREEN_HEIGHT - 1, WIDTH * 4, -HEIGHT * 3);
   }
-  
-  public void setMoveSpeed(double move_speed) {
-    this.move_speed = move_speed;
-  }
-
-  public void setAttackSpeed(double attack_speed) {
-    this.attack_speed = attack_speed;
-  }
-
-  public void setStrength(double strength) {
-    this.strength = strength;
-  }
 
   public void setLuck(double luck) {
     this.luck = luck;
-  }
-
-  public double getMoveSpeed() {
-    return move_speed;
-  }
-
-  public double getAttackSpeed() {
-    return attack_speed;
-  }
-
-  public double getStrength() {
-    return strength;
   }
 
   public double useLuck(double negativeMax, double positiveMax) {
@@ -755,7 +731,7 @@ public class Player {
     }
     health_texture = new Texture(health_map);
 
-    move_speed = Utility.mapRange(Math.ceil(thirsty_points / 5.0), MIN_TP / 5, MAX_TP / 5, MIN_MOVE_SPEED, MAX_MOVE_SPEED);
+    //move_speed = Utility.mapRange(Math.ceil(thirsty_points / 5.0), MIN_TP / 5, MAX_TP / 5, MIN_MOVE_SPEED, MAX_MOVE_SPEED);
   }
 
   // Decrease thirsty points
@@ -770,6 +746,6 @@ public class Player {
     }
     health_texture = new Texture(health_map);
 
-    move_speed = Utility.mapRange(Math.ceil(thirsty_points / 5.0), MIN_TP / 5, MAX_TP / 5, MIN_MOVE_SPEED, MAX_MOVE_SPEED);
+    //move_speed = Utility.mapRange(Math.ceil(thirsty_points / 5.0), MIN_TP / 5, MAX_TP / 5, MIN_MOVE_SPEED, MAX_MOVE_SPEED);
   }
 }
