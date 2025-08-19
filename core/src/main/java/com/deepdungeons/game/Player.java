@@ -14,7 +14,7 @@ import com.deepdungeons.game.utils.Point;
 import com.deepdungeons.game.utils.Utility;
 import com.deepdungeons.game.utils.Vector2d;
 
-public class Player extends Character{
+public final class Player extends Character{
   public static final int WIDTH = 7;
   public static final int HEIGHT = 7;
 
@@ -101,7 +101,6 @@ public class Player extends Character{
 
   private int money;
 
-  private double health_points;
   private int food_points;
   private int thirsty_points;
 
@@ -544,7 +543,7 @@ public class Player extends Character{
     return health_points <= 0;
   }
 
-  // True if it dead
+  @Override
   public boolean damage(double dmg) {
     if (health_points < 0) return true;
 
@@ -621,6 +620,7 @@ public class Player extends Character{
     health_texture = new Texture(health_map);
   }
 
+  @Override
   public void treat(double health) {
     if (health_points >= MAX_HP) return;
     int i;

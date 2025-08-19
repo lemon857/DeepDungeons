@@ -9,6 +9,8 @@ public class Character {
   private final double attack_speed;
   private final double strength;
 
+  protected double health_points;
+
   public Character(double move_speed, double attack_speed, double strength) {
     this.move_speed = move_speed;
     this.attack_speed = attack_speed;
@@ -34,4 +36,10 @@ public class Character {
   protected final void updateEffects(double delta) {
 
   }
+
+
+  // True if it dead
+  public boolean damage(double dmg) { return false; }
+
+  public void treat(double health) {}
 }

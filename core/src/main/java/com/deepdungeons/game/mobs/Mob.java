@@ -62,8 +62,6 @@ public class Mob extends Character {
 
   private Sprite sprite;
 
-  protected double health_points;
-
   protected Item inventory;
   protected Texture inventory_texture;
 
@@ -96,7 +94,7 @@ public class Mob extends Character {
     Humble, General, Wicked, Aggressive
   }
 
-  public Mob(Tier tier, double move_speed, double attack_speed, double strength, LootTable table, String path_to_texture) {
+  public Mob(String path_to_texture, Tier tier, double move_speed, double attack_speed, double strength, LootTable table) {
     super(move_speed, attack_speed, strength);
 
     this.tier = tier;
@@ -115,7 +113,7 @@ public class Mob extends Character {
     this.sprite = new Sprite(new Texture(image));
   }
 
-  public Mob(Tier tier, double move_speed, double attack_speed, double strength, LootTable table, Pixmap map) {
+  public Mob(Pixmap map, Tier tier, double move_speed, double attack_speed, double strength, LootTable table) {
     super(move_speed, attack_speed, strength);
 
     this.tier = tier;
@@ -319,7 +317,7 @@ public class Mob extends Character {
     return table;
   }
 
-  // True if it dead
+  @Override
   public boolean damage(double dmg) {
     // change color of mob to red
     sprite.setColor(DAMAGE_COLOR);
@@ -330,7 +328,7 @@ public class Mob extends Character {
   }
 
   public Mob clone() {
-    Mob mob = new Mob(this.tier, getMoveSpeed(), getAttackSpeed(), getStrength(), this.table, image);
+    Mob mob = new Mob(image, this.tier, getMoveSpeed(), getAttackSpeed(), getStrength(), this.table);
 
     mob.health_points = this.health_points;
     mob.cooldown = this.cooldown;
