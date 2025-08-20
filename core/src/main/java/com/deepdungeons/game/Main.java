@@ -15,6 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.deepdungeons.game.items.ItemForCraft;
+import com.deepdungeons.game.effects.Effect;
 import com.deepdungeons.game.items.Coin;
 import com.deepdungeons.game.items.Edible;
 import com.deepdungeons.game.items.Item;
@@ -135,16 +136,23 @@ public class Main extends ApplicationAdapter {
     Item.addStaticItem("drinks/bottle_of_water", new Edible("textures/items/bottle_of_water.png", Item.Tier.Common, "bottle of water", true, 4));
     Item.addStaticItem("drinks/cup_of_tea", new Edible("textures/items/cup_of_tea.png", Item.Tier.Uncommon, "cup of tea", true, 7));
 
-    Item.addStaticItem("weapons/knife", new CloseRangeWeapon("textures/weapons/knife.png", "sounds/knife.mp3", "knife", 0.8, 4.7, Math.PI / 2, 2, 0.5, false));
+    Item.addStaticItem("weapons/knife", new CloseRangeWeapon("textures/weapons/knife.png", "sounds/knife.mp3", "knife",
+    0.8, 4.7, Math.PI / 2, 2, 0.5, false));
 
-    Item.addStaticItem("weapons/bone_baton", new CloseRangeWeapon("textures/weapons/bone_baton.png", "sounds/baton.mp3", "bone baton", 1.2, 6.3, Math.PI / 3, 1.5, 1, true));
+    Item.addStaticItem("weapons/bone_baton", new CloseRangeWeapon("textures/weapons/bone_baton.png", "sounds/baton.mp3", "bone baton",
+     1.2, 6.3, Math.PI / 3, 1.5, 1, true));
 
     Mob.initStaticMobs();
-    Mob.addStaticMob("mobs/skeleton", new DefaultEnemy("textures/mobs/skeleton.png", 25, 1, 3,
+    Mob.addStaticMob("mobs/skeleton", new DefaultEnemy("textures/mobs/skeleton.png", 
+    25, 1.1, 0.8, 1, 3,
      new LootTable(new String[][]{{}, {"forcraft/bone"}, {"forcraft/rope"}}, new double[]{0.8, 0.15, 0.05})));
 
-     Mob.addStaticMob("mobs/zombie", new DefaultEnemy("textures/mobs/zombie.png", 20, 2, 3,
+     Mob.addStaticMob("mobs/zombie", new DefaultEnemy("textures/mobs/zombie.png", 
+     20, 0.9, 1.2, 2, 3,
       new LootTable(new String[][]{{}, {"forcraft/leather"}, {"forcraft/rope"}}, new double[]{0.8, 0.15, 0.05})));
+
+    Effect.initStaticEffects();
+    Effect.addStaticEffect("effects/speed", new Effect("textures/effects/speed.png", "speed"));
 
     Skin skin = new Skin(Gdx.files.internal("ui/uiskin.json"));
 
@@ -336,13 +344,15 @@ public class Main extends ApplicationAdapter {
         }
       } else {
         if (current_room.canGrabItem(player.getCenterPos())) {
-          if (player.isDropAvailable()) {
+          Item new_item = current_room.grabItem();
+
+          if (player.isDropAvailable() && new_item.getType() != Item.Type.Coin) {
             Item item = player.dropItem();
 
             item.setCenterPos(player.getCenterPos());
             current_room.addItem(item);
           }
-          player.pickupItem(current_room.grabItem());
+          player.pickupItem(new_item);
           coins_label.setText(player.getCoinsCount());
           debug_info[DEBUG_LINE_INFO].setText("Grabbed!");
           
@@ -432,6 +442,16 @@ public class Main extends ApplicationAdapter {
     // [DEBUG] Self drink
     if (Gdx.input.isKeyJustPressed(Input.Keys.K)) {
       player.drink(1);
+    }
+
+    // [DEBUG] Add positive effect
+    if (Gdx.input.isKeyJustPressed(Input.Keys.O)) {
+      player.addEffect("effects/speed", 3, 10);
+    }
+
+    // [DEBUG] Add negative effect
+    if (Gdx.input.isKeyJustPressed(Input.Keys.P)) {
+      player.addEffect("effects/speed", -3, 10);
     }
   }
 

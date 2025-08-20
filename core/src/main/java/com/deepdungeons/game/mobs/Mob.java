@@ -45,7 +45,7 @@ public class Mob extends Character {
   public static Mob getStaticMob(String name, Vector2d pos) {
     Mob mob = static_mobs.get(name).clone();
     if (mob == null) {
-      System.err.println("Item " + name + " is not found");
+      System.err.println("Mob " + name + " is not found");
       return null;
     }
     mob.pos = pos;
@@ -327,6 +327,7 @@ public class Mob extends Character {
     return health_points <= 0;
   }
 
+  @Override
   public Mob clone() {
     Mob mob = new Mob(image, this.tier, getMoveSpeed(), getAttackSpeed(), getStrength(), this.table);
 

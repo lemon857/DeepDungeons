@@ -440,6 +440,8 @@ public final class Player extends Character{
   }
 
   public void update(double delta) {
+    updateEffects(delta);
+    
     if (non_actual) {
       generatePlayerImage();
       non_actual = false;

@@ -107,6 +107,7 @@ public class Item {
 
   public void update(double delta) {}
 
+  @Override
   public Item clone() {
     Item item = new Item(type, tier, name, image);
     return item;
