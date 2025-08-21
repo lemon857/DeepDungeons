@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.deepdungeons.game.effects.EffectsPanel;
 import com.deepdungeons.game.items.Edible;
 import com.deepdungeons.game.items.Item;
 import com.deepdungeons.game.utils.Direction;
@@ -43,6 +44,10 @@ public final class Player extends Character{
   private static final Color HEALTH_COLOR = new Color(1f, 0f, 0.2f, 1f);
   private static final Color DEAD_HEALTH_COLOR = new Color(0.8f, 0.5f, 0.65f, 1f);
   private static final Color EYE_COLOR = new Color(0, 0, 0, 1);
+
+  private static final Vector2d EFFECT_SIZE = new Vector2d(5, 5);
+  private static final Vector2d EFFECT_PANEL_POS = new Vector2d(Room.SCREEN_WIDTH - EFFECT_SIZE.x - 1, Room.SCREEN_HEIGHT - EFFECT_SIZE.y);
+  private static final double EFFECT_Y_SHIFT = 2;
 
   private static final int WHITE_IN_HEART_MASK = -1;
 
@@ -85,6 +90,8 @@ public final class Player extends Character{
   private final Pixmap hearts[];
   private Pixmap heart_mask;
 
+  private final EffectsPanel effects_panel;
+
   private final Pixmap full_food_point;
   private final Pixmap empty_food_point;
 
@@ -108,6 +115,8 @@ public final class Player extends Character{
 
   public Player() {
     super(MOVE_SPEED, ATTCAK_SPEED, STRENGTH);
+
+    this.effects_panel = new EffectsPanel(effects, EFFECT_PANEL_POS, EFFECT_SIZE, EFFECT_Y_SHIFT);
 
     this.rand = new Random();
     this.pos = new Vector2d();
@@ -441,7 +450,7 @@ public final class Player extends Character{
 
   public void update(double delta) {
     updateEffects(delta);
-    
+
     if (non_actual) {
       generatePlayerImage();
       non_actual = false;
@@ -493,6 +502,7 @@ public final class Player extends Character{
     // correct coords for Pixmap
     updateSpritePos();;
     sprite.draw(batch);
+    effects_panel.draw(batch);
     //batch.draw(image, (float)pos.x, (float)pos.y + (float)size.y,
     //(float)size.x, -(float)size.y);
     if (inventory != null) {
@@ -623,12 +633,12 @@ public final class Player extends Character{
   }
 
   @Override
-  public void treat(double health) {
+  public void heal(double health) {
     if (health_points >= MAX_HP) return;
     int i;
     for (i = 0; i < Math.floor(health); ++i) {
       ++health_points;
-      simple_treat(1);
+      simple_heal(1);
     }
     
     if (health_points >= MAX_HP) health_points = MAX_HP;
@@ -641,7 +651,7 @@ public final class Player extends Character{
     }
     System.out.println("[treat] HP: " + health_points);
   }
-  private void simple_treat(double delta) {
+  private void simple_heal(double delta) {
     if (health_points == 0) {
 
     } else if (health_points == 10 || (health_points - delta < 10 && health_points > 10)) {

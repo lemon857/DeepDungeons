@@ -152,7 +152,10 @@ public class Main extends ApplicationAdapter {
       new LootTable(new String[][]{{}, {"forcraft/leather"}, {"forcraft/rope"}}, new double[]{0.8, 0.15, 0.05})));
 
     Effect.initStaticEffects();
-    Effect.addStaticEffect("effects/speed", new Effect("textures/effects/speed.png", "speed"));
+    Effect.addStaticEffect("effects/speed", 
+      new Effect("textures/effects/speed.png", "textures/effects/slowness.png", "speed"));
+    Effect.addStaticEffect("effects/haste", 
+      new Effect("textures/effects/attack_speed.png", "textures/effects/attack_slowness.png", "haste"));
 
     Skin skin = new Skin(Gdx.files.internal("ui/uiskin.json"));
 
@@ -421,7 +424,7 @@ public class Main extends ApplicationAdapter {
     
     // [DEBUG] Self treat
     if (Gdx.input.isKeyJustPressed(Input.Keys.H)) {
-      player.treat(1);
+      player.heal(1);
     }
 
     // [DEBUG] Self hunger
@@ -446,12 +449,22 @@ public class Main extends ApplicationAdapter {
 
     // [DEBUG] Add positive effect
     if (Gdx.input.isKeyJustPressed(Input.Keys.O)) {
-      player.addEffect("effects/speed", 3, 10);
+      player.addEffect("effects/speed", 3, 2);
     }
 
     // [DEBUG] Add negative effect
     if (Gdx.input.isKeyJustPressed(Input.Keys.P)) {
-      player.addEffect("effects/speed", -3, 10);
+      player.addEffect("effects/speed", -3, 2);
+    }
+
+    // [DEBUG] Add positive effect
+    if (Gdx.input.isKeyJustPressed(Input.Keys.K)) {
+      player.addEffect("effects/haste", 3, 2);
+    }
+
+    // [DEBUG] Add negative effect
+    if (Gdx.input.isKeyJustPressed(Input.Keys.L)) {
+      player.addEffect("effects/haste", 3, 2);
     }
   }
 

@@ -10,7 +10,7 @@ public class Character {
   private Ref<Double> attack_speed_modifier;
   private Ref<Double> strength_modifier;
 
-  private final HashSet<Effect> effects;
+  protected final HashSet<Effect> effects;
 
   private final double move_speed;
   private final double attack_speed;
@@ -43,7 +43,7 @@ public class Character {
   }
 
   public final void addEffect(String name, int level, double duration) {
-    Effect new_effect = Effect.getStaticEffect(name, move_speed_modifier, level, duration);
+    Effect new_effect = Effect.getStaticEffect(name, getReferenceFromName(name), level, duration);
     
     for (Effect effect : effects) {
       if (effect.equals(new_effect)) {
@@ -54,6 +54,19 @@ public class Character {
     effects.add(new_effect);
   }
 
+  private Ref<Double> getReferenceFromName(String name) {
+    switch (name) {
+      case "effects/speed": return move_speed_modifier;
+      case "effects/strength": return strength_modifier;
+      case "effects/haste": return attack_speed_modifier;
+    }
+    return getReferenceFromOtherName(name);
+  }
+  
+  protected Ref<Double> getReferenceFromOtherName(String name) {
+    return null;
+  }
+
   protected final void updateEffects(double delta) {
     for (Effect effect : effects) {
       effect.update(delta);
@@ -61,12 +74,11 @@ public class Character {
         effects.remove(effect);
       }
     }
-    //System.out.println("Move speed: " + move_speed_modifier.v);
   }
 
 
   // True if it dead
   public boolean damage(double dmg) { return false; }
 
-  public void treat(double health) {}
+  public void heal(double health) {}
 }
