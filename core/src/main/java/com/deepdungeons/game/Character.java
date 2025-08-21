@@ -1,6 +1,7 @@
 package com.deepdungeons.game;
 
 import java.util.HashSet;
+import java.util.Iterator;
 
 import com.deepdungeons.game.effects.Effect;
 import com.deepdungeons.game.utils.Ref;
@@ -68,10 +69,13 @@ public class Character {
   }
 
   protected final void updateEffects(double delta) {
-    for (Effect effect : effects) {
+    Iterator<Effect> it = effects.iterator();
+
+    while (it.hasNext()) {
+      Effect effect = it.next();
       effect.update(delta);
       if (!effect.isActive()) {
-        effects.remove(effect);
+        it.remove();
       }
     }
   }
