@@ -23,6 +23,7 @@ import com.deepdungeons.game.items.Item;
 import com.deepdungeons.game.items.Key;
 import com.deepdungeons.game.mobs.DefaultEnemy;
 import com.deepdungeons.game.mobs.Mob;
+import com.deepdungeons.game.utils.Generator;
 import com.deepdungeons.game.utils.LootTable;
 import com.deepdungeons.game.utils.Point;
 import com.deepdungeons.game.utils.Vector2d;
@@ -58,9 +59,6 @@ public class Main extends ApplicationAdapter {
 
   private int req_door_id;
 
-  private Key generate_key_require;
-  private int generate_key_chance;
-
   private Label pause_info_label;
   private Label pause_tip_label;
 
@@ -71,6 +69,9 @@ public class Main extends ApplicationAdapter {
 
   private static final String pause_message = "PAUSE";
   private static final String pause_tip = "Press ESC to resume\nPress SPACE to restart";
+
+  private static final Point START_ROOM = new Point(0, 0);
+  private Generator generator;
 
   private Random rand;
 
@@ -91,6 +92,7 @@ public class Main extends ApplicationAdapter {
 
   @Override
   public void create() {
+    generator = new Generator(START_ROOM);
     rand = new Random();
     batch = new SpriteBatch();
     viewport = new FitViewport(Room.SCREEN_WIDTH, Room.SCREEN_HEIGHT);
@@ -213,6 +215,8 @@ public class Main extends ApplicationAdapter {
   }
 
   private void start() {
+    generator.generateSkeleton();
+
     pause_info_label.setVisible(false);
     pause_tip_label.setVisible(false);
 
@@ -220,30 +224,8 @@ public class Main extends ApplicationAdapter {
 
     rooms = new HashMap<>();
 
-    Room new_room = new Room(new Point(0, 0), new int[]{1, 1, 1, 1});
-    Key key = new_room.lockDoor(0);
-    generate_key_require = new_room.lockDoor(2);
-    generate_key_chance = 10;
-    new_room.addItem(key);
-
-    // int count_new_mobs = rand.nextInt(10);
-
-    // for (int i = 0; i < count_new_mobs; ++i) {
-    //   Mob mob;
-    //   if (rand.nextInt(10000) < 5000) {   
-    //     mob = Mob.getStaticMob("mobs/skeleton");
-    //   } else {
-    //     mob = Mob.getStaticMob("mobs/zombie");
-    //   }
-
-    //   int r = rand.nextInt(10000);
-    //   if (r < 800) {
-    //     mob.pickUpItem("weapons/bone_baton");
-    //   } else if (r < 1000) {
-    //     mob.pickUpItem("weapons/knife");
-    //   }
-    //   new_room.addMob(mob);
-    // }
+    Generator.RoomMark mark = generator.getRoomMark(START_ROOM);
+    Room new_room = new Room(new Point(0, 0), mark.doors, mark.lock_doors);
 
     new_room.addItem("special/coin");
     new_room.addItem("special/coin");
@@ -356,7 +338,7 @@ public class Main extends ApplicationAdapter {
     // Use (pick up, put down, open door)
     if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
       if (req_door_id != -1 && player.getItem() != null) {
-        if (Point.distance(player.getCenterPos(), Room.GetDoorPosition(req_door_id)) < 7 && player.getItem().getType() == Item.Type.Key) {
+        if (Point.distance(player.getCenterPos(), Room.getDoorPosition(req_door_id)) < 7 && player.getItem().getType() == Item.Type.Key) {
           if (current_room.tryUnlockDoor(req_door_id, ((Key)player.getItem()).getKey())) {
             current_room.generateBackground();
             req_door_id = -1;
@@ -541,7 +523,7 @@ public class Main extends ApplicationAdapter {
     viewport.update(width, height, true);
   }
 
-  private boolean  tryGoToNextRoom(int door_id) {
+  private boolean tryGoToNextRoom(int door_id) {
     if (!rooms.get(current_room_pos).canGoNextRoom(door_id)) {
       int req = rooms.get(current_room_pos).getLockedDoorKey(door_id);
       if (req != 0) {
@@ -551,40 +533,25 @@ public class Main extends ApplicationAdapter {
       return false;
     }
 
-    Point new_pos = Point.sum(current_room_pos, Room.GetRoomDeltaFromDoor(door_id));
+    Point new_pos = Point.sum(current_room_pos, Generator.getRoomDeltaFromDoor(door_id));
 
     if (!rooms.containsKey(new_pos)) {
 
-      current_room_pos = Point.sub(current_room_pos, Room.GetRoomDeltaFromDoor((door_id + 2) % 4));
+      current_room_pos = Point.sub(current_room_pos, Generator.getRoomDeltaFromDoor((door_id + 2) % 4));
 
-      int[] must_doors = new int[4];
-      for (int i = 0; i < 4; ++i) {
-        Point cur_room = Point.sum(current_room_pos, Room.GetRoomDeltaFromDoor(i));
-        if (rooms.containsKey(cur_room)) {
-          if (rooms.get(cur_room).isDoorExist((i + 2) % 4)) {
-            must_doors[i] = 1;
-          } else {
-            must_doors[i] = -1;
-          }
-        } else {
-          must_doors[i] = 0;
-        }
-      }
+      Generator.RoomMark mark = generator.getRoomMark(current_room_pos);
+      Room new_room = new Room(current_room_pos, mark.doors, mark.lock_doors);
 
-      Room new_room = new Room(current_room_pos, must_doors);
+      // if (generate_key_require != null) {
+      //   if (rand.nextInt(100) < generate_key_chance) {
+      //     new_room.addItem(generate_key_require);
+      //     generate_key_require = null;
+      //   } else {
+      //     ++generate_key_chance;
+      //   }
+      // }
 
-      if (generate_key_require != null) {
-        if (rand.nextInt(100) < generate_key_chance) {
-          new_room.addItem(generate_key_require);
-          generate_key_require = null;
-        } else {
-          ++generate_key_chance;
-        }
-      }
-
-      int type_room = rand.nextInt(10); // 0-1 - empty room, 2-5 - room with enemies, 6-9 - room with textures/items
-
-      if (type_room > 1 && type_room < 6) {
+      if (mark.type == Generator.RoomType.Monsters) {
         int count_new_mobs = rand.nextInt(10 + (int)Math.floor(player.useLuck(5, -5)));
 
         for (int i = 0; i < count_new_mobs; ++i) {
@@ -599,7 +566,7 @@ public class Main extends ApplicationAdapter {
           }
           new_room.addMob(mob);
         }
-      } else if (type_room > 6) {
+      } else if (mark.type == Generator.RoomType.Items) {
         if (rand.nextInt(10000) < 7500 + (4 - new_room.getDoorsCount()) * 250) { // have items
           int count_new_items = rand.nextInt(3 + (int)Math.ceil(player.useLuck(1, -1)));
           for (int i = 0; i < count_new_items; ++i) {

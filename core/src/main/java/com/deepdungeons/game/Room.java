@@ -52,10 +52,10 @@ public class Room {
 
   //private Texture debug_texture;
 
-  private Sound doors_close;
-  private Sound doors_open;
+  private final Sound doors_close;
+  private final Sound doors_open;
 
-  private Sound drop_sound;
+  private final Sound drop_sound;
 
   private boolean non_actual;
   private boolean is_fight;
@@ -77,19 +77,7 @@ public class Room {
 
   private final Random rand;
 
-  public static Point GetRoomDeltaFromDoor(int door_id) {
-    Point delta = new Point();
-    switch (door_id) {
-      case 0: delta.y = 1; break; // top
-      case 1: delta.x = 1; break; // right
-      case 2: delta.y = -1; break; // bottom
-      case 3: delta.x = -1; break; // left
-      default: break;
-    }
-    return delta;
-  }
-
-  public static Point GetDoorPosition(int door_id) {
+  public static Point getDoorPosition(int door_id) {
     switch (door_id) {
       case 0: return new Point(DOOR_OFFSET.x + DOOR_WIDTH / 2, END_BORDER.y - DOOR_WIDTH);
       case 1: return new Point(END_BORDER.x - DOOR_WIDTH, DOOR_OFFSET.y + DOOR_WIDTH / 2);
@@ -101,15 +89,15 @@ public class Room {
 
   // Room
   // must_doors: -1 - door must empty, 0 - nevermind, 1 - doors must be
-  public Room(Point pos, int[] must_doors) {
+  public Room(Point pos, boolean[] doors, int[] lock_doors) {
     this.rand = new Random();
     this.pos = pos;
 
-    this.doors = new boolean[] {false, false, false, false};
-    this.lock_doors = new int[] {0, 0, 0, 0};
-    this.before_block_doors = new int[] {0, 0, 0, 0};
-    this.lock_doors_color = new Color[4];
-    this.before_block_doors_color = new Color[4];
+    this.doors = doors;
+    this.lock_doors = lock_doors;
+    this.before_block_doors = new int[MAX_DOORS_COUNT];
+    this.lock_doors_color = new Color[MAX_DOORS_COUNT];
+    this.before_block_doors_color = new Color[MAX_DOORS_COUNT];
     this.non_actual = true;
     this.is_fight = false;
     this.items = new ArrayList<>();
@@ -123,7 +111,13 @@ public class Room {
     // pixmap.drawPixel(0, 0);
     // debug_texture = new Texture(pixmap);
 
-    generateNewDoors(must_doors);
+    //generateNewDoors(must_doors);
+
+    for (int i = 0; i < MAX_DOORS_COUNT; ++i) {
+      if (lock_doors[i] != 0) {
+        lock_doors_color[i] = new Color(rand.nextFloat(1), rand.nextFloat(1), rand.nextFloat(1), 1);
+      }
+    }
   }
 
   public Point getPos() {
@@ -431,17 +425,5 @@ public class Room {
     }
 
     background_texture = new Texture(map);
-  }
-
-  private void generateNewDoors(int[] must_doors) {
-    for (int i = 0; i < MAX_DOORS_COUNT; ++i) {
-      if (must_doors[i] == 1) {
-        doors[i] = true;
-      } else if (must_doors[i] == -1) {
-        doors[i] = false;
-      } else if (!doors[i]) {
-        doors[i] = (rand.nextInt(100) > 70);
-      }
-    }
   }
 }
