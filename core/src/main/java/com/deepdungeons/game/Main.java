@@ -129,6 +129,9 @@ public class Main extends ApplicationAdapter {
     Item.addStaticItem("forcraft/bone", new ItemForCraft("textures/items/bone.png", Item.Tier.Common, "bone"));
     Item.addStaticItem("forcraft/rope", new ItemForCraft("textures/items/rope.png", Item.Tier.Common, "rope"));
     Item.addStaticItem("forcraft/leather", new ItemForCraft("textures/items/leather.png", Item.Tier.Common, "leather"));
+    Item.addStaticItem("forcraft/stone", new ItemForCraft("textures/items/stone.png", Item.Tier.Common, "stone"));
+    Item.addStaticItem("forcraft/stick", new ItemForCraft("textures/items/stick.png", Item.Tier.Common, "stick"));
+    Item.addStaticItem("forcraft/feather", new ItemForCraft("textures/items/feather.png", Item.Tier.Common, "feather"));
 
     Item.addStaticItem("foods/candy", new Edible("textures/items/candy.png", Item.Tier.Common, "candy", false, 2));
     Item.addStaticItem("foods/meat", new Edible("textures/items/meat.png", Item.Tier.Uncommon, "meat", false, 5));
@@ -237,6 +240,9 @@ public class Main extends ApplicationAdapter {
     new_room.addItem("forcraft/bone");
     new_room.addItem("forcraft/rope");
     new_room.addItem("forcraft/leather");
+    new_room.addItem("forcraft/stone");
+    new_room.addItem("forcraft/stick");
+    new_room.addItem("forcraft/feather");
 
     new_room.addItem("foods/candy");
     new_room.addItem("foods/meat");
