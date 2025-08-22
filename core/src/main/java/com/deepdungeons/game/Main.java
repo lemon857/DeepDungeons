@@ -16,6 +16,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.deepdungeons.game.items.ItemForCraft;
 import com.deepdungeons.game.effects.Effect;
+import com.deepdungeons.game.effects.EffectsPanel;
 import com.deepdungeons.game.items.Coin;
 import com.deepdungeons.game.items.Edible;
 import com.deepdungeons.game.items.Item;
@@ -159,6 +160,20 @@ public class Main extends ApplicationAdapter {
       new Effect("textures/effects/speed.png", "textures/effects/slowness.png", "speed"));
     Effect.addStaticEffect("effects/haste", 
       new Effect("textures/effects/attack_speed.png", "textures/effects/attack_slowness.png", "haste"));
+      Effect.addStaticEffect("effects/strength", 
+        new Effect("textures/effects/strength.png", "textures/effects/weakness.png", "strength"));
+
+    EffectsPanel.initLevelImages();
+    for (int i = -4; i < 5; ++i) {
+      if (i == 0) {
+        EffectsPanel.addLevelTexture(i, "textures/ui/neutral.png");
+      } else if (i > 0) {
+        EffectsPanel.addLevelTexture(i, "textures/ui/green" + i + ".png");
+      } else {
+        EffectsPanel.addLevelTexture(i, "textures/ui/red" + (-i) + ".png");
+      }
+    }
+    
 
     Skin skin = new Skin(Gdx.files.internal("ui/uiskin.json"));
 
@@ -456,21 +471,15 @@ public class Main extends ApplicationAdapter {
     // [DEBUG] Add positive effect
     if (Gdx.input.isKeyJustPressed(Input.Keys.O)) {
       player.addEffect("effects/speed", 3, 2);
+      player.addEffect("effects/haste", 3, 2);
+      player.addEffect("effects/strength", 3, 2);
     }
 
     // [DEBUG] Add negative effect
     if (Gdx.input.isKeyJustPressed(Input.Keys.P)) {
       player.addEffect("effects/speed", -3, 2);
-    }
-
-    // [DEBUG] Add positive effect
-    if (Gdx.input.isKeyJustPressed(Input.Keys.K)) {
-      player.addEffect("effects/haste", 3, 2);
-    }
-
-    // [DEBUG] Add negative effect
-    if (Gdx.input.isKeyJustPressed(Input.Keys.L)) {
-      player.addEffect("effects/haste", 3, 2);
+      player.addEffect("effects/haste", -3, 2);
+      player.addEffect("effects/strength", -3, 2);
     }
   }
 

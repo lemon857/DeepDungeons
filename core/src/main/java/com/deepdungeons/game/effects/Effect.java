@@ -150,6 +150,10 @@ public class Effect {
     return name;
   }
 
+  public final int getLevel() {
+    return current_level;
+  }
+
   public void addLevel(int level, double duration) {
     System.out.println("[Effect] Add level: " + level);
 
