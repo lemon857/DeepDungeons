@@ -14,12 +14,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.deepdungeons.game.items.ItemForCraft;
 import com.deepdungeons.game.effects.Effect;
 import com.deepdungeons.game.effects.EffectsPanel;
 import com.deepdungeons.game.items.Coin;
 import com.deepdungeons.game.items.Edible;
 import com.deepdungeons.game.items.Item;
+import com.deepdungeons.game.items.ItemForCraft;
 import com.deepdungeons.game.items.Key;
 import com.deepdungeons.game.mobs.DefaultEnemy;
 import com.deepdungeons.game.mobs.Mob;
@@ -64,11 +64,11 @@ public class Main extends ApplicationAdapter {
 
   private Label coins_label;
 
-  private static final String die_message = "YOU DIED";
-  private static final String die_tip = "Press SPACE to restart";
+  private static final String DIE_MESSAGE = "YOU DIED";
+  private static final String DIE_TIP = "Press G to restart";
 
-  private static final String pause_message = "PAUSE";
-  private static final String pause_tip = "Press ESC to resume\nPress SPACE to restart";
+  private static final String PAUSE_MESSAGE = "PAUSE";
+  private static final String PAUSE_TIP = "Press ESC to resume\nPress G to restart";
 
   private static final Point START_ROOM = new Point(0, 0);
   private Generator generator;
@@ -225,27 +225,27 @@ public class Main extends ApplicationAdapter {
     rooms = new HashMap<>();
 
     Generator.RoomMark mark = generator.getRoomMark(START_ROOM);
-    Room new_room = new Room(new Point(0, 0), mark.doors, mark.lock_doors);
+    Room new_room = new Room(new Point(0, 0), mark.doors, mark.lock_doors, mark.lock_doors_color);
 
-    new_room.addItem("special/coin");
-    new_room.addItem("special/coin");
-    new_room.addItem("special/coin");
+    // new_room.addItem("special/coin");
+    // new_room.addItem("special/coin");
+    // new_room.addItem("special/coin");
 
-    new_room.addItem("weapons/bone_baton");
-    new_room.addItem("weapons/knife");
+    // new_room.addItem("weapons/bone_baton");
+    // new_room.addItem("weapons/knife");
 
-    new_room.addItem("forcraft/bone");
-    new_room.addItem("forcraft/rope");
-    new_room.addItem("forcraft/leather");
-    new_room.addItem("forcraft/stone");
-    new_room.addItem("forcraft/stick");
-    new_room.addItem("forcraft/feather");
+    // new_room.addItem("forcraft/bone");
+    // new_room.addItem("forcraft/rope");
+    // new_room.addItem("forcraft/leather");
+    // new_room.addItem("forcraft/stone");
+    // new_room.addItem("forcraft/stick");
+    // new_room.addItem("forcraft/feather");
 
-    new_room.addItem("foods/candy");
-    new_room.addItem("foods/meat");
+    // new_room.addItem("foods/candy");
+    // new_room.addItem("foods/meat");
 
-    new_room.addItem("drinks/bottle_of_water");
-    new_room.addItem("drinks/cup_of_tea");
+    // new_room.addItem("drinks/bottle_of_water");
+    // new_room.addItem("drinks/cup_of_tea");
 
     current_room_pos = new_room.getPos();
     rooms.put(current_room_pos, new_room);
@@ -271,7 +271,7 @@ public class Main extends ApplicationAdapter {
 
   private void input() {
     if (is_pause) {
-      if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+      if (Gdx.input.isKeyJustPressed(Input.Keys.G)) {
         start();
       }
       
@@ -286,8 +286,8 @@ public class Main extends ApplicationAdapter {
     }
 
     if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
-      pause_info_label.setText(pause_message);
-      pause_tip_label.setText(pause_tip);
+      pause_info_label.setText(PAUSE_MESSAGE);
+      pause_tip_label.setText(PAUSE_TIP);
 
       pause_info_label.setVisible(true);
       pause_tip_label.setVisible(true);
@@ -492,8 +492,8 @@ public class Main extends ApplicationAdapter {
     if (player.isDie()) {
       is_pause = true;
 
-      pause_info_label.setText(die_message);
-      pause_tip_label.setText(die_tip);
+      pause_info_label.setText(DIE_MESSAGE);
+      pause_tip_label.setText(DIE_TIP);
 
       pause_info_label.setVisible(true);
       pause_tip_label.setVisible(true);
@@ -507,6 +507,9 @@ public class Main extends ApplicationAdapter {
     batch.begin();
     current_room.draw(batch);
     player.draw(batch);
+
+    batch.draw(generator.getTexture(), (float)Room.SHIFT_X, 0, 100, 100);
+
     batch.end();
 
     stage.act(Gdx.graphics.getDeltaTime());
@@ -540,16 +543,13 @@ public class Main extends ApplicationAdapter {
       current_room_pos = Point.sub(current_room_pos, Generator.getRoomDeltaFromDoor((door_id + 2) % 4));
 
       Generator.RoomMark mark = generator.getRoomMark(current_room_pos);
-      Room new_room = new Room(current_room_pos, mark.doors, mark.lock_doors);
+      Room new_room = new Room(current_room_pos, mark.doors, mark.lock_doors, mark.lock_doors_color);
 
-      // if (generate_key_require != null) {
-      //   if (rand.nextInt(100) < generate_key_chance) {
-      //     new_room.addItem(generate_key_require);
-      //     generate_key_require = null;
-      //   } else {
-      //     ++generate_key_chance;
-      //   }
-      // }
+      if (mark.require_key != 0) {
+        Key key = (Key)Item.getStaticItem("special/key");
+        key.setParams(mark.require_key, mark.require_key_color);
+        new_room.addItem(key);
+      }
 
       if (mark.type == Generator.RoomType.Monsters) {
         int count_new_mobs = rand.nextInt(10 + (int)Math.floor(player.useLuck(5, -5)));

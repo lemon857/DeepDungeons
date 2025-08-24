@@ -89,15 +89,17 @@ public class Room {
 
   // Room
   // must_doors: -1 - door must empty, 0 - nevermind, 1 - doors must be
-  public Room(Point pos, boolean[] doors, int[] lock_doors) {
+  public Room(Point pos, boolean[] doors, int[] lock_doors, Color[] lock_doors_color) {
     this.rand = new Random();
     this.pos = pos;
 
     this.doors = doors;
     this.lock_doors = lock_doors;
+    this.lock_doors_color = lock_doors_color;
+
     this.before_block_doors = new int[MAX_DOORS_COUNT];
-    this.lock_doors_color = new Color[MAX_DOORS_COUNT];
     this.before_block_doors_color = new Color[MAX_DOORS_COUNT];
+
     this.non_actual = true;
     this.is_fight = false;
     this.items = new ArrayList<>();
@@ -112,12 +114,6 @@ public class Room {
     // debug_texture = new Texture(pixmap);
 
     //generateNewDoors(must_doors);
-
-    for (int i = 0; i < MAX_DOORS_COUNT; ++i) {
-      if (lock_doors[i] != 0) {
-        lock_doors_color[i] = new Color(rand.nextFloat(1), rand.nextFloat(1), rand.nextFloat(1), 1);
-      }
-    }
   }
 
   public Point getPos() {
@@ -125,7 +121,8 @@ public class Room {
   }
 
   public boolean canGoNextRoom(int door_id) {
-    return doors[door_id] && (lock_doors[door_id] == 0);
+    //return doors[door_id] && (lock_doors[door_id] == 0);
+    return doors[door_id];
   }
 
   public boolean isDoorExist(int door_id) {
