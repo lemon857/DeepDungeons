@@ -21,9 +21,9 @@ public class EffectsPanel {
 
   private final HashSet<Effect> effects;
 
-  private Vector2d position;
-  private Vector2d effect_size;
-  private double y_shift;
+  private final Vector2d position;
+  private final Vector2d effect_size;
+  private final double y_shift;
 
   public EffectsPanel(HashSet<Effect> ref_to_effects, Vector2d position, Vector2d effect_size, double y_shift) {
     this.effects = ref_to_effects;

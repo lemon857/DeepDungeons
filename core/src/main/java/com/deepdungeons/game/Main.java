@@ -30,7 +30,7 @@ import com.deepdungeons.game.utils.Vector2d;
 import com.deepdungeons.game.weapons.CloseRangeWeapon;
 import com.deepdungeons.game.weapons.Hand;
 
-// ! WARNING ! 
+// ! WARNING !
 // IDK why, start coords on Pixmap located at Up-Left corner,
 // but start coords when draw texture located at Down-Left corner
 // for minimize misunderstanding I'll correct all of Pixmap drawing
@@ -72,6 +72,8 @@ public class Main extends ApplicationAdapter {
 
   private static final Point START_ROOM = new Point(0, 0);
   private Generator generator;
+
+  private LootTable items_room_lt;
 
   private Random rand;
 
@@ -177,6 +179,18 @@ public class Main extends ApplicationAdapter {
       }
     }
     
+    // for_craft eat drink special
+    items_room_lt = new LootTable(new String[][]{
+      {"forcraft/bone", "forcraft/rope", "forcraft/leather", "forcraft/stone", "forcraft/stick", "forcraft/feather"},
+      {"foods/candy", "foods/meat"},
+      {"drinks/bottle_of_water", "drinks/cup_of_tea"},
+      {"special/coin"}
+    }, new double[]{
+      0.5,
+      0.15,
+      0.15,
+      0.2
+    });
 
     Skin skin = new Skin(Gdx.files.internal("ui/uiskin.json"));
 
@@ -237,25 +251,8 @@ public class Main extends ApplicationAdapter {
       }
     }
 
-    new_room.addItem("special/coin");
-    new_room.addItem("special/coin");
-    new_room.addItem("special/coin");
-
     new_room.addItem("weapons/bone_baton");
     new_room.addItem("weapons/knife");
-
-    new_room.addItem("forcraft/bone");
-    new_room.addItem("forcraft/rope");
-    new_room.addItem("forcraft/leather");
-    new_room.addItem("forcraft/stone");
-    new_room.addItem("forcraft/stick");
-    new_room.addItem("forcraft/feather");
-
-    new_room.addItem("foods/candy");
-    new_room.addItem("foods/meat");
-
-    new_room.addItem("drinks/bottle_of_water");
-    new_room.addItem("drinks/cup_of_tea");
 
     current_room_pos = new_room.getPos();
     rooms.put(current_room_pos, new_room);
@@ -270,7 +267,7 @@ public class Main extends ApplicationAdapter {
     cooldown = 0;
     show_item_info = false;
     is_pause = false;
-    show_map = true;
+    show_map = false;
   }
 
   @Override
@@ -589,12 +586,7 @@ public class Main extends ApplicationAdapter {
       } else if (mark.type == Generator.RoomType.Items) {
         int count_new_items = rand.nextInt(3 + (int)Math.ceil(player.useLuck(1, -1)));
         for (int i = 0; i < count_new_items; ++i) {
-          switch(rand.nextInt(4)) {
-          case 0: new_room.addItem("forcraft/leather");
-          case 1: new_room.addItem("forcraft/rope");
-          case 2: new_room.addItem("forcraft/bone");
-          default: new_room.addItem("special/coin");
-          }
+          new_room.addItem(items_room_lt.nextItem());
         }
       }
 

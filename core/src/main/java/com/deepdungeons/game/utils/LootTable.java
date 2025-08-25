@@ -13,18 +13,28 @@ public class LootTable {
     this.rand = new Random();
     this.table = table;
     this.weights = weights;
+
+    double res = 0;
+    for (double i : weights) {
+      res += i;
+    }
+
+    if (res != 1) {
+      System.err.println("[LootTable] Invalid weights");
+    }
   }
 
   public Item nextItem() {
     int cur = Utility.getRandomWeightedNumber(rand, weights);
 
-    System.out.println("[LootTable] Cur: " + cur);
-
-    if (table[cur].length == 0) return null;
+    if (table[cur].length == 0) {
+      System.out.println("[LootTable] Null");
+      return null; 
+    }
 
     int item = rand.nextInt(table[cur].length);
     
-    System.out.println("[LootTable] Item: " + item);
+    System.out.printf("[LootTable] Cur: %d Item: %d Name: %s\n", cur, item, table[cur][item]);
 
     return Item.getStaticItem(table[cur][item]);
   }

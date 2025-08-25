@@ -79,11 +79,11 @@ public class Effect {
   
   private boolean is_active;
 
-  private Texture positive_texture;
-  private Pixmap positive_image;
+  private final Texture positive_texture;
+  private final Pixmap positive_image;
 
-  private Texture negative_texture;
-  private Pixmap negative_image;
+  private final Texture negative_texture;
+  private final Pixmap negative_image;
 
   public Effect(String path_to_positive_texture, String path_to_negative_texture, String name) {
     init(name);
@@ -217,7 +217,7 @@ public class Effect {
     if (this == obj) return true;
     if (!(obj instanceof Effect)) return false;
     Effect other = (Effect)obj;
-    return this.name == other.name;
+    return this.name.equals(other.name);
   }
   @Override
   public int hashCode() {

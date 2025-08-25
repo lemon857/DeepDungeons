@@ -108,12 +108,6 @@ public class Room {
     this.doors_close = Gdx.audio.newSound(Gdx.files.internal("sounds/doors_close.mp3"));
     this.doors_open = Gdx.audio.newSound(Gdx.files.internal("sounds/doors_open.mp3"));
     this.drop_sound = Gdx.audio.newSound(Gdx.files.internal("sounds/drop.mp3"));
-    // Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGB888);
-    // pixmap.setColor(1, 1, 1, 1);
-    // pixmap.drawPixel(0, 0);
-    // debug_texture = new Texture(pixmap);
-
-    //generateNewDoors(must_doors);
   }
 
   public Point getPos() {
@@ -121,8 +115,8 @@ public class Room {
   }
 
   public boolean canGoNextRoom(int door_id) {
-    // return doors[door_id] && (lock_doors[door_id] == 0);
-    return doors[door_id];
+    return doors[door_id] && (lock_doors[door_id] == 0);
+    // return doors[door_id];
   }
 
   public boolean isDoorExist(int door_id) {
