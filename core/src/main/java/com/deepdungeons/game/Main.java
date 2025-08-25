@@ -229,6 +229,14 @@ public class Main extends ApplicationAdapter {
 
     Room new_room = new Room(new Point(0, 0), mark.doors, mark.lock_doors, mark.lock_doors_color);
 
+    if (!mark.require_keys.isEmpty()) {
+      for (int i = 0; i < mark.require_keys.size(); ++i) {
+        Key key = (Key)Item.getStaticItem("special/key");
+        key.setParams(mark.require_keys.get(i), mark.require_keys_color.get(i));
+        new_room.addItem(key);
+      }
+    }
+
     new_room.addItem("special/coin");
     new_room.addItem("special/coin");
     new_room.addItem("special/coin");
@@ -262,7 +270,7 @@ public class Main extends ApplicationAdapter {
     cooldown = 0;
     show_item_info = false;
     is_pause = false;
-    show_map = false;
+    show_map = true;
   }
 
   @Override
@@ -555,10 +563,12 @@ public class Main extends ApplicationAdapter {
       Generator.RoomMark mark = generator.getRoomMark(current_room_pos);
       Room new_room = new Room(current_room_pos, mark.doors, mark.lock_doors, mark.lock_doors_color);
 
-      if (mark.require_key != 0) {
-        Key key = (Key)Item.getStaticItem("special/key");
-        key.setParams(mark.require_key, mark.require_key_color);
-        new_room.addItem(key);
+      if (!mark.require_keys.isEmpty()) {
+        for (int i = 0; i < mark.require_keys.size(); ++i) {
+          Key key = (Key)Item.getStaticItem("special/key");
+          key.setParams(mark.require_keys.get(i), mark.require_keys_color.get(i));
+          new_room.addItem(key);
+        }
       }
 
       if (mark.type == Generator.RoomType.Monsters) {
@@ -577,15 +587,13 @@ public class Main extends ApplicationAdapter {
           new_room.addMob(mob);
         }
       } else if (mark.type == Generator.RoomType.Items) {
-        if (rand.nextInt(10000) < 7500 + (4 - new_room.getDoorsCount()) * 250) { // have items
-          int count_new_items = rand.nextInt(3 + (int)Math.ceil(player.useLuck(1, -1)));
-          for (int i = 0; i < count_new_items; ++i) {
-            switch(rand.nextInt(4)) {
-            case 0: new_room.addItem("forcraft/leather");
-            case 1: new_room.addItem("forcraft/rope");
-            case 2: new_room.addItem("forcraft/bone");
-            default: new_room.addItem("special/coin");
-            }
+        int count_new_items = rand.nextInt(3 + (int)Math.ceil(player.useLuck(1, -1)));
+        for (int i = 0; i < count_new_items; ++i) {
+          switch(rand.nextInt(4)) {
+          case 0: new_room.addItem("forcraft/leather");
+          case 1: new_room.addItem("forcraft/rope");
+          case 2: new_room.addItem("forcraft/bone");
+          default: new_room.addItem("special/coin");
           }
         }
       }

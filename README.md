@@ -6,6 +6,13 @@ Doors can be locked, every locked door have one unique key same with door lock c
 
 Now room can be generated with some Skeletons, if you need you can kill they, but they can take revenge
 
+## How run it?
+
+You must have java jdk 8+  
+For run game use `./gradlew lwjgl3:run` in main directory  
+For build game into .jar file use `./gradlew lwjgl3:dist` in main directory  
+Build located in `lwjgl3/build/libs`
+
 ## Player description  
 
 If you very hungry you lose some health points every third second  

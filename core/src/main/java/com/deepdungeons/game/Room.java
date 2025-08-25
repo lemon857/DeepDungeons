@@ -121,8 +121,8 @@ public class Room {
   }
 
   public boolean canGoNextRoom(int door_id) {
-    return doors[door_id] && (lock_doors[door_id] == 0);
-    //return doors[door_id];
+    // return doors[door_id] && (lock_doors[door_id] == 0);
+    return doors[door_id];
   }
 
   public boolean isDoorExist(int door_id) {

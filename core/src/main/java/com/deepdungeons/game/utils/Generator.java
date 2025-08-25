@@ -1,10 +1,10 @@
 package com.deepdungeons.game.utils;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Map;
-import java.util.Queue;
+import java.util.PriorityQueue;
 import java.util.Random;
 
 import com.badlogic.gdx.graphics.Color;
@@ -40,17 +40,23 @@ public class Generator {
     public boolean[] doors;
     public int[] lock_doors;
     public Color[] lock_doors_color;
-    public int require_key;
-    public Color require_key_color;
+    public ArrayList<Integer> require_keys;
+    public ArrayList<Color> require_keys_color;
   }
 
   private class NextRoomInfo {
     public Point pos;
     public int zone;
     public int from;
+
+    public boolean is_lock;
+
+    public final int isLock() {
+      return is_lock ? 1 : 0;
+    }
   }
 
-  private static final int ROOMS_LIMIT = 10;
+  private static final int ROOMS_LIMIT = 50;
   private static final int ROOMS_LIMIT_MIN = 3;
   private static final int ZONES_LIMIT = ROOMS_LIMIT * 4 + 1;
 
@@ -60,7 +66,7 @@ public class Generator {
 
   private final Random rand;
 
-  private final Queue<NextRoomInfo> next_rooms;
+  private final PriorityQueue<NextRoomInfo> next_rooms;
 
   private final HashMap<Point, RoomMark> skeleton;
   
@@ -76,7 +82,7 @@ public class Generator {
   private final Point offset;
 
   public Generator(Point start_pos) {
-    this.next_rooms = new LinkedList<>();
+    this.next_rooms = new PriorityQueue<>(Comparator.comparingInt(NextRoomInfo::isLock).reversed());
     this.skeleton = new HashMap<>();
     this.zones = new HashMap<>();
     this.rand = new Random();
@@ -85,20 +91,19 @@ public class Generator {
     this.require_keys = new int[ZONES_LIMIT];
     this.require_key_colors = new Color[ZONES_LIMIT];
 
-    this.map = new Pixmap(100, 100, Pixmap.Format.RGBA8888);
     this.offset = new Point(50, 50);
   }
 
   public void clearSkeleton() {
     next_rooms.clear();
     skeleton.clear();
+    zones.clear();
     zone_pool = 0;
     map = new Pixmap(100, 100, Pixmap.Format.RGBA8888);
   }
 
   public void generateSkeleton() {
     clearSkeleton();
-
 
     prev_zones = new int[ZONES_LIMIT];
     require_keys = new int[ZONES_LIMIT];
@@ -108,11 +113,11 @@ public class Generator {
     start_info.pos = start_pos;
     start_info.zone = zone_pool;
     start_info.from = -1;
+    start_info.is_lock = false;
     next_rooms.offer(start_info);
 
     while (!next_rooms.isEmpty()) {
-      generateNextRoom(next_rooms.peek());
-      next_rooms.poll();
+      generateNextRoom();
     }
 
     generateKeys();
@@ -166,6 +171,8 @@ public class Generator {
       System.out.print("\n");
     }
 
+    System.out.print("=====================================================\n");
+
     image = new Texture(map);
   }
 
@@ -181,19 +188,28 @@ public class Generator {
     return skeleton.get(pos);
   }
 
-  private void generateNextRoom(NextRoomInfo info) {
+  private void generateNextRoom() {
+    NextRoomInfo info = next_rooms.peek();
+    next_rooms.poll();
     if (skeleton.containsKey(info.pos)) {
       return;
     }
 
     int[] must_doors = new int[Room.MAX_DOORS_COUNT];
-    System.out.printf("----------------------\n[Generator] Pos: X: %d, Y: %d Must doors: ", info.pos.x, info.pos.y);
+    System.out.printf("[Generator] Pos: X: %d, Y: %d Zone: %d Must doors: ", info.pos.x, info.pos.y, info.zone);
     for (int i = 0; i < Room.MAX_DOORS_COUNT; ++i) {
       Point cur_room = Point.sum(info.pos, getRoomDeltaFromDoor(i));
 
       if (skeleton.containsKey(cur_room)) {
-        if (skeleton.get(cur_room).doors[(i + 2) % 4]) {
-          must_doors[i] = 1;
+        RoomMark other = skeleton.get(cur_room);
+        if (other.doors[(i + 2) % 4]) {
+          if (other.zone != info.zone && info.from != i) {
+            must_doors[i] = -1;
+            other.doors[(i + 2) % 4] = false; // remove other ways to other zone
+            other.lock_doors[(i + 2) % 4] = 0;
+          } else {
+            must_doors[i] = 1;
+          }
         } else {
           must_doors[i] = -1;
         }
@@ -205,7 +221,7 @@ public class Generator {
         }
       }
 
-      System.out.printf("(%d) %d ", (i + 2) % 4, must_doors[i]);
+      System.out.printf("%d ", must_doors[i]);
     }
 
     int counter = 0;
@@ -221,14 +237,14 @@ public class Generator {
     mark.type = generateRandomType();
 
     mark.doors = generateNewDoors(new boolean[Room.MAX_DOORS_COUNT], must_doors);
-    //mark.lock_doors = generateLockDoors(new int[Room.MAX_DOORS_COUNT], mark.doors, info.from);
-    mark.lock_doors = new int[Room.MAX_DOORS_COUNT];
+    mark.lock_doors = generateLockDoors(new int[Room.MAX_DOORS_COUNT], mark.doors, must_doors, info.from);
     mark.lock_doors_color = new Color[Room.MAX_DOORS_COUNT];
-    mark.require_key = 0;
+    mark.require_keys = new ArrayList<>();
+    mark.require_keys_color = new ArrayList<>();
 
-    System.out.print("doors: ");
+    System.out.print("doors(lock): ");
     for (int i = 0; i < Room.MAX_DOORS_COUNT; ++i) {
-      System.out.printf("%d ", mark.doors[i] ? 1 : 0);
+      System.out.printf("%d(%s) ", mark.doors[i] ? 1 : 0, mark.lock_doors[i] == 0 ? "-" : "+");
       if (mark.lock_doors[i] == 0) continue;
 
       mark.lock_doors_color[i] = new Color(rand.nextFloat(1), rand.nextFloat(1), rand.nextFloat(1), 1);
@@ -260,32 +276,35 @@ public class Generator {
       skeleton.put(info.pos, mark);
     }
 
-    // for (int i = 0; i < Room.MAX_DOORS_COUNT; ++i) {
-    //   if (mark.lock_doors[i] != 0 && mark.doors[i]) {
-    //     NextRoomInfo new_info = new NextRoomInfo();
-    //     new_info.pos = Point.sum(info.pos, getRoomDeltaFromDoor(i));
-    //     new_info.zone = ++zone_pool;
-    //     new_info.from = (i + 2) % 4;
-    //     next_rooms.offer(new_info);
+    for (int i = 0; i < Room.MAX_DOORS_COUNT; ++i) {
+      if (mark.lock_doors[i] != 0 && mark.doors[i]) {
+        NextRoomInfo new_info = new NextRoomInfo();
+        new_info.pos = Point.sum(info.pos, getRoomDeltaFromDoor(i));
+        new_info.zone = ++zone_pool;
+        new_info.from = (i + 2) % 4;
+        new_info.is_lock = true;
+        next_rooms.offer(new_info);
 
-    //     System.out.println("New zone: " + new_info.zone);
+        System.out.printf("PUSH INTO QUEUE NEW ZONE (%d): i: %d, pos: X: %d, Y:%d\n", new_info.zone, i, new_info.pos.x, new_info.pos.y);
 
-    //     prev_zones[new_info.zone] = mark.zone;
-    //     require_keys[new_info.zone] = mark.lock_doors[i];
-    //     require_key_colors[new_info.zone] = mark.lock_doors_color[i];
-    //   }
-    // }
+        prev_zones[new_info.zone] = mark.zone;
+        require_keys[new_info.zone] = mark.lock_doors[i];
+        require_key_colors[new_info.zone] = mark.lock_doors_color[i];
+      }
+    }
 
     for (int i = 0; i < Room.MAX_DOORS_COUNT; ++i) {
-      if (mark.doors[i]) {
+      if (mark.lock_doors[i] == 0 && mark.doors[i]) {
         NextRoomInfo new_info = new NextRoomInfo();
         new_info.pos = Point.sum(info.pos, getRoomDeltaFromDoor(i));
         new_info.zone = mark.zone;
         new_info.from = (i + 2) % 4;
+        new_info.is_lock = false;
         next_rooms.offer(new_info);
         System.out.printf("PUSH INTO QUEUE: i: %d, pos: X: %d, Y:%d\n", i, new_info.pos.x, new_info.pos.y);
       }
     }
+    System.out.println("----------------------------------");
   }
 
   private void generateKeys() {
@@ -296,13 +315,13 @@ public class Generator {
 
       int index = rand.nextInt(zones.get(zone).size());
 
-      zones.get(zone).get(index).require_key = require_keys[i];
-      zones.get(zone).get(index).require_key_color = require_key_colors[i];
+      zones.get(zone).get(index).require_keys.add(require_keys[i]);
+      zones.get(zone).get(index).require_keys_color.add(require_key_colors[i]);
     }
   }
 
   private RoomType generateRandomType() {
-    switch (rand.nextInt(3)) {
+    switch (rand.nextInt(5)) {
     case 0: return RoomType.Items;
     case 1: return RoomType.Monsters;
     default: return RoomType.Empty;
@@ -322,9 +341,9 @@ public class Generator {
     return doors;
   }
 
-  private int[] generateLockDoors(int[] lock_doors, boolean[] doors, int from) {
+  private int[] generateLockDoors(int[] lock_doors, boolean[] doors, int[] must_doors, int from) {
     for (int i = 0; i < Room.MAX_DOORS_COUNT; ++i) {
-      if (from != i && doors[i] && rand.nextInt(10000) < 7000) {
+      if (from != i && doors[i] && must_doors[i] != 1 && rand.nextInt(10000) < 1500) {
         while(lock_doors[i] == 0) {
           lock_doors[i] = rand.nextInt();
         }
