@@ -75,6 +75,7 @@ public class Main extends ApplicationAdapter {
 
   private Random rand;
 
+  private boolean show_map;
   private boolean show_item_info;
 
   private Label[] debug_info;
@@ -225,27 +226,28 @@ public class Main extends ApplicationAdapter {
     rooms = new HashMap<>();
 
     Generator.RoomMark mark = generator.getRoomMark(START_ROOM);
+
     Room new_room = new Room(new Point(0, 0), mark.doors, mark.lock_doors, mark.lock_doors_color);
 
-    // new_room.addItem("special/coin");
-    // new_room.addItem("special/coin");
-    // new_room.addItem("special/coin");
+    new_room.addItem("special/coin");
+    new_room.addItem("special/coin");
+    new_room.addItem("special/coin");
 
-    // new_room.addItem("weapons/bone_baton");
-    // new_room.addItem("weapons/knife");
+    new_room.addItem("weapons/bone_baton");
+    new_room.addItem("weapons/knife");
 
-    // new_room.addItem("forcraft/bone");
-    // new_room.addItem("forcraft/rope");
-    // new_room.addItem("forcraft/leather");
-    // new_room.addItem("forcraft/stone");
-    // new_room.addItem("forcraft/stick");
-    // new_room.addItem("forcraft/feather");
+    new_room.addItem("forcraft/bone");
+    new_room.addItem("forcraft/rope");
+    new_room.addItem("forcraft/leather");
+    new_room.addItem("forcraft/stone");
+    new_room.addItem("forcraft/stick");
+    new_room.addItem("forcraft/feather");
 
-    // new_room.addItem("foods/candy");
-    // new_room.addItem("foods/meat");
+    new_room.addItem("foods/candy");
+    new_room.addItem("foods/meat");
 
-    // new_room.addItem("drinks/bottle_of_water");
-    // new_room.addItem("drinks/cup_of_tea");
+    new_room.addItem("drinks/bottle_of_water");
+    new_room.addItem("drinks/cup_of_tea");
 
     current_room_pos = new_room.getPos();
     rooms.put(current_room_pos, new_room);
@@ -260,6 +262,7 @@ public class Main extends ApplicationAdapter {
     cooldown = 0;
     show_item_info = false;
     is_pause = false;
+    show_map = false;
   }
 
   @Override
@@ -415,6 +418,11 @@ public class Main extends ApplicationAdapter {
       }
     }
 
+    // [DEBUG] Show map
+    if (Gdx.input.isKeyJustPressed(Input.Keys.M)) {
+      show_map = !show_map;
+    }
+
     // [DEBUG] Spawn new mob
     if (Gdx.input.isKeyJustPressed(Input.Keys.T)) {
       current_room.addMob(Mob.getStaticMob("mobs/skeleton", new Vector2d(player.getPos())));
@@ -508,7 +516,9 @@ public class Main extends ApplicationAdapter {
     current_room.draw(batch);
     player.draw(batch);
 
-    batch.draw(generator.getTexture(), (float)Room.SHIFT_X, 0, 100, 100);
+    if (show_map) {
+      batch.draw(generator.getTexture(), (float)Room.SHIFT_X, 100, 100, -100);
+    }
 
     batch.end();
 

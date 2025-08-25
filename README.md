@@ -60,6 +60,7 @@ Y  | Eat and drink
 Space  | Attack
 Esc | Pause menu
 *Debug features*
+M  | Switch map 
 T  | Spawn new skeleton *(for debug)*
 G  | Self-damage *(for debug)*
 H  | Self-treat *(for debug)*
