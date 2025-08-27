@@ -75,11 +75,11 @@ public final class Player extends Character{
 
   private double attack_anim_timer;
   private boolean attack_anim_play;
-  private static final double attack_anim_time = 0.2;
+  private static final double ATTACK_ANIM_TIME = 0.2;
 
   protected double damage_anim_timer;
   protected boolean damage_anim_play;
-  protected static final double damage_anim_time = 0.25;
+  protected static final double DAMAGE_ANIM_TIME = 0.25;
 
   private Sprite sprite;
 
@@ -121,9 +121,9 @@ public final class Player extends Character{
     this.rand = new Random();
     this.pos = new Vector2d();
     this.size = new Vector2d(WIDTH, HEIGHT);
-    this.damage_anim_timer = damage_anim_time + 1;
+    this.damage_anim_timer = DAMAGE_ANIM_TIME + 1;
     this.damage_anim_play = false;
-    this.attack_anim_timer = attack_anim_time + 1;
+    this.attack_anim_timer = ATTACK_ANIM_TIME + 1;
     this.attack_anim_play = false;;
     this.dir = Direction.Up;
     this.non_actual = false;
@@ -363,18 +363,21 @@ public final class Player extends Character{
     return inventory != null;
   }
 
-  public void tryUseEdibleItem() {
-    if (inventory == null) return;
+  public boolean tryUseEdibleItem() {
+    if (inventory == null) return false;
     if (inventory.getType() == Item.Type.Food) {
       saturation(((Edible)inventory).getPoints());
       inventory.playSound();
       inventory = null;
+      return true;
 
     } else if (inventory.getType() == Item.Type.Drink) {
       drink(((Edible)inventory).getPoints());
       inventory.playSound();
       inventory = null;
+      return true;
     }
+    return false;
   }
 
   public void startAttackAnim() {
@@ -480,7 +483,7 @@ public final class Player extends Character{
     //   }
     // }
 
-    if (attack_anim_timer >= attack_anim_time && attack_anim_play) {
+    if (attack_anim_timer >= ATTACK_ANIM_TIME && attack_anim_play) {
       size.y = HEIGHT;
       updateSpriteSize();
       attack_anim_play = false;
@@ -490,7 +493,7 @@ public final class Player extends Character{
 
     if (damage_anim_play) {
       damage_anim_timer += delta;
-      if (damage_anim_timer >= damage_anim_time) {
+      if (damage_anim_timer >= DAMAGE_ANIM_TIME) {
         // change color of mob to default
         sprite.setColor(1, 1, 1, 1);
         damage_anim_play = false;

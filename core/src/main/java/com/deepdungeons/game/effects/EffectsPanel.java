@@ -1,7 +1,6 @@
 package com.deepdungeons.game.effects;
 
 import java.util.HashMap;
-import java.util.HashSet;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -19,13 +18,13 @@ public class EffectsPanel {
     level_images.put(level, new Texture(path_to_texture));
   }
 
-  private final HashSet<Effect> effects;
+  private final HashMap<String, Effect> effects;
 
   private final Vector2d position;
   private final Vector2d effect_size;
   private final double y_shift;
 
-  public EffectsPanel(HashSet<Effect> ref_to_effects, Vector2d position, Vector2d effect_size, double y_shift) {
+  public EffectsPanel(HashMap<String, Effect> ref_to_effects, Vector2d position, Vector2d effect_size, double y_shift) {
     this.effects = ref_to_effects;
     this.position = position;
     this.effect_size = effect_size;
@@ -34,7 +33,7 @@ public class EffectsPanel {
 
   public void draw(SpriteBatch batch) {
     int i = 0;
-    for (Effect effect : effects) {
+    for (Effect effect : effects.values()) {
       if (!effect.isActive()) continue;
       ++i;
 

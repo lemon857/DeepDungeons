@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.deepdungeons.game.utils.Ref;
 
 class LevelPair {
+  // -1 if infinity
   private double duration;
   private int level;
 
@@ -120,26 +121,19 @@ public class Effect {
   public void update(double delta) {
     if (!is_active) return;
 
-    timer += delta;
+    if (levels.peek().getDuration() != -1) {
+      timer += delta;
 
-    if (timer >= levels.peek().getDuration()) {
-      timer = 0;
-      current_sum -= levels.peek().getPrevLevel();
-      current_level = getCorrectLevel(current_sum);
-
-      levels.remove();
-
-      if (levels.isEmpty()) {
-        ref.v = getChangeKoef(0);
-        current_level = 0;
-        current_sum = 0;
-        System.out.println("[Effect] Change ref final: " + ref.v);
-        is_active = false;
-      } else {
-        ref.v = getChangeKoef(current_level);
-        System.out.println("[Effect] Change ref next: " + ref.v);
+      if (timer >= levels.peek().getDuration()) {
+        timer = 0;
+        
+        removeCurrentLevel();
       }
     }
+  }
+
+  public final boolean isInfinity() {
+    return levels.peek().getDuration() == -1; 
   }
 
   public final boolean isActive() {
@@ -165,6 +159,24 @@ public class Effect {
 
     ref.v = getChangeKoef(current_level);
     System.out.println("[Effect] Change ref add level: " + ref.v);
+  }
+
+  public void removeCurrentLevel() {
+    current_sum -= levels.peek().getPrevLevel();
+    current_level = getCorrectLevel(current_sum);
+
+    levels.remove();
+
+    if (levels.isEmpty()) {
+      ref.v = getChangeKoef(0);
+      current_level = 0;
+      current_sum = 0;
+      System.out.println("[Effect] Change ref final: " + ref.v);
+      is_active = false;
+    } else {
+      ref.v = getChangeKoef(current_level);
+      System.out.println("[Effect] Change ref next: " + ref.v);
+    }
   }
 
   public Texture getTexture() {

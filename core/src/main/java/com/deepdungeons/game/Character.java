@@ -1,17 +1,17 @@
 package com.deepdungeons.game;
 
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.Iterator;
 
 import com.deepdungeons.game.effects.Effect;
 import com.deepdungeons.game.utils.Ref;
 
 public class Character {
-  private Ref<Double> move_speed_modifier;
-  private Ref<Double> attack_speed_modifier;
-  private Ref<Double> strength_modifier;
+  private final Ref<Double> move_speed_modifier;
+  private final Ref<Double> attack_speed_modifier;
+  private final Ref<Double> strength_modifier;
 
-  protected final HashSet<Effect> effects;
+  protected final HashMap<String, Effect> effects;
 
   private final double move_speed;
   private final double attack_speed;
@@ -24,11 +24,11 @@ public class Character {
     this.attack_speed = attack_speed;
     this.strength = strength;
 
-    this.effects = new HashSet<>();
+    this.effects = new HashMap<>();
 
-    this.move_speed_modifier = new Ref<Double>(1.0);
-    this.attack_speed_modifier = new Ref<Double>(1.0);
-    this.strength_modifier = new Ref<Double>(1.0);
+    this.move_speed_modifier = new Ref<>(1.0);
+    this.attack_speed_modifier = new Ref<>(1.0);
+    this.strength_modifier = new Ref<>(1.0);
   }
 
   public final double getMoveSpeed() {
@@ -44,15 +44,24 @@ public class Character {
   }
 
   public final void addEffect(String name, int level, double duration) {
-    Effect new_effect = Effect.getStaticEffect(name, getReferenceFromName(name), level, duration);
-    
-    for (Effect effect : effects) {
-      if (effect.equals(new_effect)) {
-        effect.addLevel(level, duration);
-        return;
+    if (effects.containsKey(name)) {
+      effects.get(name).addLevel(level, duration);
+    } else {
+      Effect new_effect = Effect.getStaticEffect(name, getReferenceFromName(name), level, duration);
+      effects.put(name, new_effect);
+    }
+  }
+
+  public final boolean tryRemoveInfEffect(String name) {
+    if (effects.containsKey(name)) {
+      Effect effect = effects.get(name);
+
+      if (effect.isInfinity()) {
+        effect.removeCurrentLevel();
+        return true;
       }
     }
-    effects.add(new_effect);
+    return false;
   }
 
   private Ref<Double> getReferenceFromName(String name) {
@@ -69,7 +78,7 @@ public class Character {
   }
 
   protected final void updateEffects(double delta) {
-    Iterator<Effect> it = effects.iterator();
+    Iterator<Effect> it = effects.values().iterator();
 
     while (it.hasNext()) {
       Effect effect = it.next();

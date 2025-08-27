@@ -465,16 +465,14 @@ public class Main extends ApplicationAdapter {
 
     // [DEBUG] Add positive effect
     if (Gdx.input.isKeyJustPressed(Input.Keys.O)) {
-      player.addEffect("effects/speed", 3, 2);
-      player.addEffect("effects/haste", 3, 2);
-      player.addEffect("effects/strength", 3, 2);
+      player.addEffect("effects/speed", 4, -1); // infinity
     }
 
     // [DEBUG] Add negative effect
     if (Gdx.input.isKeyJustPressed(Input.Keys.P)) {
-      player.addEffect("effects/speed", -3, 2);
-      player.addEffect("effects/haste", -3, 2);
-      player.addEffect("effects/strength", -3, 2);
+      player.tryRemoveInfEffect("effects/speed");
+      // player.addEffect("effects/speed", -4, 10);
+      
     }
   }
 
