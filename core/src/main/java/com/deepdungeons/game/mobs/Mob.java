@@ -95,7 +95,7 @@ public class Mob extends Character {
   }
 
   public Mob(String path_to_texture, Tier tier, double move_speed, double attack_speed, double strength, LootTable table) {
-    super(move_speed, attack_speed, strength);
+    super(1, move_speed, attack_speed, strength);
 
     this.tier = tier;
     this.table = table;
@@ -114,7 +114,7 @@ public class Mob extends Character {
   }
 
   public Mob(Pixmap map, Tier tier, double move_speed, double attack_speed, double strength, LootTable table) {
-    super(move_speed, attack_speed, strength);
+    super(1, move_speed, attack_speed, strength);
 
     this.tier = tier;
     this.table = table;
@@ -323,15 +323,15 @@ public class Mob extends Character {
     sprite.setColor(DAMAGE_COLOR);
     damage_anim_play = true;
     damage_anim_timer = 0;
-    health_points -= dmg;
-    return health_points <= 0;
+    health_points.v -= dmg;
+    return health_points.v <= 0;
   }
 
   @Override
   public Mob clone() {
     Mob mob = new Mob(image, this.tier, getMoveSpeed(), getAttackSpeed(), getStrength(), this.table);
 
-    mob.health_points = this.health_points;
+    mob.health_points.v = this.health_points.v;
     mob.cooldown = this.cooldown;
     mob.attack_timer = this.attack_timer;
     mob.dir = this.dir;

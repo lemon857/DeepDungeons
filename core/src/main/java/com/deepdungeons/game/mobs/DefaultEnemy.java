@@ -14,7 +14,7 @@ public class DefaultEnemy extends Mob {
 
   public DefaultEnemy(String path_to_texture, double move_speed, double attack_speed, double strength, double min_hp, double max_hp, LootTable table) {
     super(path_to_texture, Mob.Tier.Humble, move_speed, attack_speed, strength, table);
-    this.health_points = rand.nextDouble(min_hp, max_hp + 1);
+    this.health_points.v = rand.nextDouble(min_hp, max_hp + 1);
     this.pos = new Vector2d();
 
     updateSize(SIZE_KOEF);
@@ -24,7 +24,7 @@ public class DefaultEnemy extends Mob {
 
   public DefaultEnemy(Pixmap map, double move_speed, double attack_speed, double strength, double min_hp, double max_hp, LootTable table) {
     super(map, Mob.Tier.Humble, move_speed, attack_speed, strength, table);
-    this.health_points = rand.nextDouble(min_hp, max_hp + 1);
+    this.health_points.v = rand.nextDouble(min_hp, max_hp + 1);
     this.pos = new Vector2d();
 
     updateSize(SIZE_KOEF);
@@ -86,7 +86,7 @@ public class DefaultEnemy extends Mob {
 
   @Override
   public Mob clone() {
-    DefaultEnemy mob = new DefaultEnemy(image, getMoveSpeed(), getAttackSpeed(), getStrength(), health_points, health_points, getTable());
+    DefaultEnemy mob = new DefaultEnemy(image, getMoveSpeed(), getAttackSpeed(), getStrength(), health_points.v, health_points.v, getTable());
 
     return mob;
   }

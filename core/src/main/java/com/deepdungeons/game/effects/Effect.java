@@ -9,25 +9,6 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.deepdungeons.game.utils.Ref;
 
-class LevelPair {
-  // -1 if infinity
-  private double duration;
-  private int level;
-
-  public LevelPair(double duration, int level) {
-    this.duration = duration;
-    this.level = level;
-  }
-
-  public double getDuration() {
-    return duration;
-  }
-
-  public int getPrevLevel() {
-    return level;
-  }
-}
-
 public class Effect {
   // Levels
   // I      change 10%
@@ -67,6 +48,26 @@ public class Effect {
     return effect;
   }
 
+  protected class LevelPair {
+    // -1 if infinity
+    private final double duration;
+    private final int level;
+  
+    public LevelPair(double duration, int level) {
+      this.duration = duration;
+      this.level = level;
+    }
+  
+    public double getDuration() {
+      return duration;
+    }
+  
+    public int getPrevLevel() {
+      return level;
+    }
+  }
+  
+
   protected Ref<Double> ref;
 
   private int current_level;
@@ -74,11 +75,11 @@ public class Effect {
 
   private String name;
 
-  private PriorityQueue<LevelPair> levels;
+  protected PriorityQueue<LevelPair> levels;
 
-  private double timer;
+  protected double timer;
   
-  private boolean is_active;
+  protected boolean is_active;
 
   private final Texture positive_texture;
   private final Pixmap positive_image;
@@ -118,6 +119,14 @@ public class Effect {
     this.levels = new PriorityQueue<>(Comparator.comparingDouble(LevelPair::getDuration));
   }
 
+  protected Pixmap getPositiveImage() {
+    return positive_image;
+  }
+
+  protected Pixmap getNegativeImage() {
+    return negative_image;
+  }
+
   public void update(double delta) {
     if (!is_active) return;
 
@@ -148,7 +157,7 @@ public class Effect {
     return current_level;
   }
 
-  public void addLevel(int level, double duration) {
+  public final void addLevel(int level, double duration) {
     System.out.println("[Effect] Add level: " + level);
 
     is_active = true;
@@ -161,7 +170,7 @@ public class Effect {
     System.out.println("[Effect] Change ref add level: " + ref.v);
   }
 
-  public void removeCurrentLevel() {
+  public final void removeCurrentLevel() {
     current_sum -= levels.peek().getPrevLevel();
     current_level = getCorrectLevel(current_sum);
 

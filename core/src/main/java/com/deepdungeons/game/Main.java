@@ -14,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.deepdungeons.game.effects.CycleEffect;
 import com.deepdungeons.game.effects.Effect;
 import com.deepdungeons.game.effects.EffectsPanel;
 import com.deepdungeons.game.items.Coin;
@@ -167,6 +168,8 @@ public class Main extends ApplicationAdapter {
       new Effect("textures/effects/attack_speed.png", "textures/effects/attack_slowness.png", "haste"));
       Effect.addStaticEffect("effects/strength", 
         new Effect("textures/effects/strength.png", "textures/effects/weakness.png", "strength"));
+      Effect.addStaticEffect("effects/instant_damage", 
+          new CycleEffect("textures/effects/strength.png", "textures/effects/weakness.png", "instant damage"));
 
     EffectsPanel.initLevelImages();
     for (int i = -4; i < 5; ++i) {
@@ -465,12 +468,12 @@ public class Main extends ApplicationAdapter {
 
     // [DEBUG] Add positive effect
     if (Gdx.input.isKeyJustPressed(Input.Keys.O)) {
-      player.addEffect("effects/speed", 4, -1); // infinity
+      player.addCycleEffect("effects/instant_damage", 4, -1, 1, 1); // infinity
     }
 
     // [DEBUG] Add negative effect
     if (Gdx.input.isKeyJustPressed(Input.Keys.P)) {
-      player.tryRemoveInfEffect("effects/speed");
+      player.tryRemoveInfEffect("effects/instant_damage");
       // player.addEffect("effects/speed", -4, 10);
       
     }
