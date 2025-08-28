@@ -458,13 +458,13 @@ public final class Player extends Character{
       non_actual = false;
     }
 
-    if (food_points == 0) {
-      hunger_damage_timer += delta;
-      if (hunger_damage_timer >= HUNGER_DAMAGE_COOLDOWN) {
-        damage(rand.nextInt(0, 3));
-        hunger_damage_timer = 0;
-      }
-    }
+    // if (food_points == 0) {
+    //   hunger_damage_timer += delta;
+    //   if (hunger_damage_timer >= HUNGER_DAMAGE_COOLDOWN) {
+    //     damage(rand.nextInt(0, 3));
+    //     hunger_damage_timer = 0;
+    //   }
+    // }
 
     // if (strength > 1) {
     //   strength_hunger_timer += delta;
@@ -554,12 +554,12 @@ public final class Player extends Character{
   }
 
   public boolean isDie() {
-    return health_points.v <= 0;
+    return health_points <= 0;
   }
 
   @Override
   public boolean damage(double dmg) {
-    if (health_points.v < 0) return true;
+    if (health_points < 0) return true;
 
     sprite.setColor(DAMAGE_COLOR);
     damage_anim_play = true;
@@ -567,48 +567,48 @@ public final class Player extends Character{
 
     int i;
     for (i = 0; i < Math.floor(dmg); ++i) {
-      --health_points.v;
+      --health_points;
       simple_damage(1);
     }
-    int before = (int)Math.ceil(health_points.v);
-    health_points.v -= (dmg - i);
-    int after = (int)Math.ceil(health_points.v);
-    System.out.println("[damage] before: " + before + " after: " + after);
+    int before = (int)Math.ceil(health_points);
+    health_points -= (dmg - i);
+    int after = (int)Math.ceil(health_points);
+    // System.out.println("[damage] before: " + before + " after: " + after);
     if (before - after != 0) {
       simple_damage(dmg - i);
     }
 
-    System.out.println("[damage] HP: " + health_points.v);
+    System.out.printf("[damage] HP: %f, dmg: %f\n", health_points, dmg);
 
     if (rand.nextInt(10000) < 1000 + useLuck(200, -200)) {
       hunger(rand.nextInt(2, 5));
     }
 
-    return health_points.v <= 0;
+    return health_points <= 0;
   }
   private void simple_damage(double delta) {
-    if (health_points.v <= 0) {
+    if (health_points <= 0) {
       hearts[0] = Utility.replacePixelsColor(hearts[0], HEALTH_COLOR, DEAD_HEALTH_COLOR);
       health_map.drawPixmap(hearts[0], 0, HEIGHT * 2);
       health_texture = new Texture(health_map);
 
-    } else if (health_points.v == 10 || (health_points.v + delta > 10 && health_points.v < 10)) {
+    } else if (health_points == 10 || (health_points + delta > 10 && health_points < 10)) {
       hearts[1] = Utility.replacePixelsColor(hearts[1], HEALTH_COLOR, DEAD_HEALTH_COLOR);
       health_map.drawPixmap(hearts[1], WIDTH + 1, HEIGHT * 2);
       health_texture = new Texture(health_map);
 
-    } else if (health_points.v > 0 && health_points.v < 10) {
+    } else if (health_points > 0 && health_points < 10) {
       damage_heart(0);
 
-    } else if (health_points.v == 20 || (health_points.v + delta > 20 && health_points.v < 20)) {
+    } else if (health_points == 20 || (health_points + delta > 20 && health_points < 20)) {
       hearts[2] = Utility.replacePixelsColor(hearts[2], HEALTH_COLOR, DEAD_HEALTH_COLOR);
       health_map.drawPixmap(hearts[2], WIDTH * 2 + 2, HEIGHT * 2);
       health_texture = new Texture(health_map);
 
-    } else if (health_points.v > 10 && health_points.v < 20) {
+    } else if (health_points > 10 && health_points < 20) {
       damage_heart(1);
 
-    } else if (health_points.v > 20 && health_points.v < 30) {
+    } else if (health_points > 20 && health_points < 30) {
       damage_heart(2);
     }
   }
@@ -623,7 +623,7 @@ public final class Player extends Character{
         ++counter;
       } while((Utility.isEqualColorsWithoutAlpha(hearts[heart_num].getPixel(x, y), Color.BLACK)
         || heart_mask.getPixel(x, y) != WHITE_IN_HEART_MASK) && counter < 1000);
-      System.out.println("[damage] Selected: x: " + x + " y: " + y + " color: " + Utility.getRGBAString(hearts[heart_num].getPixel(x, y)));
+      // System.out.println("[damage] Selected: x: " + x + " y: " + y + " color: " + Utility.getRGBAString(hearts[heart_num].getPixel(x, y)));
 
       if (counter >= 1000) {
         System.out.println("[damage] Count of tries is over");
@@ -636,52 +636,52 @@ public final class Player extends Character{
 
   @Override
   public void heal(double health) {
-    if (health_points.v >= MAX_HP) return;
+    if (health_points >= MAX_HP) return;
     int i;
     for (i = 0; i < Math.floor(health); ++i) {
-      ++health_points.v;
+      ++health_points;
       simple_heal(1);
     }
     
-    if (health_points.v >= MAX_HP) health_points.v = MAX_HP;
-    int before = (int)Math.ceil(health_points.v);
-    health_points.v += (health - i);
-    int after = (int)Math.ceil(health_points.v);
+    if (health_points >= MAX_HP) health_points = MAX_HP;
+    int before = (int)Math.ceil(health_points);
+    health_points += (health - i);
+    int after = (int)Math.ceil(health_points);
     System.out.println("[treat] before: " + before + " after: " + after);
     if (before - after != 0) {
       simple_damage(health - i);
     }
-    System.out.println("[treat] HP: " + health_points.v);
+    System.out.println("[treat] HP: " + health_points);
   }
   private void simple_heal(double delta) {
-    if (health_points.v == 0) {
+    if (health_points == 0) {
 
-    } else if (health_points.v == 10 || (health_points.v - delta < 10 && health_points.v > 10)) {
+    } else if (health_points == 10 || (health_points - delta < 10 && health_points > 10)) {
       hearts[0] = generateHeart();
       health_map.drawPixmap(hearts[0], 0, HEIGHT * 2);
       health_texture = new Texture(health_map);
 
-    } else if (health_points.v > 0 && health_points.v < 10) {
-      treat_heart(0);
+    } else if (health_points > 0 && health_points < 10) {
+      heal_heart(0);
 
-    } else if (health_points.v == 20 || (health_points.v - delta < 20 && health_points.v > 20)) {
+    } else if (health_points == 20 || (health_points - delta < 20 && health_points > 20)) {
       hearts[1] = generateHeart();
       health_map.drawPixmap(hearts[1], WIDTH + 1, HEIGHT * 2);
       health_texture = new Texture(health_map);
 
-    } else if (health_points.v > 10 && health_points.v < 20) {
-      treat_heart(1);
+    } else if (health_points > 10 && health_points < 20) {
+      heal_heart(1);
 
-    } else if (health_points.v == 30 || (health_points.v - delta < 30 && health_points.v > 30)) {
+    } else if (health_points == 30 || (health_points - delta < 30 && health_points > 30)) {
       hearts[2] = generateHeart();
       health_map.drawPixmap(hearts[2], WIDTH * 2 + 2, HEIGHT * 2);
       health_texture = new Texture(health_map);
-    } else if (health_points.v > 20 && health_points.v < 30) {
-      treat_heart(2);
+    } else if (health_points > 20 && health_points < 30) {
+      heal_heart(2);
 
     }
   }
-  private void treat_heart(int heart_num) {
+  private void heal_heart(int heart_num) {
     hearts[heart_num].setColor(HEALTH_COLOR);
     for (int i = 0; i < 2; ++i) {
       int x, y;
@@ -692,10 +692,10 @@ public final class Player extends Character{
         ++counter;
       } while((!Utility.isEqualColorsWithoutAlpha(hearts[heart_num].getPixel(x, y), Color.BLACK)
         || heart_mask.getPixel(x, y) != WHITE_IN_HEART_MASK) && counter < 1000);
-      System.out.println("[treat] Selected: x: " + x + " y: " + y + " color: " + Utility.getRGBAString(hearts[heart_num].getPixel(x, y)));
+      // System.out.println("[heal] Selected: x: " + x + " y: " + y + " color: " + Utility.getRGBAString(hearts[heart_num].getPixel(x, y)));
 
       if (counter >= 1000) {
-        System.out.println("[treat] Count of tries is over");
+        System.out.println("[heal] Count of tries is over");
       }
       hearts[heart_num].drawPixel(x, y);
     }
@@ -706,7 +706,8 @@ public final class Player extends Character{
   // Increase food points
   public void saturation(int points) {
     if (food_points <= 0 && points > 0) {
-      tryRemoveInfEffect("effects/instant_damage");
+      tryRemoveInfEffect("effects/damage");
+      tryRemoveInfEffect("effects/strength");
     }
     food_points += points;
     if (food_points > MAX_FP) food_points = MAX_FP;
@@ -728,7 +729,8 @@ public final class Player extends Character{
     food_points -= points;
     if (food_points <= 0) {
       food_points = 0;
-      addCycleEffect("effects/instant_damage", 1, -1, 500, 1);
+      addCycleEffect("effects/damage", 1, -1, 2, 1);
+      addEffect("effects/strength", -1, -1);
     }
 
     System.out.println("[hunger] FP: " + food_points + " int: " + (food_points / 5));
@@ -754,8 +756,6 @@ public final class Player extends Character{
       health_map.drawPixmap(full_thirsty_point, 2 + i * 4, 2);
     }
     health_texture = new Texture(health_map);
-
-    //move_speed = Utility.mapRange(Math.ceil(thirsty_points / 5.0), MIN_TP / 5, MAX_TP / 5, MIN_MOVE_SPEED, MAX_MOVE_SPEED);
   }
 
   // Decrease thirsty points
@@ -773,7 +773,5 @@ public final class Player extends Character{
       health_map.drawPixmap(empty_thirsty_point, 2 + i * 4, 2);
     }
     health_texture = new Texture(health_map);
-
-    //move_speed = Utility.mapRange(Math.ceil(thirsty_points / 5.0), MIN_TP / 5, MAX_TP / 5, MIN_MOVE_SPEED, MAX_MOVE_SPEED);
   }
 }

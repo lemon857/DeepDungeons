@@ -17,6 +17,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.deepdungeons.game.effects.CycleEffect;
 import com.deepdungeons.game.effects.Effect;
 import com.deepdungeons.game.effects.EffectsPanel;
+import com.deepdungeons.game.effects.SimpleEffect;
 import com.deepdungeons.game.items.Coin;
 import com.deepdungeons.game.items.Edible;
 import com.deepdungeons.game.items.Item;
@@ -163,13 +164,15 @@ public class Main extends ApplicationAdapter {
 
     Effect.initStaticEffects();
     Effect.addStaticEffect("effects/speed", 
-      new Effect("textures/effects/speed.png", "textures/effects/slowness.png", "speed"));
+      new SimpleEffect("textures/effects/speed.png", "textures/effects/slowness.png", "speed"));
     Effect.addStaticEffect("effects/haste", 
-      new Effect("textures/effects/attack_speed.png", "textures/effects/attack_slowness.png", "haste"));
+      new SimpleEffect("textures/effects/attack_speed.png", "textures/effects/attack_slowness.png", "haste"));
       Effect.addStaticEffect("effects/strength", 
-        new Effect("textures/effects/strength.png", "textures/effects/weakness.png", "strength"));
-      Effect.addStaticEffect("effects/instant_damage", 
-          new CycleEffect("textures/effects/strength.png", "textures/effects/weakness.png", "instant damage"));
+        new SimpleEffect("textures/effects/strength.png", "textures/effects/weakness.png", "strength"));
+      Effect.addStaticEffect("effects/damage", 
+          new CycleEffect("textures/effects/damage.png", "damage", -1));
+      Effect.addStaticEffect("effects/heal", 
+          new CycleEffect("textures/effects/heal.png", "heal", 1));
 
     EffectsPanel.initLevelImages();
     for (int i = -4; i < 5; ++i) {
@@ -468,14 +471,12 @@ public class Main extends ApplicationAdapter {
 
     // [DEBUG] Add positive effect
     if (Gdx.input.isKeyJustPressed(Input.Keys.O)) {
-      player.addCycleEffect("effects/instant_damage", 4, -1, 1, 1); // infinity
+      player.addCycleEffect("effects/heal", 4, 5, 1, 1);
     }
 
     // [DEBUG] Add negative effect
     if (Gdx.input.isKeyJustPressed(Input.Keys.P)) {
-      player.tryRemoveInfEffect("effects/instant_damage");
-      // player.addEffect("effects/speed", -4, 10);
-      
+      // player.addEffect("effects/speed", -4, 10);      
     }
   }
 

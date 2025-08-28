@@ -76,11 +76,11 @@ public class Mob extends Character {
 
   protected double attack_anim_timer;
   protected boolean attack_anim_play;
-  protected static final double attack_anim_time = 0.2;
+  protected static final double ATTACK_ANIM_TIME = 0.2;
 
   protected double damage_anim_timer;
   protected boolean damage_anim_play;
-  protected static final double damage_anim_time = 0.25;
+  protected static final double DAMAGE_ANIM_TIME = 0.25;
 
   private final LootTable table;
 
@@ -105,9 +105,9 @@ public class Mob extends Character {
     this.cooldown = 0;
     this.attack_timer = 0;
     this.dir = Direction.Undefined;
-    this.damage_anim_timer = damage_anim_time + 1;
+    this.damage_anim_timer = DAMAGE_ANIM_TIME + 1;
     this.damage_anim_play = false;
-    this.attack_anim_timer = attack_anim_time + 1;
+    this.attack_anim_timer = ATTACK_ANIM_TIME + 1;
     this.attack_anim_play = false;
     this.image = new Pixmap(Gdx.files.internal(path_to_texture));
     this.sprite = new Sprite(new Texture(image));
@@ -124,9 +124,9 @@ public class Mob extends Character {
     this.cooldown = 0;
     this.attack_timer = 0;
     this.dir = Direction.Undefined;
-    this.damage_anim_timer = damage_anim_time + 1;
+    this.damage_anim_timer = DAMAGE_ANIM_TIME + 1;
     this.damage_anim_play = false;
-    this.attack_anim_timer = attack_anim_time + 1;
+    this.attack_anim_timer = ATTACK_ANIM_TIME + 1;
     this.attack_anim_play = false;
     this.image = new Pixmap(map.getWidth(), map.getHeight(), map.getFormat());
     this.image.drawPixmap(map, 0, 0);
@@ -141,7 +141,7 @@ public class Mob extends Character {
 
     if (attack_anim_play) {
       attack_anim_timer += delta;
-      if (attack_anim_timer >= attack_anim_time) {
+      if (attack_anim_timer >= ATTACK_ANIM_TIME) {
         size.y = size.y / 0.9;
         updateSpriteSize();
         attack_anim_play = false;
@@ -150,7 +150,7 @@ public class Mob extends Character {
 
     if (damage_anim_play) {
       damage_anim_timer += delta;
-      if (damage_anim_timer >= damage_anim_time) {
+      if (damage_anim_timer >= DAMAGE_ANIM_TIME) {
         // change color of mob to default
         sprite.setColor(1, 1, 1, 1);
         damage_anim_play = false;
@@ -323,15 +323,15 @@ public class Mob extends Character {
     sprite.setColor(DAMAGE_COLOR);
     damage_anim_play = true;
     damage_anim_timer = 0;
-    health_points.v -= dmg;
-    return health_points.v <= 0;
+    health_points -= dmg;
+    return health_points <= 0;
   }
 
   @Override
   public Mob clone() {
     Mob mob = new Mob(image, this.tier, getMoveSpeed(), getAttackSpeed(), getStrength(), this.table);
 
-    mob.health_points.v = this.health_points.v;
+    mob.health_points = this.health_points;
     mob.cooldown = this.cooldown;
     mob.attack_timer = this.attack_timer;
     mob.dir = this.dir;

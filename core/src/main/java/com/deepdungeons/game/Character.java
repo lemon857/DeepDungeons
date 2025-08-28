@@ -2,15 +2,15 @@ package com.deepdungeons.game;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.function.Consumer;
 
 import com.deepdungeons.game.effects.CycleEffect;
 import com.deepdungeons.game.effects.Effect;
-import com.deepdungeons.game.utils.Ref;
 
 public class Character {
-  private final Ref<Double> move_speed_modifier;
-  private final Ref<Double> attack_speed_modifier;
-  private final Ref<Double> strength_modifier;
+  private double move_speed_modifier;
+  private double attack_speed_modifier;
+  private double strength_modifier;
 
   protected final HashMap<String, Effect> effects;
 
@@ -18,7 +18,7 @@ public class Character {
   private final double attack_speed;
   private final double strength;
 
-  protected final Ref<Double> health_points;
+  protected double health_points;
 
   public Character(double health_points, double move_speed, double attack_speed, double strength) {
     this.move_speed = move_speed;
@@ -27,37 +27,43 @@ public class Character {
 
     this.effects = new HashMap<>();
 
-    this.move_speed_modifier = new Ref<>(1.0);
-    this.attack_speed_modifier = new Ref<>(1.0);
-    this.strength_modifier = new Ref<>(1.0);
+    this.move_speed_modifier = 1.0;
+    this.attack_speed_modifier = 1.0;
+    this.strength_modifier = 1.0;
 
-    this.health_points = new Ref<>(health_points);
+    this.health_points = health_points;
   }
 
   public final double getMoveSpeed() {
-    return move_speed * move_speed_modifier.v;
+    return move_speed * move_speed_modifier;
   }
 
   public final double getAttackSpeed() {
-    return attack_speed * attack_speed_modifier.v;
+    return attack_speed * attack_speed_modifier;
   }
 
   public final double getStrength() {
-    return strength * strength_modifier.v;
+    return strength * strength_modifier;
   }
 
   public final void addEffect(String name, int level, double duration) {
     if (effects.containsKey(name)) {
-      effects.get(name).addLevel(level, duration);
+      Effect effect = effects.get(name);
+      if (effect.getLevel() == level && effect.getDuration() == -1 && duration == -1) return;
+
+      effect.addLevel(level, duration);
     } else {
-      Effect new_effect = Effect.getStaticEffect(name, getReferenceFromName(name), level, duration);
-      effects.put(name, new_effect);
+      effects.put(name, Effect.getStaticEffect(name, getReferenceFromName(name), level, duration));
     }
   }
 
   public final void addCycleEffect(String name, int level, double duration, double period, double damage) {
     if (effects.containsKey(name)) {
-      effects.get(name).addLevel(level, duration); // need fix updating different period and damage levels
+      CycleEffect effect = (CycleEffect)effects.get(name);
+      if (effect.getLevel() == level && effect.getDuration() == -1 && duration == -1
+          && effect.getPeriod() == period && effect.getDamage() == damage) return;
+
+      effect.addLevel(level, duration); // need fix updating different period and damage levels
     } else {
       CycleEffect new_effect = (CycleEffect)Effect.getStaticEffect(name, getReferenceFromName(name), level, duration);
       new_effect.updateProperties(period, damage);
@@ -66,32 +72,44 @@ public class Character {
   }
 
   public final boolean tryRemoveInfEffect(String name) {
-    boolean res = false;
     if (effects.containsKey(name)) {
       Effect effect = effects.get(name);
 
     
-      while (effect.isActive()) {
-        if (!effect.isInfinity()) break;
-         
-        effect.removeCurrentLevel();
-        res = true;
+      if (effect.isActive()) {
+        if (effect.isInfinity()) {
+          effect.removeCurrentLevel();
+          return true;
+        }
       }
     }
-    return res;
+    return false;
   }
 
-  private Ref<Double> getReferenceFromName(String name) {
+  private void setMoveSpeedModifier(double value) {
+    move_speed_modifier = value;
+  }
+
+  private void setAttackSpeedModifier(double value) {
+    attack_speed_modifier = value;
+  }
+  
+  private void setStrengthModifier(double value) {
+    strength_modifier = value;
+  }
+
+  private Consumer<Double> getReferenceFromName(String name) {
     switch (name) {
-      case "effects/speed": return move_speed_modifier;
-      case "effects/strength": return strength_modifier;
-      case "effects/haste": return attack_speed_modifier;
-      case "effects/instant_damage": return health_points;
+      case "effects/speed": return this::setMoveSpeedModifier;
+      case "effects/strength": return this::setStrengthModifier;
+      case "effects/haste": return this::setAttackSpeedModifier;
+      case "effects/damage": return this::damage;
+      case "effects/heal": return this::heal;
     }
     return getReferenceFromOtherName(name);
   }
   
-  protected Ref<Double> getReferenceFromOtherName(String name) {
+  protected Consumer<Double> getReferenceFromOtherName(String name) {
     return null;
   }
 

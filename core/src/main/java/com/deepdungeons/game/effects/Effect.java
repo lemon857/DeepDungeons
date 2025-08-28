@@ -3,18 +3,19 @@ package com.deepdungeons.game.effects;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.PriorityQueue;
+import java.util.function.Consumer;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
-import com.deepdungeons.game.utils.Ref;
 
 public class Effect {
   // Levels
-  // I      change 10%
-  // II     change 15%
-  // III    change 20%
-  // IV     change 25%
+  // change simple  cycle
+  // I      10%     100%
+  // II     15%     110%
+  // III    20%     120%
+  // IV     25%     130%
   private static final int MAX_LEVEL = 4;
 
   private static HashMap<String, Effect> static_effects;
@@ -27,23 +28,23 @@ public class Effect {
     static_effects.put(name, effect);
   }
 
-  public static Effect getStaticEffect(String name, Ref<Double> ref) {
+  public static Effect getStaticEffect(String name, Consumer<Double> change_func) {
     Effect effect = static_effects.get(name).clone();
     if (effect == null) {
       System.err.println("Effect " + name + " is not found");
       return null;
     }
-    effect.ref = ref;
+    effect.change_func = change_func;
     return effect;
   }
 
-  public static Effect getStaticEffect(String name, Ref<Double> ref, int level, double duration) {
+  public static Effect getStaticEffect(String name, Consumer<Double> change_func, int level, double duration) {
     Effect effect = static_effects.get(name).clone();
     if (effect == null) {
       System.err.println("Effect " + name + " is not found");
       return null;
     }
-    effect.ref = ref;
+    effect.change_func = change_func;
     effect.addLevel(level, duration);
     return effect;
   }
@@ -67,13 +68,14 @@ public class Effect {
     }
   }
   
-
-  protected Ref<Double> ref;
-
-  private int current_level;
-  private int current_sum;
-
   private String name;
+  
+  // set for simple effect
+  // change with delta for cycle effect
+  protected Consumer<Double> change_func;
+
+  protected int current_level;
+  protected int current_sum;
 
   protected PriorityQueue<LevelPair> levels;
 
@@ -81,32 +83,24 @@ public class Effect {
   
   protected boolean is_active;
 
-  private final Texture positive_texture;
-  private final Pixmap positive_image;
+  protected final Texture positive_texture;
+  protected final Pixmap positive_image;
 
-  private final Texture negative_texture;
-  private final Pixmap negative_image;
+  protected double positive_sign;
 
-  public Effect(String path_to_positive_texture, String path_to_negative_texture, String name) {
+  public Effect(String path_to_positive_texture, String name) {
     init(name);
 
     this.positive_image = new Pixmap(Gdx.files.internal(path_to_positive_texture));
     this.positive_texture = new Texture(positive_image);
-
-    this.negative_image = new Pixmap(Gdx.files.internal(path_to_negative_texture));
-    this.negative_texture = new Texture(negative_image);
   }
 
-  public Effect(Pixmap positive_map, Pixmap negative_map, String name) {
+  public Effect(Pixmap positive_map, String name) {
     init(name);
 
     this.positive_image = new Pixmap(positive_map.getWidth(), positive_map.getHeight(), positive_map.getFormat());
     this.positive_image.drawPixmap(positive_map, 0, 0);
     this.positive_texture = new Texture(positive_image);
-
-    this.negative_image = new Pixmap(negative_map.getWidth(), negative_map.getHeight(), negative_map.getFormat());
-    this.negative_image.drawPixmap(negative_map, 0, 0);
-    this.negative_texture = new Texture(negative_image);
   }
 
   private void init(String name) {
@@ -119,27 +113,7 @@ public class Effect {
     this.levels = new PriorityQueue<>(Comparator.comparingDouble(LevelPair::getDuration));
   }
 
-  protected Pixmap getPositiveImage() {
-    return positive_image;
-  }
-
-  protected Pixmap getNegativeImage() {
-    return negative_image;
-  }
-
-  public void update(double delta) {
-    if (!is_active) return;
-
-    if (levels.peek().getDuration() != -1) {
-      timer += delta;
-
-      if (timer >= levels.peek().getDuration()) {
-        timer = 0;
-        
-        removeCurrentLevel();
-      }
-    }
-  }
+  public void update(double delta) {}
 
   public final boolean isInfinity() {
     return levels.peek().getDuration() == -1; 
@@ -157,46 +131,25 @@ public class Effect {
     return current_level;
   }
 
-  public final void addLevel(int level, double duration) {
-    System.out.println("[Effect] Add level: " + level);
+  public final double getDuration() {
+    if (!is_active) return 0;
 
-    is_active = true;
-    current_level = sumLevels(current_level, level);
-    current_sum += level;
-
-    levels.add(new LevelPair(duration, level));
-
-    ref.v = getChangeKoef(current_level);
-    System.out.println("[Effect] Change ref add level: " + ref.v);
+    return levels.peek().getDuration();
   }
 
-  public final void removeCurrentLevel() {
-    current_sum -= levels.peek().getPrevLevel();
-    current_level = getCorrectLevel(current_sum);
-
-    levels.remove();
-
-    if (levels.isEmpty()) {
-      ref.v = getChangeKoef(0);
-      current_level = 0;
-      current_sum = 0;
-      System.out.println("[Effect] Change ref final: " + ref.v);
-      is_active = false;
-    } else {
-      ref.v = getChangeKoef(current_level);
-      System.out.println("[Effect] Change ref next: " + ref.v);
-    }
+  public final double getPositiveSign() {
+    return positive_sign;
   }
+
+  public void addLevel(int level, double duration) {}
+
+  public void removeCurrentLevel() {}
 
   public Texture getTexture() {
-    if (current_level < 0) {
-      return negative_texture;
-    }
-
     return positive_texture;
   }
 
-  private static int sumLevels(int level_a, int level_b) {
+  protected static int sumLevels(int level_a, int level_b) {
     if (Math.signum(level_a) != Math.signum(level_b)) {
       level_a += level_b;
       level_a = getCorrectLevel(level_a);
@@ -210,6 +163,10 @@ public class Effect {
     return level_a;
   }
 
+  protected double getChangeKoef(int level) {
+    return 1;
+  }
+
   protected static int getCorrectLevel(int level) {
     if (level < -MAX_LEVEL) {
       level = -MAX_LEVEL;
@@ -219,18 +176,9 @@ public class Effect {
     return level;
   }
 
-  protected static double getChangeKoef(int level) {
-    if (level > 0) {
-      return 1.05 + level * 0.05;
-    } else if (level < 0) {
-      return 0.95 + level * 0.05;
-    }
-    return 1;
-  }
-
   @Override
   public Effect clone() {
-    return new Effect(positive_image, negative_image, name);
+    return new Effect(positive_image, name);
   }
 
   @Override
