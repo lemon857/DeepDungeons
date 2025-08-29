@@ -7,22 +7,22 @@ public final class CycleEffect extends Effect {
   private double period;
   private double period_timer;
 
-  public CycleEffect(String path_to_positive_texture, String name, double posivite_sign) {
+  public CycleEffect(String path_to_positive_texture, String name, double positive_sign) {
     super(path_to_positive_texture, name);
 
     this.damage = 0;
     this.period = 0;
     this.period_timer = 0;
-    this.positive_sign = posivite_sign;
+    this.positive_sign = positive_sign;
   }
 
-  public CycleEffect(Pixmap positive_map, String name, double posivite_sign) {
+  public CycleEffect(Pixmap positive_map, String name, double positive_sign) {
     super(positive_map, name);
 
     this.damage = 0;
     this.period = 0;
     this.period_timer = 0;
-    this.positive_sign = posivite_sign;
+    this.positive_sign = positive_sign;
   }
 
   public void updateProperties(double period, double damage) {
@@ -93,8 +93,19 @@ public final class CycleEffect extends Effect {
   }
 
   @Override
-  public Effect clone() {
-    Effect effect = new CycleEffect(positive_image, getName(), positive_sign);
+  public Object clone() {
+    CycleEffect effect = new CycleEffect(positive_image, getName(), positive_sign);
+
+    effect.damage = 0;
+    effect.period = 0;
+    effect.period_timer = 0;
+    effect.positive_sign = positive_sign;
+
+    if (is_player) {
+      effect.setPlayerFunc(change_func_sig_player);
+    } else {
+      effect.setCharacterFunc(change_func_sig_character);
+    }
 
     return effect;
   }

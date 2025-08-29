@@ -3,11 +3,14 @@ package com.deepdungeons.game.effects;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.PriorityQueue;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
+import com.deepdungeons.game.Character;
+import com.deepdungeons.game.Player;
 
 public class Effect {
   // Levels
@@ -24,27 +27,39 @@ public class Effect {
     static_effects = new HashMap<>();
   }
 
-  public static void addStaticEffect(String name, Effect effect) {
+  public static Effect addStaticEffect(String name, Effect effect) {
     static_effects.put(name, effect);
+    return static_effects.get(name);
   }
 
-  public static Effect getStaticEffect(String name, Consumer<Double> change_func) {
-    Effect effect = static_effects.get(name).clone();
+  public static Effect getStaticEffect(String name, Character character) {
+    Effect effect = (Effect)static_effects.get(name).clone();
     if (effect == null) {
       System.err.println("Effect " + name + " is not found");
       return null;
     }
-    effect.change_func = change_func;
+    if (effect.is_player) {
+      effect.change_func = (value) -> effect.change_func_sig_player.accept((Player)character, value);
+    } else {
+      effect.change_func = (value) -> effect.change_func_sig_character.accept(character, value);
+    }
     return effect;
   }
 
-  public static Effect getStaticEffect(String name, Consumer<Double> change_func, int level, double duration) {
-    Effect effect = static_effects.get(name).clone();
+  public static Effect getStaticEffect(String name, Character character, int level, double duration) {
+    Effect effect = (Effect)static_effects.get(name).clone();
     if (effect == null) {
-      System.err.println("Effect " + name + " is not found");
+      System.err.printf("Effect %s is not found", name);
       return null;
     }
-    effect.change_func = change_func;
+
+    System.out.printf("Is char method null: %b\n", effect.change_func_sig_character == null);
+
+    if (effect.is_player) {
+      effect.change_func = (value) -> effect.change_func_sig_player.accept((Player)character, value);
+    } else {
+      effect.change_func = (value) -> effect.change_func_sig_character.accept(character, value);
+    }
     effect.addLevel(level, duration);
     return effect;
   }
@@ -74,6 +89,10 @@ public class Effect {
   // change with delta for cycle effect
   protected Consumer<Double> change_func;
 
+  protected BiConsumer<com.deepdungeons.game.Character, Double> change_func_sig_character;
+  protected BiConsumer<com.deepdungeons.game.Player, Double> change_func_sig_player;
+  protected boolean is_player;
+
   protected int current_level;
   protected int current_sum;
 
@@ -88,6 +107,7 @@ public class Effect {
 
   protected double positive_sign;
 
+  // For character
   public Effect(String path_to_positive_texture, String name) {
     init(name);
 
@@ -114,6 +134,16 @@ public class Effect {
   }
 
   public void update(double delta) {}
+
+  public final void setCharacterFunc(BiConsumer<com.deepdungeons.game.Character, Double> func) {
+    change_func_sig_character = func;
+    is_player = false;
+  }
+
+  public final void setPlayerFunc(BiConsumer<com.deepdungeons.game.Player, Double> func) {
+    change_func_sig_player = func;
+    is_player = true;
+  }
 
   public final boolean isInfinity() {
     return levels.peek().getDuration() == -1; 
@@ -176,9 +206,18 @@ public class Effect {
     return level;
   }
 
-  @Override
-  public Effect clone() {
-    return new Effect(positive_image, name);
+  public Object clone() {
+    Effect effect = new Effect(positive_image, name);
+
+    if (is_player) {
+      effect.setPlayerFunc(change_func_sig_player);
+    } else {
+      effect.setCharacterFunc(change_func_sig_character);
+    }
+
+    System.out.printf("Clone effect Is char method null: %b\n", effect.change_func_sig_character == null);
+
+    return effect;
   }
 
   @Override

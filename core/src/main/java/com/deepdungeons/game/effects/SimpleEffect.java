@@ -92,6 +92,14 @@ public final class SimpleEffect extends Effect {
 
   @Override
   public Effect clone() {
-    return new SimpleEffect(positive_image, negative_image, getName());
+    SimpleEffect effect = new SimpleEffect(positive_image, negative_image, getName());
+    
+    if (is_player) {
+      effect.setPlayerFunc(change_func_sig_player);
+    } else {
+      effect.setCharacterFunc(change_func_sig_character);
+    }
+
+    return effect;
   }
 }

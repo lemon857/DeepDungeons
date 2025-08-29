@@ -16,8 +16,6 @@ Build located in `lwjgl3/build/libs`
 ## Player description  
 
 If you very hungry you lose some health points every third second  
-If you have strength modifier more than one you lose some food points every 4.5th second  
-If you have attack speed modifier more than one you lose some thirst points every 5th second  
 Luck is ... variable, which is indirectly can change game probabilities  
 If you have not full thirst points you lose some move speed  
 If you get damage you can hunger  

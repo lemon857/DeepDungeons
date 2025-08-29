@@ -51,22 +51,11 @@ public final class Player extends Character{
 
   private static final int WHITE_IN_HEART_MASK = -1;
 
-  private static final double HUNGER_DAMAGE_COOLDOWN = 3;
-  // private static final double STRENGTH_HUNGER_COOLDOWN = 4;
-  // private static final double FAST_ATTACK_THIRSTY_COOLDOWN = 5;
-
-  // private static final double MAX_MOVE_SPEED = 40;
-  // private static final double MIN_MOVE_SPEED = 20;
-
   private static final double MAX_THIRSTY_DISTANCE = Room.WIDTH * 10;
   private static final double MIN_THIRSTY_DISTANCED = Room.WIDTH * 6;
 
   private double next_thirsty_distance;
   private double current_walked_distance;
-
-  private double hunger_damage_timer;
-  // private double strength_hunger_timer;
-  // private double fast_attack_thirsty_timer;
 
   private final Random rand;
 
@@ -124,7 +113,7 @@ public final class Player extends Character{
     this.damage_anim_timer = DAMAGE_ANIM_TIME + 1;
     this.damage_anim_play = false;
     this.attack_anim_timer = ATTACK_ANIM_TIME + 1;
-    this.attack_anim_play = false;;
+    this.attack_anim_play = false;
     this.dir = Direction.Up;
     this.non_actual = false;
     this.food_points = MAX_FP;
@@ -133,10 +122,6 @@ public final class Player extends Character{
     this.money = 0;
 
     this.luck = 0;
-
-    this.hunger_damage_timer = 0;
-    // this.strength_hunger_timer = 0;
-    // this.fast_attack_thirsty_timer = 0;
 
     this.next_thirsty_distance = rand.nextDouble(MIN_THIRSTY_DISTANCED, MAX_THIRSTY_DISTANCE) + useLuck(-2.0 * Room.WIDTH, 2.0 * Room.WIDTH);
     this.current_walked_distance = 0;
@@ -343,7 +328,7 @@ public final class Player extends Character{
 
     health_texture = new Texture(health_map);
   }
-
+ 
   public Item getItem() {
     return inventory; 
   }
@@ -458,30 +443,6 @@ public final class Player extends Character{
       non_actual = false;
     }
 
-    // if (food_points == 0) {
-    //   hunger_damage_timer += delta;
-    //   if (hunger_damage_timer >= HUNGER_DAMAGE_COOLDOWN) {
-    //     damage(rand.nextInt(0, 3));
-    //     hunger_damage_timer = 0;
-    //   }
-    // }
-
-    // if (strength > 1) {
-    //   strength_hunger_timer += delta;
-    //   if (strength_hunger_timer >= STRENGTH_HUNGER_COOLDOWN) {
-    //     hunger(rand.nextInt(0, 3));
-    //     strength_hunger_timer = 0;
-    //   }
-    // }
-
-    // if (attack_speed > 1) {
-    //   fast_attack_thirsty_timer += delta;
-    //   if (fast_attack_thirsty_timer >= FAST_ATTACK_THIRSTY_COOLDOWN) {
-    //     thirst(rand.nextInt(0, 3));
-    //     fast_attack_thirsty_timer = 0;
-    //   }
-    // }
-
     if (attack_anim_timer >= ATTACK_ANIM_TIME && attack_anim_play) {
       size.y = HEIGHT;
       updateSpriteSize();
@@ -502,7 +463,7 @@ public final class Player extends Character{
 
   public void draw(SpriteBatch batch) {
     // correct coords for Pixmap
-    updateSpritePos();;
+    updateSpritePos();
     sprite.draw(batch);
     effects_panel.draw(batch);
     //batch.draw(image, (float)pos.x, (float)pos.y + (float)size.y,
@@ -704,7 +665,8 @@ public final class Player extends Character{
   }
 
   // Increase food points
-  public void saturation(int points) {
+  public void saturation(double points) {
+    points = Math.floor(points);
     if (food_points <= 0 && points > 0) {
       tryRemoveInfEffect("effects/damage");
       tryRemoveInfEffect("effects/strength");
@@ -725,11 +687,12 @@ public final class Player extends Character{
   }
 
   // Decrease food points
-  public void hunger(int points) {
+  public void hunger(double points) {
+    points = Math.floor(points);
     food_points -= points;
     if (food_points <= 0) {
       food_points = 0;
-      addCycleEffect("effects/damage", 1, -1, 2, 1);
+      addCycleEffect("effects/damage", 1, -1, 3, 1);
       addEffect("effects/strength", -1, -1);
     }
 
@@ -742,7 +705,8 @@ public final class Player extends Character{
   }
 
   // Increase thirsty points
-  public void drink(int points) {
+  public void drink(double points) {
+    points = Math.floor(points);
     if (thirsty_points <= 0 && points > 0) {
       tryRemoveInfEffect("effects/speed");
       System.out.println("remove slow");
@@ -759,7 +723,8 @@ public final class Player extends Character{
   }
 
   // Decrease thirsty points
-  public void thirst(int points) {
+  public void thirst(double points) {
+    points = Math.floor(points);
     thirsty_points -= points;
     if (thirsty_points <= 0) {
       thirsty_points = 0;

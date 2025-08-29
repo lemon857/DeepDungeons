@@ -2,7 +2,6 @@ package com.deepdungeons.game;
 
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.function.Consumer;
 
 import com.deepdungeons.game.effects.CycleEffect;
 import com.deepdungeons.game.effects.Effect;
@@ -53,7 +52,7 @@ public class Character {
 
       effect.addLevel(level, duration);
     } else {
-      effects.put(name, Effect.getStaticEffect(name, getReferenceFromName(name), level, duration));
+      effects.put(name, Effect.getStaticEffect(name, this, level, duration));
     }
   }
 
@@ -65,7 +64,7 @@ public class Character {
 
       effect.addLevel(level, duration); // need fix updating different period and damage levels
     } else {
-      CycleEffect new_effect = (CycleEffect)Effect.getStaticEffect(name, getReferenceFromName(name), level, duration);
+      CycleEffect new_effect = (CycleEffect)Effect.getStaticEffect(name, this, level, duration);
       new_effect.updateProperties(period, damage);
       effects.put(name, new_effect);
     }
@@ -86,31 +85,16 @@ public class Character {
     return false;
   }
 
-  private void setMoveSpeedModifier(double value) {
+  public final void setMoveSpeedModifier(double value) {
     move_speed_modifier = value;
   }
 
-  private void setAttackSpeedModifier(double value) {
+  public final void setAttackSpeedModifier(double value) {
     attack_speed_modifier = value;
   }
   
-  private void setStrengthModifier(double value) {
+  public final void setStrengthModifier(double value) {
     strength_modifier = value;
-  }
-
-  private Consumer<Double> getReferenceFromName(String name) {
-    switch (name) {
-      case "effects/speed": return this::setMoveSpeedModifier;
-      case "effects/strength": return this::setStrengthModifier;
-      case "effects/haste": return this::setAttackSpeedModifier;
-      case "effects/damage": return this::damage;
-      case "effects/heal": return this::heal;
-    }
-    return getReferenceFromOtherName(name);
-  }
-  
-  protected Consumer<Double> getReferenceFromOtherName(String name) {
-    return null;
   }
 
   protected final void updateEffects(double delta) {
@@ -124,7 +108,6 @@ public class Character {
       }
     }
   }
-
 
   // True if it dead
   public boolean damage(double dmg) { return false; }

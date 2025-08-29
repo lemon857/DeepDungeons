@@ -164,15 +164,24 @@ public class Main extends ApplicationAdapter {
 
     Effect.initStaticEffects();
     Effect.addStaticEffect("effects/speed", 
-      new SimpleEffect("textures/effects/speed.png", "textures/effects/slowness.png", "speed"));
+      new SimpleEffect("textures/effects/speed.png", "textures/effects/slowness.png", "speed"))
+      .setCharacterFunc(Character::setMoveSpeedModifier);
+
     Effect.addStaticEffect("effects/haste", 
-      new SimpleEffect("textures/effects/attack_speed.png", "textures/effects/attack_slowness.png", "haste"));
-      Effect.addStaticEffect("effects/strength", 
-        new SimpleEffect("textures/effects/strength.png", "textures/effects/weakness.png", "strength"));
-      Effect.addStaticEffect("effects/damage", 
-          new CycleEffect("textures/effects/damage.png", "damage", -1));
-      Effect.addStaticEffect("effects/heal", 
-          new CycleEffect("textures/effects/heal.png", "heal", 1));
+      new SimpleEffect("textures/effects/attack_speed.png", "textures/effects/attack_slowness.png", "haste"))
+      .setCharacterFunc(Character::setAttackSpeedModifier);
+
+    Effect.addStaticEffect("effects/strength", 
+      new SimpleEffect("textures/effects/strength.png", "textures/effects/weakness.png", "strength"))
+      .setCharacterFunc(Character::setStrengthModifier);
+
+    Effect.addStaticEffect("effects/damage", 
+      new CycleEffect("textures/effects/damage.png", "damage", -1))
+      .setCharacterFunc(Character::damage);
+
+    Effect.addStaticEffect("effects/heal", 
+      new CycleEffect("textures/effects/heal.png", "heal", 1))
+      .setCharacterFunc(Character::heal);
 
     EffectsPanel.initLevelImages();
     for (int i = -4; i < 5; ++i) {
