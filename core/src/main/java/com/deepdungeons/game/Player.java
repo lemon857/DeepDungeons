@@ -668,8 +668,8 @@ public final class Player extends Character{
   public void saturation(double points) {
     points = Math.floor(points);
     if (food_points <= 0 && points > 0) {
-      tryRemoveInfEffect("effects/damage");
-      tryRemoveInfEffect("effects/strength");
+      removeInfEffect("effects/damage", -1);
+      removeInfEffect("effects/strength", -1);
     }
     food_points += points;
     if (food_points > MAX_FP) food_points = MAX_FP;
@@ -689,11 +689,13 @@ public final class Player extends Character{
   // Decrease food points
   public void hunger(double points) {
     points = Math.floor(points);
-    food_points -= points;
-    if (food_points <= 0) {
-      food_points = 0;
+    if (food_points > 0 && food_points - points <= 0) {
       addCycleEffect("effects/damage", 1, -1, 3, 1);
       addEffect("effects/strength", -1, -1);
+    }
+    food_points -= points;
+    if (food_points < 0) {
+      food_points = 0;
     }
 
     System.out.println("[hunger] FP: " + food_points + " int: " + (food_points / 5));
@@ -707,10 +709,16 @@ public final class Player extends Character{
   // Increase thirsty points
   public void drink(double points) {
     points = Math.floor(points);
-    if (thirsty_points <= 0 && points > 0) {
-      tryRemoveInfEffect("effects/speed");
-      System.out.println("remove slow");
+    if (thirsty_points <= 0 && thirsty_points + points > 0) {
+      removeInfEffect("effects/speed", -3);
+
+    } else if (thirsty_points <= 10 && thirsty_points + points > 10) {
+      removeInfEffect("effects/speed", -2);
+
+    } else if (thirsty_points <= 15 && thirsty_points + points > 15) {
+      removeInfEffect("effects/speed", -1);
     }
+
     thirsty_points += points;
     if (thirsty_points > MAX_TP) thirsty_points = MAX_TP;
 
@@ -725,12 +733,18 @@ public final class Player extends Character{
   // Decrease thirsty points
   public void thirst(double points) {
     points = Math.floor(points);
-    thirsty_points -= points;
-    if (thirsty_points <= 0) {
-      thirsty_points = 0;
+    if (thirsty_points > 0 && thirsty_points - points <= 0) {
+      addEffect("effects/speed", -3, -1);
+
+    } else if (thirsty_points > 10 && thirsty_points - points <= 10) {
+      addEffect("effects/speed", -2, -1);
+
+    } else if (thirsty_points > 15 && thirsty_points - points <= 15) {
       addEffect("effects/speed", -1, -1);
-      System.out.println("add slow");
     }
+
+    thirsty_points -= points;
+    if (thirsty_points < 0) thirsty_points = 0;
 
     System.out.println("[thirst] TP: " + thirsty_points + " int: " + (thirsty_points / 5));
 

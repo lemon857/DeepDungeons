@@ -1,8 +1,6 @@
 package com.deepdungeons.game.effects;
 
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.PriorityQueue;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -20,6 +18,7 @@ public class Effect {
   // III    20%     120%
   // IV     25%     130%
   private static final int MAX_LEVEL = 4;
+  private static final int LEVELS_SIZE = 2 * MAX_LEVEL + 1;
 
   private static HashMap<String, Effect> static_effects;
 
@@ -53,8 +52,6 @@ public class Effect {
       return null;
     }
 
-    System.out.printf("Is char method null: %b\n", effect.change_func_sig_character == null);
-
     if (effect.is_player) {
       effect.change_func = (value) -> effect.change_func_sig_player.accept((Player)character, value);
     } else {
@@ -62,25 +59,6 @@ public class Effect {
     }
     effect.addLevel(level, duration);
     return effect;
-  }
-
-  protected class LevelPair {
-    // -1 if infinity
-    private final double duration;
-    private final int level;
-  
-    public LevelPair(double duration, int level) {
-      this.duration = duration;
-      this.level = level;
-    }
-  
-    public double getDuration() {
-      return duration;
-    }
-  
-    public int getPrevLevel() {
-      return level;
-    }
   }
   
   private String name;
@@ -96,9 +74,8 @@ public class Effect {
   protected int current_level;
   protected int current_sum;
 
-  protected PriorityQueue<LevelPair> levels;
-
-  protected double timer;
+  protected int[] inf_levels;
+  protected int[] levels;
   
   protected boolean is_active;
 
@@ -128,12 +105,26 @@ public class Effect {
     this.is_active = true;
     this.current_level = 0;
     this.current_sum = 0;
-    this.timer = 0;
-
-    this.levels = new PriorityQueue<>(Comparator.comparingDouble(LevelPair::getDuration));
+    
+    this.inf_levels = new int[LEVELS_SIZE];
+    this.levels = new int[LEVELS_SIZE];
   }
 
-  public void update(double delta) {}
+  public final void update(double delta) {
+    if (!is_active) return;
+
+    for (int i = 0; i < LEVELS_SIZE; ++i) {
+      if (levels[i] != 0) {
+        levels[i] -= delta;
+      }
+      if (levels[i] <= 0) {
+        levels[i] = 0;
+        recalculateLevel();
+      }
+    }
+
+    updateEffect(delta);
+  }
 
   public final void setCharacterFunc(BiConsumer<com.deepdungeons.game.Character, Double> func) {
     change_func_sig_character = func;
@@ -143,10 +134,6 @@ public class Effect {
   public final void setPlayerFunc(BiConsumer<com.deepdungeons.game.Player, Double> func) {
     change_func_sig_player = func;
     is_player = true;
-  }
-
-  public final boolean isInfinity() {
-    return levels.peek().getDuration() == -1; 
   }
 
   public final boolean isActive() {
@@ -161,37 +148,77 @@ public class Effect {
     return current_level;
   }
 
-  public final double getDuration() {
-    if (!is_active) return 0;
-
-    return levels.peek().getDuration();
-  }
-
   public final double getPositiveSign() {
     return positive_sign;
   }
-
-  public void addLevel(int level, double duration) {}
-
-  public void removeCurrentLevel() {}
 
   public Texture getTexture() {
     return positive_texture;
   }
 
-  protected static int sumLevels(int level_a, int level_b) {
-    if (Math.signum(level_a) != Math.signum(level_b)) {
-      level_a += level_b;
-      level_a = getCorrectLevel(level_a);
-    } else if (Math.signum(level_a) > 0) {
-      level_b = getCorrectLevel(level_b);
-      level_a = Math.max(level_a, level_b);
+  public final void addLevel(int level, double duration) {
+    level = getCorrectLevel(level);
+
+    is_active = true;
+    if (duration < 0) {
+      ++inf_levels[level + MAX_LEVEL];
     } else {
-      level_b = getCorrectLevel(level_b);
-      level_a = Math.min(level_a, level_b);
+      levels[level + MAX_LEVEL] += duration;
     }
-    return level_a;
+    recalculateLevel();
   }
+
+  public final void removeInfLevel(int level) {
+    level = getCorrectLevel(level);
+
+    if (--inf_levels[level + MAX_LEVEL] < 0) {
+      inf_levels[level + MAX_LEVEL] = 0;
+    }
+    recalculateLevel();
+  }
+
+  private void recalculateLevel() {
+    boolean is_empty = true;
+    for (int i : levels) {
+      if (i != 0) {
+        is_empty = false;
+        break;
+      }
+    }
+    for (int i : inf_levels) {
+      if (i != 0) {
+        is_empty = false;
+        break;
+      }
+    }
+
+    if (is_empty) {
+      is_active = false;
+      applyLevel(0);
+      return;
+    }
+
+    int negative_level = 0;
+    for (int i = MAX_LEVEL - 1; i > 0; --i) {
+      if (levels[i] != 0 || inf_levels[i] != 0) {
+        negative_level = i - 4;
+      }
+    }
+
+    int positive_level = 0;
+    for (int i = MAX_LEVEL + 1; i < 2 * MAX_LEVEL + 1; ++i) {
+      if (levels[i] != 0 || inf_levels[i] != 0) {
+        positive_level = i - MAX_LEVEL;
+      }
+    }
+
+    current_level = negative_level + positive_level;
+    applyLevel(current_level);
+  }
+
+  protected void applyLevel(int level) {}
+
+  protected void updateEffect(double delta) {}
 
   protected double getChangeKoef(int level) {
     return 1;

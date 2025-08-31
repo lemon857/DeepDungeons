@@ -48,7 +48,6 @@ public class Character {
   public final void addEffect(String name, int level, double duration) {
     if (effects.containsKey(name)) {
       Effect effect = effects.get(name);
-      if (effect.getLevel() == level && effect.getDuration() == -1 && duration == -1) return;
 
       effect.addLevel(level, duration);
     } else {
@@ -59,8 +58,6 @@ public class Character {
   public final void addCycleEffect(String name, int level, double duration, double period, double damage) {
     if (effects.containsKey(name)) {
       CycleEffect effect = (CycleEffect)effects.get(name);
-      if (effect.getLevel() == level && effect.getDuration() == -1 && duration == -1
-          && effect.getPeriod() == period && effect.getDamage() == damage) return;
 
       effect.addLevel(level, duration); // need fix updating different period and damage levels
     } else {
@@ -70,19 +67,12 @@ public class Character {
     }
   }
 
-  public final boolean tryRemoveInfEffect(String name) {
+  // level = 0 is any level
+  public final void removeInfEffect(String name, int level) {
     if (effects.containsKey(name)) {
       Effect effect = effects.get(name);
-
-    
-      if (effect.isActive()) {
-        if (effect.isInfinity()) {
-          effect.removeCurrentLevel();
-          return true;
-        }
-      }
+      effect.removeInfLevel(level);
     }
-    return false;
   }
 
   public final void setMoveSpeedModifier(double value) {

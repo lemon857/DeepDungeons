@@ -25,50 +25,10 @@ public final class SimpleEffect extends Effect {
     this.negative_texture = new Texture(negative_image);
     this.positive_sign = 1;
   }
-
+  
   @Override
-  public void update(double delta) {
-    if (!is_active) return;
-
-    if (levels.peek().getDuration() != -1) {
-      timer += delta;
-
-      if (timer >= levels.peek().getDuration()) {
-        timer = 0;
-        
-        removeCurrentLevel();
-      }
-    }
-  }
-
-  @Override
-  public void addLevel(int level, double duration) {
-    System.out.println("[Effect] Add level: " + level);
-
-    is_active = true;
-    current_level = sumLevels(current_level, level);
-    current_sum += level;
-
-    levels.add(new LevelPair(duration, level));
-
-    change_func.accept(getChangeKoef(current_level));
-  }
-
-  @Override
-  public void removeCurrentLevel() {
-    current_sum -= levels.peek().getPrevLevel();
-    current_level = getCorrectLevel(current_sum);
-
-    levels.remove();
-
-    if (levels.isEmpty()) {
-      change_func.accept(getChangeKoef(0));
-      current_level = 0;
-      current_sum = 0;
-      is_active = false;
-    } else {
-      change_func.accept(getChangeKoef(current_level));
-    }
+  protected void applyLevel(int level) {
+    change_func.accept(getChangeKoef(level));
   }
 
   @Override

@@ -183,6 +183,14 @@ public class Main extends ApplicationAdapter {
       new CycleEffect("textures/effects/heal.png", "heal", 1))
       .setCharacterFunc(Character::heal);
 
+    Effect.addStaticEffect("effects/hunger", 
+      new CycleEffect("textures/effects/heal.png", "hunger", -1))
+      .setPlayerFunc(Player::hunger);
+
+    Effect.addStaticEffect("effects/saturation", 
+      new CycleEffect("textures/effects/heal.png", "saturation", -1))
+      .setPlayerFunc(Player::saturation);
+
     EffectsPanel.initLevelImages();
     for (int i = -4; i < 5; ++i) {
       if (i == 0) {
@@ -481,6 +489,7 @@ public class Main extends ApplicationAdapter {
     // [DEBUG] Add positive effect
     if (Gdx.input.isKeyJustPressed(Input.Keys.O)) {
       player.addCycleEffect("effects/heal", 4, 5, 1, 1);
+      // player.addCycleEffect("effects/hunger", 4, 10, 1, 1);
     }
 
     // [DEBUG] Add negative effect

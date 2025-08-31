@@ -13,7 +13,7 @@ public final class CycleEffect extends Effect {
     this.damage = 0;
     this.period = 0;
     this.period_timer = 0;
-    this.positive_sign = positive_sign;
+    this.positive_sign = Math.signum(positive_sign == 0 ? 1 : positive_sign);
   }
 
   public CycleEffect(Pixmap positive_map, String name, double positive_sign) {
@@ -22,7 +22,7 @@ public final class CycleEffect extends Effect {
     this.damage = 0;
     this.period = 0;
     this.period_timer = 0;
-    this.positive_sign = positive_sign;
+    this.positive_sign = Math.signum(positive_sign == 0 ? 1 : positive_sign);
   }
 
   public void updateProperties(double period, double damage) {
@@ -39,9 +39,7 @@ public final class CycleEffect extends Effect {
   }
 
   @Override
-  public void update(double delta) {
-    if (!is_active) return;
-
+  protected void updateEffect(double delta) {
     period_timer += delta;
 
     if (period_timer >= period) {
@@ -49,41 +47,6 @@ public final class CycleEffect extends Effect {
       period_timer = 0;
       
       change_func.accept(damage * getChangeKoef(current_level));
-    }
-
-    if (levels.peek().getDuration() != -1) {
-      timer += delta;
-
-      if (timer >= levels.peek().getDuration()) {
-        timer = 0;
-        
-        removeCurrentLevel();
-      }
-    }
-  }
-
-  @Override
-  public void addLevel(int level, double duration) {
-    System.out.println("[Effect] Add level: " + level);
-
-    is_active = true;
-    current_level = sumLevels(current_level, level);
-    current_sum += level;
-
-    levels.add(new LevelPair(duration, level));
-  }
-
-  @Override
-  public void removeCurrentLevel() {
-    current_sum -= levels.peek().getPrevLevel();
-    current_level = getCorrectLevel(current_sum);
-
-    levels.remove();
-
-    if (levels.isEmpty()) {
-      current_level = 0;
-      current_sum = 0;
-      is_active = false;
     }
   }
 
