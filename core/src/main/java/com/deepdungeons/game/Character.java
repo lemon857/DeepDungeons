@@ -67,7 +67,6 @@ public class Character {
     }
   }
 
-  // level = 0 is any level
   public final void removeInfEffect(String name, int level) {
     if (effects.containsKey(name)) {
       Effect effect = effects.get(name);

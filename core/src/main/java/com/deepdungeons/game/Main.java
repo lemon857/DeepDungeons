@@ -191,6 +191,10 @@ public class Main extends ApplicationAdapter {
       new CycleEffect("textures/effects/heal.png", "saturation", -1))
       .setPlayerFunc(Player::saturation);
 
+    Effect.addStaticEffect("effects/luck", 
+      new SimpleEffect("textures/effects/luck.png",  "textures/effects/unluck.png", "luck"))
+      .setPlayerFunc(Player::setLuck);
+
     EffectsPanel.initLevelImages();
     for (int i = -4; i < 5; ++i) {
       if (i == 0) {
@@ -198,6 +202,7 @@ public class Main extends ApplicationAdapter {
       } else if (i > 0) {
         EffectsPanel.addLevelTexture(i, "textures/ui/green" + i + ".png");
       } else {
+        System.out.println("Add: " + i);
         EffectsPanel.addLevelTexture(i, "textures/ui/red" + (-i) + ".png");
       }
     }
@@ -488,13 +493,13 @@ public class Main extends ApplicationAdapter {
 
     // [DEBUG] Add positive effect
     if (Gdx.input.isKeyJustPressed(Input.Keys.O)) {
-      player.addCycleEffect("effects/heal", 4, 5, 1, 1);
+      player.addCycleEffect("effects/heal", 4, 100, 1, 1);
       // player.addCycleEffect("effects/hunger", 4, 10, 1, 1);
     }
 
     // [DEBUG] Add negative effect
     if (Gdx.input.isKeyJustPressed(Input.Keys.P)) {
-      // player.addEffect("effects/speed", -4, 10);      
+      player.addEffect("effects/luck", -4, -1);
     }
   }
 

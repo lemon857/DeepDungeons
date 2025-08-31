@@ -37,6 +37,7 @@ public class EffectsPanel {
       if (!effect.isActive()) continue;
       ++i;
 
+      // System.out.printf("Get %s num %d\n", effect.getName(), effect.getLevel());
       batch.draw(level_images.get(effect.getLevel() * (int)effect.getPositiveSign()), (float)position.x - (float)effect_size.x, (float)position.y - (float)(y_shift + effect_size.y) * i, 
         (float)effect_size.x / 2.f, (float)effect_size.y / 2.f);
 

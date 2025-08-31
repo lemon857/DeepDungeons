@@ -75,7 +75,7 @@ public class Effect {
   protected int current_sum;
 
   protected int[] inf_levels;
-  protected int[] levels;
+  protected double[] levels;
   
   protected boolean is_active;
 
@@ -107,7 +107,7 @@ public class Effect {
     this.current_sum = 0;
     
     this.inf_levels = new int[LEVELS_SIZE];
-    this.levels = new int[LEVELS_SIZE];
+    this.levels = new double[LEVELS_SIZE];
   }
 
   public final void update(double delta) {
@@ -116,10 +116,10 @@ public class Effect {
     for (int i = 0; i < LEVELS_SIZE; ++i) {
       if (levels[i] != 0) {
         levels[i] -= delta;
-      }
-      if (levels[i] <= 0) {
-        levels[i] = 0;
-        recalculateLevel();
+        if (levels[i] <= 0) {
+          levels[i] = 0;
+          recalculateLevel();
+        }
       }
     }
 
@@ -179,7 +179,7 @@ public class Effect {
 
   private void recalculateLevel() {
     boolean is_empty = true;
-    for (int i : levels) {
+    for (double i : levels) {
       if (i != 0) {
         is_empty = false;
         break;
@@ -199,7 +199,7 @@ public class Effect {
     }
 
     int negative_level = 0;
-    for (int i = MAX_LEVEL - 1; i > 0; --i) {
+    for (int i = MAX_LEVEL - 1; i >= 0; --i) {
       if (levels[i] != 0 || inf_levels[i] != 0) {
         negative_level = i - 4;
       }
