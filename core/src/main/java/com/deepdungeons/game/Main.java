@@ -148,10 +148,10 @@ public class Main extends ApplicationAdapter {
     Item.addStaticItem("drinks/cup_of_tea", new Edible("textures/items/cup_of_tea.png", Item.Tier.Uncommon, "cup of tea", true, 7));
 
     Item.addStaticItem("weapons/knife", new CloseRangeWeapon("textures/weapons/knife.png", "sounds/knife.mp3", "knife",
-    0.8, 4.7, Math.PI / 2, 2, 0.5, false));
+    0.8, 0.4, Math.PI / 2, 2, 0.5, false));
 
     Item.addStaticItem("weapons/bone_baton", new CloseRangeWeapon("textures/weapons/bone_baton.png", "sounds/baton.mp3", "bone baton",
-     1.2, 6.3, Math.PI / 3, 1.5, 1, true));
+     1.2, 2, Math.PI / 3, 1.5, 1, true));
 
     Mob.initStaticMobs();
     Mob.addStaticMob("mobs/skeleton", new DefaultEnemy("textures/mobs/skeleton.png", 
@@ -202,21 +202,20 @@ public class Main extends ApplicationAdapter {
       } else if (i > 0) {
         EffectsPanel.addLevelTexture(i, "textures/ui/green" + i + ".png");
       } else {
-        System.out.println("Add: " + i);
         EffectsPanel.addLevelTexture(i, "textures/ui/red" + (-i) + ".png");
       }
     }
     
     // for_craft eat drink special
     items_room_lt = new LootTable(new String[][]{
-      {"forcraft/bone", "forcraft/rope", "forcraft/leather", "forcraft/stone", "forcraft/stick", "forcraft/feather"},
+      {"forcraft/stone", "forcraft/stick", "forcraft/feather"},
       {"foods/candy", "foods/meat"},
       {"drinks/bottle_of_water", "drinks/cup_of_tea"},
       {"special/coin"}
     }, new double[]{
-      0.5,
-      0.15,
-      0.15,
+      0.3,
+      0.25,
+      0.25,
       0.2
     });
 
@@ -511,8 +510,8 @@ public class Main extends ApplicationAdapter {
     current_room.update(delta);
     //debug_info[DEBUG_LINE_DISTANCE].setText("Dis to door: " + Point.distance(player.getCenterPos(), Room.GetDoorPosition(req_door_id)));
     //debug_info[DEBUG_LINE_DISTANCE].setText("Dis to item: " + current_room.distanceToNearestItem(player.getCenterPos()));
-    debug_info[DEBUG_LINE_DISTANCE].setText("Dis to mob: " + (current_room.distanceToNearestMob(player.getCenterPos()) - player.getSizeOffset()));
-    debug_info[DEBUG_LINE_ANGLE].setText("Angle to mob: " + current_room.angleToNearestMob(player.getCenterPos(), player.getDirection()));
+    debug_info[DEBUG_LINE_DISTANCE].setText("Dis to mob: " + (current_room.distanceToNearestMob(player.getCenterPos(), player.getSizeOffset())));
+    debug_info[DEBUG_LINE_ANGLE].setText("Angle to mob: " + current_room.angleToNearestMob(player.getCenterPos(), player.getDirection(), player.getSizeOffset()));
     Point pos = new Point(player.getPos());
 
     debug_info[DEBUG_LINE_PLAYER_POS].setText("Player X: " + pos.x + " Y: " + pos.y);
@@ -609,7 +608,7 @@ public class Main extends ApplicationAdapter {
           new_room.addMob(mob);
         }
       } else if (mark.type == Generator.RoomType.Items) {
-        int count_new_items = rand.nextInt(3 + (int)Math.ceil(player.useLuck(1, -1)));
+        int count_new_items = rand.nextInt(2, 6 + (int)Math.ceil(player.useLuck(1, -1)));
         for (int i = 0; i < count_new_items; ++i) {
           new_room.addItem(items_room_lt.nextItem());
         }

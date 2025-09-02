@@ -44,7 +44,7 @@ public class Room {
   private static final Color OPENED_DOOR_COLOR = new Color(0.5f, 0.3f, 0.13f, 1);
   private static final Color CLOSED_DOOR_COLOR = new Color(1, 0.3f, 0.3f, 0.5f);
 
-  private static final boolean MOBS_AI = true;
+  private static final boolean MOBS_AI = false;
 
   private final Point pos;
 
@@ -261,16 +261,16 @@ public class Room {
     return res;
   }
 
-  public double distanceToNearestMob(Vector2d cur_pos) {
+  public double distanceToNearestMob(Vector2d cur_pos, double offset) {
     double res = 50;
     for (Mob mob : mobs) {
-      res = Math.min(res, Vector2d.distance(cur_pos, mob.getCenterPos()));
+      res = Math.min(res, Vector2d.distance(cur_pos, mob.getCenterPos()) - offset - mob.getSizeOffset());
     }
     return res;
   }
 
-  public double angleToNearestMob(Vector2d cur_pos, Vector2d dir) {
-    double distance = distanceToNearestMob(cur_pos);
+  public double angleToNearestMob(Vector2d cur_pos, Vector2d dir, double offset) {
+    double distance = distanceToNearestMob(cur_pos, offset);
 
     int current_mob = -1;
 
@@ -291,10 +291,11 @@ public class Room {
   public boolean tryHitMob(Vector2d player_pos, Vector2d dir, double damage, double max_distance, double max_angle, double offset, boolean allow_splash) {
     boolean is_hit = false;
     for (int i = 0; i < mobs.size(); ++i) {
-      Vector2d v2 = new Vector2d(player_pos, mobs.get(i).getCenterPos());
+      Mob mob = mobs.get(i);
+      Vector2d v2 = new Vector2d(player_pos, mob.getCenterPos());
 
-      double dis = Vector2d.distance(player_pos, mobs.get(i).getCenterPos());
-      if (dis - offset > max_distance) {
+      double dis = Vector2d.distance(player_pos, mob.getCenterPos());
+      if (dis - offset - mob.getSizeOffset() > max_distance) {
         // System.out.println("[" + i + "] Too far: " + (dis - offset));
         continue;
       }
@@ -303,11 +304,11 @@ public class Room {
         continue;
       }
 
-      if (mobs.get(i).damage(damage)) {
-        Item item = mobs.get(i).getDrop();
+      if (mob.damage(damage)) {
+        Item item = mob.getDrop();
         if (item != null) {
           drop_sound.play();
-          item.setCenterPos(mobs.get(i).getCenterPos());
+          item.setCenterPos(mob.getCenterPos());
           items.add(item);
         }
         mobs.remove(i);

@@ -82,6 +82,8 @@ public class Mob extends Character {
   protected boolean damage_anim_play;
   protected static final double DAMAGE_ANIM_TIME = 0.25;
 
+  protected double size_offset;
+
   private final LootTable table;
 
   private final int id;
@@ -188,6 +190,10 @@ public class Mob extends Character {
     return id;
   }
 
+  public final double getSizeOffset() {
+    return size_offset;
+  }
+
   public final Vector2d getCenterPos() {
     return Vector2d.sum(pos, Vector2d.div(size, 2));
   }
@@ -221,6 +227,7 @@ public class Mob extends Character {
     start_border = Point.sum(Room.START_BORDER, new Point(1, 1));
     end_border = Point.sub(Room.END_BORDER, new Point((int)Math.ceil(width), (int)Math.ceil(height)));
     size = new Vector2d(width, height);
+    size_offset = size.length() / 5.0;
     updateSpriteSize();
   }
   public final void translate(Vector2d vector) {
@@ -300,7 +307,7 @@ public class Mob extends Character {
     }
     Vector2d v2 = new Vector2d(pos, Main.player.getPos());
 
-    if (v2.length() < max_distance && Vector2d.angle(Utility.getDirectionVector(dir), v2) < max_angle) {
+    if (v2.length() - size_offset - Main.player.getSizeOffset() < max_distance && Vector2d.angle(Utility.getDirectionVector(dir), v2) < max_angle) {
       Main.player.damage(damage);
       if (is_hand) {
         Hand.playSound();

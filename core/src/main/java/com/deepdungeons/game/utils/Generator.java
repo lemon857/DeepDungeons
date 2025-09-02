@@ -125,7 +125,7 @@ public class Generator {
     for (Map.Entry<Point, RoomMark> e : skeleton.entrySet()) {
       Point pos = e.getKey();
       RoomMark mark = e.getValue();
-      System.out.printf("Pos: x: %d, y: %d -- zone: %d -- doors: ", pos.x, pos.y, mark.zone);
+      // System.out.printf("Pos: x: %d, y: %d -- zone: %d -- doors: ", pos.x, pos.y, mark.zone);
 
       Point map_pos = Point.sum(offset, Point.mul(pos, 3));
 
@@ -150,28 +150,28 @@ public class Generator {
 
       map.setColor(Color.BROWN);
       for (int i = 0; i < Room.MAX_DOORS_COUNT; ++i) {
-        System.out.printf("%d ", mark.doors[i] ? 1 : 0);
+        // System.out.printf("%d ", mark.doors[i] ? 1 : 0);
         if (mark.doors[i]) {
           Point door_pos = Point.sum(map_pos, getRoomDeltaFromDoor(i));
           map.drawPixel(door_pos.x, door_pos.y);
         }
       }
 
-      System.out.print(" -- lock doors: ");
+      // System.out.print(" -- lock doors: ");
 
       map.setColor(Color.RED);
       for (int i = 0; i < Room.MAX_DOORS_COUNT; ++i) {
-        System.out.printf("%d ", mark.lock_doors[i]);
+        // System.out.printf("%d ", mark.lock_doors[i]);
         if (mark.lock_doors[i] != 0) {
           Point door_pos = Point.sum(map_pos, getRoomDeltaFromDoor(i));
           map.drawPixel(door_pos.x, door_pos.y);
         }
       }
 
-      System.out.print("\n");
+      // System.out.print("\n");
     }
 
-    System.out.print("=====================================================\n");
+    // System.out.print("=====================================================\n");
 
     image = new Texture(map);
   }
@@ -196,7 +196,7 @@ public class Generator {
     }
 
     int[] must_doors = new int[Room.MAX_DOORS_COUNT];
-    System.out.printf("[Generator] Pos: X: %d, Y: %d Zone: %d Must doors: ", info.pos.x, info.pos.y, info.zone);
+    // System.out.printf("[Generator] Pos: X: %d, Y: %d Zone: %d Must doors: ", info.pos.x, info.pos.y, info.zone);
     for (int i = 0; i < Room.MAX_DOORS_COUNT; ++i) {
       Point cur_room = Point.sum(info.pos, getRoomDeltaFromDoor(i));
 
@@ -221,7 +221,7 @@ public class Generator {
         }
       }
 
-      System.out.printf("%d ", must_doors[i]);
+      // System.out.printf("%d ", must_doors[i]);
     }
 
     int counter = 0;
@@ -242,14 +242,14 @@ public class Generator {
     mark.require_keys = new ArrayList<>();
     mark.require_keys_color = new ArrayList<>();
 
-    System.out.print("doors(lock): ");
+    // System.out.print("doors(lock): ");
     for (int i = 0; i < Room.MAX_DOORS_COUNT; ++i) {
-      System.out.printf("%d(%s) ", mark.doors[i] ? 1 : 0, mark.lock_doors[i] == 0 ? "-" : "+");
+      // System.out.printf("%d(%s) ", mark.doors[i] ? 1 : 0, mark.lock_doors[i] == 0 ? "-" : "+");
       if (mark.lock_doors[i] == 0) continue;
 
       mark.lock_doors_color[i] = new Color(rand.nextFloat(1), rand.nextFloat(1), rand.nextFloat(1), 1);
     }
-    System.out.print("\n");
+    // System.out.print("\n");
     
     if (!zones.containsKey(mark.zone)) {
       zones.put(mark.zone, new ArrayList<>());
@@ -285,7 +285,7 @@ public class Generator {
         new_info.is_lock = true;
         next_rooms.offer(new_info);
 
-        System.out.printf("PUSH INTO QUEUE NEW ZONE (%d): i: %d, pos: X: %d, Y:%d\n", new_info.zone, i, new_info.pos.x, new_info.pos.y);
+        // System.out.printf("PUSH INTO QUEUE NEW ZONE (%d): i: %d, pos: X: %d, Y:%d\n", new_info.zone, i, new_info.pos.x, new_info.pos.y);
 
         prev_zones[new_info.zone] = mark.zone;
         require_keys[new_info.zone] = mark.lock_doors[i];
@@ -301,10 +301,10 @@ public class Generator {
         new_info.from = (i + 2) % 4;
         new_info.is_lock = false;
         next_rooms.offer(new_info);
-        System.out.printf("PUSH INTO QUEUE: i: %d, pos: X: %d, Y:%d\n", i, new_info.pos.x, new_info.pos.y);
+        // System.out.printf("PUSH INTO QUEUE: i: %d, pos: X: %d, Y:%d\n", i, new_info.pos.x, new_info.pos.y);
       }
     }
-    System.out.println("----------------------------------");
+    // System.out.println("----------------------------------");
   }
 
   private void generateKeys() {
@@ -321,11 +321,14 @@ public class Generator {
   }
 
   private RoomType generateRandomType() {
-    switch (rand.nextInt(5)) {
-    case 0: return RoomType.Items;
-    case 1: return RoomType.Monsters;
-    default: return RoomType.Empty;
+    double val = rand.nextDouble();
+    if (val < 0.7) {
+      return RoomType.Monsters;
+    } else if (val < 0.9) {
+      return RoomType.Items;
     }
+
+    return RoomType.Empty;
   }
 
   private boolean[] generateNewDoors(boolean[] doors, int[] must_doors) {

@@ -102,6 +102,8 @@ public final class Player extends Character{
 
   private double luck;
 
+  private double size_offset;
+
   public Player() {
     super(MAX_HP, MOVE_SPEED, ATTCAK_SPEED, STRENGTH);
 
@@ -118,6 +120,7 @@ public final class Player extends Character{
     this.non_actual = false;
     this.food_points = MAX_FP;
     this.thirsty_points = MAX_TP;
+    this.size_offset = size.length() / 2.0;
 
     this.money = 0;
 
@@ -511,7 +514,7 @@ public final class Player extends Character{
   }
 
   public double getSizeOffset() {
-    return size.length() / 2.0;
+    return size_offset;
   }
 
   public boolean isDie() {

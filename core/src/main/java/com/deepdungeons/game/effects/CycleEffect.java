@@ -43,7 +43,7 @@ public final class CycleEffect extends Effect {
     period_timer += delta;
 
     if (period_timer >= period) {
-      System.out.printf("[CycleEffect] Update, delta %f, period: %f, timer: %f\n", delta, period, period_timer);
+      // System.out.printf("[CycleEffect] Update, delta %f, period: %f, timer: %f\n", delta, period, period_timer);
       period_timer = 0;
       
       change_func.accept(damage * getChangeKoef(current_level));

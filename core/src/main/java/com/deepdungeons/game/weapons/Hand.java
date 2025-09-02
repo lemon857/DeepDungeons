@@ -12,7 +12,7 @@ public final class Hand {
   protected static final double MIN_COOLDOWN = 0.27;
   protected static final double MAX_COOLDOWN = 0.4;
 
-  public static final double DISTANCE = 5;
+  public static final double DISTANCE = 0.5;
 
   public static final double ANGLE = Math.PI;
 

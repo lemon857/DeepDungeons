@@ -242,7 +242,7 @@ public class Effect {
       effect.setCharacterFunc(change_func_sig_character);
     }
 
-    System.out.printf("Clone effect Is char method null: %b\n", effect.change_func_sig_character == null);
+    // System.out.printf("Clone effect Is char method null: %b\n", effect.change_func_sig_character == null);
 
     return effect;
   }
