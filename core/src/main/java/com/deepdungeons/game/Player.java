@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.deepdungeons.game.effects.EffectsPanel;
 import com.deepdungeons.game.items.Edible;
 import com.deepdungeons.game.items.Item;
@@ -15,7 +16,7 @@ import com.deepdungeons.game.utils.Point;
 import com.deepdungeons.game.utils.Utility;
 import com.deepdungeons.game.utils.Vector2d;
 
-public final class Player extends Character{
+public final class Player extends Character {
   public static final int WIDTH = 7;
   public static final int HEIGHT = 7;
 
@@ -58,9 +59,6 @@ public final class Player extends Character{
   private double current_walked_distance;
 
   private final Random rand;
-
-  private final Vector2d pos;
-  private final Vector2d size;
 
   private double attack_anim_timer;
   private boolean attack_anim_play;
@@ -106,6 +104,10 @@ public final class Player extends Character{
 
   public Player() {
     super(MAX_HP, MOVE_SPEED, ATTCAK_SPEED, STRENGTH);
+
+    CircleShape shape = new CircleShape();
+    shape.setRadius(WIDTH);
+    setShape(shape, 4f, 0.5f);
 
     this.effects_panel = new EffectsPanel(effects, EFFECT_PANEL_POS, EFFECT_SIZE, EFFECT_Y_SHIFT);
 

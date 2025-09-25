@@ -3,10 +3,12 @@ package com.deepdungeons.game;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.deepdungeons.PhysicsObject;
 import com.deepdungeons.game.effects.CycleEffect;
 import com.deepdungeons.game.effects.Effect;
 
-public class Character {
+public class Character extends PhysicsObject {
   private double move_speed_modifier;
   private double attack_speed_modifier;
   private double strength_modifier;
@@ -20,6 +22,8 @@ public class Character {
   protected double health_points;
 
   public Character(double health_points, double move_speed, double attack_speed, double strength) {
+    super(BodyDef.BodyType.DynamicBody);
+
     this.move_speed = move_speed;
     this.attack_speed = attack_speed;
     this.strength = strength;

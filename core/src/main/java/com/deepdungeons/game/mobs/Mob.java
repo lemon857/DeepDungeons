@@ -57,7 +57,6 @@ public class Mob extends Character {
 
   protected Pixmap image;
 
-  protected Vector2d pos;
   protected Direction dir;
 
   private Sprite sprite;
@@ -70,7 +69,6 @@ public class Mob extends Character {
 
   protected final Random rand;
 
-  protected Vector2d size;
   protected Point start_border;
   protected Point end_border;
 
@@ -226,7 +224,6 @@ public class Mob extends Character {
   public final void setSize(double width, double height) {
     start_border = Point.sum(Room.START_BORDER, new Point(1, 1));
     end_border = Point.sub(Room.END_BORDER, new Point((int)Math.ceil(width), (int)Math.ceil(height)));
-    size = new Vector2d(width, height);
     size_offset = size.length() / 5.0;
     updateSpriteSize();
   }

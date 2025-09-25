@@ -7,6 +7,8 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -79,6 +81,8 @@ public class Main extends ApplicationAdapter {
 
   private Random rand;
 
+  public World world;
+
   private boolean show_map;
   private boolean show_item_info;
 
@@ -97,6 +101,8 @@ public class Main extends ApplicationAdapter {
 
   @Override
   public void create() {
+    world = new World(new Vector2(0f, 0f), true);
+
     generator = new Generator(START_ROOM);
     rand = new Random();
     batch = new SpriteBatch();
@@ -127,97 +133,7 @@ public class Main extends ApplicationAdapter {
       }
     });
 
-    Hand.initSound("sounds/hand.mp3");
-    Edible.setSounds("sounds/eating.mp3", "sounds/drinking.mp3");
-
-    Item.initStaticItems();
-    Item.addStaticItem("special/key", new Key("textures/items/key.png", "sounds/use_key.mp3"));
-    Item.addStaticItem("special/coin", new Coin("textures/items/coin.png", "sounds/coin.mp3"));
-
-    Item.addStaticItem("forcraft/bone", new ItemForCraft("textures/items/bone.png", Item.Tier.Common, "bone"));
-    Item.addStaticItem("forcraft/rope", new ItemForCraft("textures/items/rope.png", Item.Tier.Common, "rope"));
-    Item.addStaticItem("forcraft/leather", new ItemForCraft("textures/items/leather.png", Item.Tier.Common, "leather"));
-    Item.addStaticItem("forcraft/stone", new ItemForCraft("textures/items/stone.png", Item.Tier.Common, "stone"));
-    Item.addStaticItem("forcraft/stick", new ItemForCraft("textures/items/stick.png", Item.Tier.Common, "stick"));
-    Item.addStaticItem("forcraft/feather", new ItemForCraft("textures/items/feather.png", Item.Tier.Common, "feather"));
-
-    Item.addStaticItem("foods/candy", new Edible("textures/items/candy.png", Item.Tier.Common, "candy", false, 2));
-    Item.addStaticItem("foods/meat", new Edible("textures/items/meat.png", Item.Tier.Uncommon, "meat", false, 5));
-
-    Item.addStaticItem("drinks/bottle_of_water", new Edible("textures/items/bottle_of_water.png", Item.Tier.Common, "bottle of water", true, 4));
-    Item.addStaticItem("drinks/cup_of_tea", new Edible("textures/items/cup_of_tea.png", Item.Tier.Uncommon, "cup of tea", true, 7));
-
-    Item.addStaticItem("weapons/knife", new CloseRangeWeapon("textures/weapons/knife.png", "sounds/knife.mp3", "knife",
-    0.8, 0.4, Math.PI / 2, 2, 0.5, false));
-
-    Item.addStaticItem("weapons/bone_baton", new CloseRangeWeapon("textures/weapons/bone_baton.png", "sounds/baton.mp3", "bone baton",
-     1.2, 2, Math.PI / 3, 1.5, 1, true));
-
-    Mob.initStaticMobs();
-    Mob.addStaticMob("mobs/skeleton", new DefaultEnemy("textures/mobs/skeleton.png", 
-    25, 1.1, 0.8, 1, 3,
-     new LootTable(new String[][]{{}, {"forcraft/bone"}, {"forcraft/rope"}}, new double[]{0.8, 0.15, 0.05})));
-
-     Mob.addStaticMob("mobs/zombie", new DefaultEnemy("textures/mobs/zombie.png", 
-     20, 0.9, 1.2, 2, 3,
-      new LootTable(new String[][]{{}, {"forcraft/leather"}, {"forcraft/rope"}}, new double[]{0.8, 0.15, 0.05})));
-
-    Effect.initStaticEffects();
-    Effect.addStaticEffect("effects/speed", 
-      new SimpleEffect("textures/effects/speed.png", "textures/effects/slowness.png", "speed"))
-      .setCharacterFunc(Character::setMoveSpeedModifier);
-
-    Effect.addStaticEffect("effects/haste", 
-      new SimpleEffect("textures/effects/attack_speed.png", "textures/effects/attack_slowness.png", "haste"))
-      .setCharacterFunc(Character::setAttackSpeedModifier);
-
-    Effect.addStaticEffect("effects/strength", 
-      new SimpleEffect("textures/effects/strength.png", "textures/effects/weakness.png", "strength"))
-      .setCharacterFunc(Character::setStrengthModifier);
-
-    Effect.addStaticEffect("effects/damage", 
-      new CycleEffect("textures/effects/damage.png", "damage", -1))
-      .setCharacterFunc(Character::damage);
-
-    Effect.addStaticEffect("effects/heal", 
-      new CycleEffect("textures/effects/heal.png", "heal", 1))
-      .setCharacterFunc(Character::heal);
-
-    Effect.addStaticEffect("effects/hunger", 
-      new CycleEffect("textures/effects/heal.png", "hunger", -1))
-      .setPlayerFunc(Player::hunger);
-
-    Effect.addStaticEffect("effects/saturation", 
-      new CycleEffect("textures/effects/heal.png", "saturation", -1))
-      .setPlayerFunc(Player::saturation);
-
-    Effect.addStaticEffect("effects/luck", 
-      new SimpleEffect("textures/effects/luck.png",  "textures/effects/unluck.png", "luck"))
-      .setPlayerFunc(Player::setLuck);
-
-    EffectsPanel.initLevelImages();
-    for (int i = -4; i < 5; ++i) {
-      if (i == 0) {
-        EffectsPanel.addLevelTexture(i, "textures/ui/neutral.png");
-      } else if (i > 0) {
-        EffectsPanel.addLevelTexture(i, "textures/ui/green" + i + ".png");
-      } else {
-        EffectsPanel.addLevelTexture(i, "textures/ui/red" + (-i) + ".png");
-      }
-    }
-    
-    // for_craft eat drink special
-    items_room_lt = new LootTable(new String[][]{
-      {"forcraft/stone", "forcraft/stick", "forcraft/feather"},
-      {"foods/candy", "foods/meat"},
-      {"drinks/bottle_of_water", "drinks/cup_of_tea"},
-      {"special/coin"}
-    }, new double[]{
-      0.3,
-      0.25,
-      0.25,
-      0.2
-    });
+    initStaticItems();
 
     Skin skin = new Skin(Gdx.files.internal("ui/uiskin.json"));
 
@@ -504,6 +420,8 @@ public class Main extends ApplicationAdapter {
 
   private void logic() {
     if (is_pause) return;
+
+    // world.step(Gdx.graphics.getDeltaTime(), 6, 2);
     
     double delta = Gdx.graphics.getDeltaTime();
     player.update(delta);
@@ -558,6 +476,7 @@ public class Main extends ApplicationAdapter {
   @Override
   public void dispose() {
     batch.dispose();
+    world.dispose();
   }
 
   @Override
@@ -624,5 +543,99 @@ public class Main extends ApplicationAdapter {
 
     debug_info[DEBUG_LINE_ROOM_POS].setText("Room X: " + current_room_pos.x + " Y: " + current_room_pos.y);
     return true;
+  }
+
+  private void initStaticItems() {
+    Hand.initSound("sounds/hand.mp3");
+    Edible.setSounds("sounds/eating.mp3", "sounds/drinking.mp3");
+
+    Item.initStaticItems();
+    Item.addStaticItem("special/key", new Key("textures/items/key.png", "sounds/use_key.mp3"));
+    Item.addStaticItem("special/coin", new Coin("textures/items/coin.png", "sounds/coin.mp3"));
+
+    Item.addStaticItem("forcraft/bone", new ItemForCraft("textures/items/bone.png", Item.Tier.Common, "bone"));
+    Item.addStaticItem("forcraft/rope", new ItemForCraft("textures/items/rope.png", Item.Tier.Common, "rope"));
+    Item.addStaticItem("forcraft/leather", new ItemForCraft("textures/items/leather.png", Item.Tier.Common, "leather"));
+    Item.addStaticItem("forcraft/stone", new ItemForCraft("textures/items/stone.png", Item.Tier.Common, "stone"));
+    Item.addStaticItem("forcraft/stick", new ItemForCraft("textures/items/stick.png", Item.Tier.Common, "stick"));
+    Item.addStaticItem("forcraft/feather", new ItemForCraft("textures/items/feather.png", Item.Tier.Common, "feather"));
+
+    Item.addStaticItem("foods/candy", new Edible("textures/items/candy.png", Item.Tier.Common, "candy", false, 2));
+    Item.addStaticItem("foods/meat", new Edible("textures/items/meat.png", Item.Tier.Uncommon, "meat", false, 5));
+
+    Item.addStaticItem("drinks/bottle_of_water", new Edible("textures/items/bottle_of_water.png", Item.Tier.Common, "bottle of water", true, 4));
+    Item.addStaticItem("drinks/cup_of_tea", new Edible("textures/items/cup_of_tea.png", Item.Tier.Uncommon, "cup of tea", true, 7));
+
+    Item.addStaticItem("weapons/knife", new CloseRangeWeapon("textures/weapons/knife.png", "sounds/knife.mp3", "knife",
+    0.8, 0.4, Math.PI / 2, 2, 0.5, false));
+
+    Item.addStaticItem("weapons/bone_baton", new CloseRangeWeapon("textures/weapons/bone_baton.png", "sounds/baton.mp3", "bone baton",
+     1.2, 2, Math.PI / 3, 1.5, 1, true));
+
+    Mob.initStaticMobs();
+    Mob.addStaticMob("mobs/skeleton", new DefaultEnemy("textures/mobs/skeleton.png", 
+    25, 1.1, 0.8, 1, 3,
+     new LootTable(new String[][]{{}, {"forcraft/bone"}, {"forcraft/rope"}}, new double[]{0.8, 0.15, 0.05})));
+
+     Mob.addStaticMob("mobs/zombie", new DefaultEnemy("textures/mobs/zombie.png", 
+     20, 0.9, 1.2, 2, 3,
+      new LootTable(new String[][]{{}, {"forcraft/leather"}, {"forcraft/rope"}}, new double[]{0.8, 0.15, 0.05})));
+
+    Effect.initStaticEffects();
+    Effect.addStaticEffect("effects/speed", 
+      new SimpleEffect("textures/effects/speed.png", "textures/effects/slowness.png", "speed"))
+      .setCharacterFunc(Character::setMoveSpeedModifier);
+
+    Effect.addStaticEffect("effects/haste", 
+      new SimpleEffect("textures/effects/attack_speed.png", "textures/effects/attack_slowness.png", "haste"))
+      .setCharacterFunc(Character::setAttackSpeedModifier);
+
+    Effect.addStaticEffect("effects/strength", 
+      new SimpleEffect("textures/effects/strength.png", "textures/effects/weakness.png", "strength"))
+      .setCharacterFunc(Character::setStrengthModifier);
+
+    Effect.addStaticEffect("effects/damage", 
+      new CycleEffect("textures/effects/damage.png", "damage", -1))
+      .setCharacterFunc(Character::damage);
+
+    Effect.addStaticEffect("effects/heal", 
+      new CycleEffect("textures/effects/heal.png", "heal", 1))
+      .setCharacterFunc(Character::heal);
+
+    Effect.addStaticEffect("effects/hunger", 
+      new CycleEffect("textures/effects/heal.png", "hunger", -1))
+      .setPlayerFunc(Player::hunger);
+
+    Effect.addStaticEffect("effects/saturation", 
+      new CycleEffect("textures/effects/heal.png", "saturation", -1))
+      .setPlayerFunc(Player::saturation);
+
+    Effect.addStaticEffect("effects/luck", 
+      new SimpleEffect("textures/effects/luck.png",  "textures/effects/unluck.png", "luck"))
+      .setPlayerFunc(Player::setLuck);
+
+    EffectsPanel.initLevelImages();
+    for (int i = -4; i < 5; ++i) {
+      if (i == 0) {
+        EffectsPanel.addLevelTexture(i, "textures/ui/neutral.png");
+      } else if (i > 0) {
+        EffectsPanel.addLevelTexture(i, "textures/ui/green" + i + ".png");
+      } else {
+        EffectsPanel.addLevelTexture(i, "textures/ui/red" + (-i) + ".png");
+      }
+    }
+    
+    // for_craft eat drink special
+    items_room_lt = new LootTable(new String[][]{
+      {"forcraft/stone", "forcraft/stick", "forcraft/feather"},
+      {"foods/candy", "foods/meat"},
+      {"drinks/bottle_of_water", "drinks/cup_of_tea"},
+      {"special/coin"}
+    }, new double[]{
+      0.3,
+      0.25,
+      0.25,
+      0.2
+    });
   }
 }
