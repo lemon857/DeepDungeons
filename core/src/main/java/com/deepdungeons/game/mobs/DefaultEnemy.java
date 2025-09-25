@@ -1,6 +1,7 @@
 package com.deepdungeons.game.mobs;
 
 import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.math.Vector2;
 import com.deepdungeons.game.utils.Direction;
 import com.deepdungeons.game.utils.LootTable;
 import com.deepdungeons.game.utils.Utility;
@@ -15,7 +16,6 @@ public class DefaultEnemy extends Mob {
   public DefaultEnemy(String path_to_texture, double move_speed, double attack_speed, double strength, double min_hp, double max_hp, LootTable table) {
     super(path_to_texture, Mob.Tier.Humble, move_speed, attack_speed, strength, table);
     this.health_points = rand.nextDouble(min_hp, max_hp + 1);
-    this.pos = new Vector2d();
 
     updateSize(SIZE_KOEF);
     generateRandomPos();
@@ -25,7 +25,6 @@ public class DefaultEnemy extends Mob {
   public DefaultEnemy(Pixmap map, double move_speed, double attack_speed, double strength, double min_hp, double max_hp, LootTable table) {
     super(map, Mob.Tier.Humble, move_speed, attack_speed, strength, table);
     this.health_points = rand.nextDouble(min_hp, max_hp + 1);
-    this.pos = new Vector2d();
 
     updateSize(SIZE_KOEF);
     generateRandomPos();
@@ -45,6 +44,7 @@ public class DefaultEnemy extends Mob {
       }
 
       Vector2d move = Vector2d.mul(current_move_dir, delta * getMoveSpeed());
+      Vector2 pos = body.getPosition();
        
       pos.x += move.x;
       pos.y += move.y;

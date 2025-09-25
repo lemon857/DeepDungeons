@@ -9,14 +9,13 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Vector2;
 import com.deepdungeons.game.Character;
-import com.deepdungeons.game.Main;
 import com.deepdungeons.game.Room;
 import com.deepdungeons.game.items.Item;
 import com.deepdungeons.game.utils.Direction;
 import com.deepdungeons.game.utils.LootTable;
 import com.deepdungeons.game.utils.Point;
-import com.deepdungeons.game.utils.Utility;
 import com.deepdungeons.game.utils.Vector2d;
 import com.deepdungeons.game.weapons.CloseRangeWeapon;
 import com.deepdungeons.game.weapons.Hand;
@@ -48,7 +47,7 @@ public class Mob extends Character {
       System.err.println("Mob " + name + " is not found");
       return null;
     }
-    mob.pos = pos;
+    mob.body.setTransform((float)pos.x, (float)pos.y, 0);
     mob.updateSpritePos();
     return mob;
   }
@@ -142,8 +141,8 @@ public class Mob extends Character {
     if (attack_anim_play) {
       attack_anim_timer += delta;
       if (attack_anim_timer >= ATTACK_ANIM_TIME) {
-        size.y = size.y / 0.9;
-        updateSpriteSize();
+        // size.y = size.y / 0.9;
+        // updateSpriteSize();
         attack_anim_play = false;
       }
     }
@@ -163,7 +162,8 @@ public class Mob extends Character {
   }
 
   protected void updateSpritePos() {
-    sprite.setPosition((float)pos.x, (float)pos.y);
+    Vector2 pos = body.getPosition();
+    sprite.setPosition(pos.x, pos.y);
   }
 
   protected void updateSpriteSize() {
@@ -193,15 +193,16 @@ public class Mob extends Character {
   }
 
   public final Vector2d getCenterPos() {
-    return Vector2d.sum(pos, Vector2d.div(size, 2));
+    return Vector2d.sum(getPos(), Vector2d.div(getSize(), 2));
   }
 
   public final Vector2d getPos() {
-    return pos;
+    Vector2 pos = body.getPosition();
+    return new Vector2d(pos.x, pos.y);
   }
 
   public final Vector2d getSize() {
-    return size;
+    return new Vector2d(size.x, size.y);
   }
 
   public final Pixmap getImage() {
@@ -209,8 +210,10 @@ public class Mob extends Character {
   }
 
   public final void generateRandomPos() {
-    pos.x = rand.nextDouble(size.x + Room.START_BORDER.x + 1, Room.END_BORDER.x - size.x - 1);
-    pos.y = rand.nextDouble(Room.START_BORDER.y + size.y + 1, Room.END_BORDER.y - size.y - 1);
+    Vector2 pos = new Vector2();
+    pos.x = rand.nextFloat(size.x + Room.START_BORDER.x + 1, Room.END_BORDER.x - size.x - 1);
+    pos.y = rand.nextFloat(Room.START_BORDER.y + size.y + 1, Room.END_BORDER.y - size.y - 1);
+    body.setTransform(pos, 0);
     updateSpritePos();
   }
 
@@ -224,25 +227,27 @@ public class Mob extends Character {
   public final void setSize(double width, double height) {
     start_border = Point.sum(Room.START_BORDER, new Point(1, 1));
     end_border = Point.sub(Room.END_BORDER, new Point((int)Math.ceil(width), (int)Math.ceil(height)));
-    size_offset = size.length() / 5.0;
+    // size_offset = size.length() / 5.0;
+    size.x = (float)width;
+    size.y = (float) height;
     updateSpriteSize();
   }
-  public final void translate(Vector2d vector) {
-    translate(vector.x, vector.y);
-  }
+  // public final void translate(Vector2d vector) {
+  //   translate(vector.x, vector.y);
+  // }
 
-  public final void translate(double x, double y) {
-    pos.x += x;
-    pos.y += y;
+  // public final void translate(double x, double y) {
+  //   pos.x += x;
+  //   pos.y += y;
 
-    if (pos.x < start_border.x) pos.x = start_border.x;
-    else if (pos.x > end_border.x) pos.x = end_border.x;
+  //   if (pos.x < start_border.x) pos.x = start_border.x;
+  //   else if (pos.x > end_border.x) pos.x = end_border.x;
 
-    if (pos.y < start_border.y) pos.y = start_border.y;
-    else if (pos.y > end_border.y) pos.y = end_border.y;
+  //   if (pos.y < start_border.y) pos.y = start_border.y;
+  //   else if (pos.y > end_border.y) pos.y = end_border.y;
 
-    if (Utility.getTranslateDirection(x, y) != Direction.Undefined) dir = Utility.getTranslateDirection(x, y);
-  }
+  //   if (Utility.getTranslateDirection(x, y) != Direction.Undefined) dir = Utility.getTranslateDirection(x, y);
+  // }
 
   private void generateInventoryTexture() {
     if (inventory != null) {
@@ -264,6 +269,7 @@ public class Mob extends Character {
   }
 
   public final void draw(SpriteBatch batch) {
+    Vector2 pos = body.getPosition();
     updateSpritePos();
     sprite.draw(batch);
     if (inventory != null) {
@@ -302,18 +308,18 @@ public class Mob extends Character {
       max_angle = Hand.ANGLE;
       cooldown = Hand.getCooldown(rand);
     }
-    Vector2d v2 = new Vector2d(pos, Main.player.getPos());
+    // Vector2d v2 = new Vector2d(pos, Main.player.getPos());
 
-    if (v2.length() - size_offset - Main.player.getSizeOffset() < max_distance && Vector2d.angle(Utility.getDirectionVector(dir), v2) < max_angle) {
-      Main.player.damage(damage);
-      if (is_hand) {
-        Hand.playSound();
-      } else {
-        inventory.playSound();
-      }
-      attack_timer = 0;
-      return true;
-    }
+    // if (v2.length() - size_offset - Main.player.getSizeOffset() < max_distance && Vector2d.angle(Utility.getDirectionVector(dir), v2) < max_angle) {
+      // Main.player.damage(damage);
+    //   if (is_hand) {
+    //     Hand.playSound();
+    //   } else {
+    //     inventory.playSound();
+    //   }
+    //   attack_timer = 0;
+    //   return true;
+    // }
     return false;
   }
 

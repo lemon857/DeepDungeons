@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.deepdungeons.PhysicsObject;
 import com.deepdungeons.game.effects.CycleEffect;
 import com.deepdungeons.game.effects.Effect;
 

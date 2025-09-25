@@ -7,6 +7,8 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.deepdungeons.game.effects.EffectsPanel;
 import com.deepdungeons.game.items.Edible;
 import com.deepdungeons.game.items.Item;
@@ -99,22 +101,16 @@ public final class Player extends Character {
 
   private double luck;
 
-  private double size_offset;
-
   public Player() {
     super(MAX_HP, MOVE_SPEED, ATTCAK_SPEED, STRENGTH);
 
-    // CircleShape shape = new CircleShape();
-    // PolygonShape shape = new PolygonShape();
-    // shape.setRadius(WIDTH);
-    // shape.setAsBox(10, 10);
-    // setShape(shape, 4f, 0.5f);
+    CircleShape shape = new CircleShape();
+    shape.setRadius(WIDTH);
+    setShape(shape, 4f, 0.5f);
 
     this.effects_panel = new EffectsPanel(effects, EFFECT_PANEL_POS, EFFECT_SIZE, EFFECT_Y_SHIFT);
 
     this.rand = new Random();
-    this.pos = new Vector2d();
-    this.size = new Vector2d(WIDTH, HEIGHT);
     this.damage_anim_timer = DAMAGE_ANIM_TIME + 1;
     this.damage_anim_play = false;
     this.attack_anim_timer = ATTACK_ANIM_TIME + 1;
@@ -123,7 +119,6 @@ public final class Player extends Character {
     this.non_actual = false;
     this.food_points = MAX_FP;
     this.thirsty_points = MAX_TP;
-    this.size_offset = size.length() / 2.0;
 
     this.money = 0;
 
@@ -154,13 +149,15 @@ public final class Player extends Character {
     this.sprite.setSize(WIDTH, HEIGHT);
   }
   public final void generateRandomPos() {
-    pos.x = rand.nextDouble(WIDTH + Room.START_BORDER.x + 1, Room.END_BORDER.x - WIDTH - 1);
-    pos.y = rand.nextDouble(Room.START_BORDER.y + HEIGHT + 1, Room.END_BORDER.y - HEIGHT - 1);
+    Vector2 pos = new Vector2();
+    pos.x = rand.nextFloat(WIDTH + Room.START_BORDER.x + 1, Room.END_BORDER.x - WIDTH - 1);
+    pos.y = rand.nextFloat(Room.START_BORDER.y + HEIGHT + 1, Room.END_BORDER.y - HEIGHT - 1);
+    body.setTransform(pos, 0);
     updateSpritePos();
   }
 
   private void updateSpritePos() {
-    sprite.setPosition((float)pos.x, (float)pos.y);
+    sprite.setPosition(body.getPosition().x, body.getPosition().y);
   }
 
   protected void updateSpriteSize() {
@@ -384,48 +381,52 @@ public final class Player extends Character {
     generateInventoryTexture();
     return res;
   }
-  public void translate(Vector2d vector) {
-    translate(vector.x, vector.y);
-  }
-  public void translate(double x, double y) {
-    Vector2d old_pos = new Vector2d(pos);
+  // public void translate(Vector2d vector) {
+  //   translate(vector.x, vector.y);
+  // }
+  // public void translate(double x, double y) {
+  //   Vector2d old_pos = new Vector2d(pos);
 
-    pos.x += x;
-    pos.y += y;
+  //   pos.x += x;
+  //   pos.y += y;
 
-    if (pos.x < START_BORDER.x) pos.x = START_BORDER.x;
-    else if (pos.x > END_BORDER.x) pos.x = END_BORDER.x;
+  //   if (pos.x < START_BORDER.x) pos.x = START_BORDER.x;
+  //   else if (pos.x > END_BORDER.x) pos.x = END_BORDER.x;
 
-    if (pos.y < START_BORDER.y) pos.y = START_BORDER.y;
-    else if (pos.y > END_BORDER.y) pos.y = END_BORDER.y;
+  //   if (pos.y < START_BORDER.y) pos.y = START_BORDER.y;
+  //   else if (pos.y > END_BORDER.y) pos.y = END_BORDER.y;
 
-    current_walked_distance += Vector2d.distance(old_pos, pos);
-    if (current_walked_distance >= next_thirsty_distance) {
-      thirst(rand.nextInt(2, 5));
-      next_thirsty_distance = rand.nextDouble(MIN_THIRSTY_DISTANCED, MAX_THIRSTY_DISTANCE) + useLuck(-2.0 * Room.WIDTH, 2.0 * Room.WIDTH);
-      current_walked_distance = 0;
-    }
+  //   current_walked_distance += Vector2d.distance(old_pos, pos);
+  //   if (current_walked_distance >= next_thirsty_distance) {
+  //     thirst(rand.nextInt(2, 5));
+  //     next_thirsty_distance = rand.nextDouble(MIN_THIRSTY_DISTANCED, MAX_THIRSTY_DISTANCE) + useLuck(-2.0 * Room.WIDTH, 2.0 * Room.WIDTH);
+  //     current_walked_distance = 0;
+  //   }
 
-    if (Utility.getTranslateDirection(x, y) != Direction.Undefined) {
-      dir = Utility.getTranslateDirection(x, y);
-      updateSpritePos();
-    }
+  //   if (Utility.getTranslateDirection(x, y) != Direction.Undefined) {
+  //     dir = Utility.getTranslateDirection(x, y);
+  //     updateSpritePos();
+  //   }
     
-    non_actual = true;
-  }
+  //   non_actual = true;
+  // }
 
   public void setX(int x) {
+    Vector2 pos = body.getPosition();
     pos.x = x;
     if (pos.x < START_BORDER.x) pos.x = START_BORDER.x;
     else if (pos.x > END_BORDER.x) pos.x = END_BORDER.x;
 
+    body.setTransform(pos, 0);
     updateSpritePos();
   }
   public void setY(int y) {
+    Vector2 pos = body.getPosition();
     pos.y = y;
     if (pos.y < START_BORDER.y) pos.y = START_BORDER.y;
     else if (pos.y > END_BORDER.y) pos.y = END_BORDER.y;
 
+    body.setTransform(pos, 0);
     updateSpritePos();
   }
 
@@ -468,6 +469,7 @@ public final class Player extends Character {
   }
 
   public void draw(SpriteBatch batch) {
+    Vector2 pos = body.getPosition();
     // correct coords for Pixmap
     updateSpritePos();
     sprite.draw(batch);
@@ -505,11 +507,12 @@ public final class Player extends Character {
   }
 
   public Vector2d getPos() {
-    return pos;
+    Vector2 pos = body.getPosition();
+    return new Vector2d(pos.x, pos.y);
   }
 
   public Vector2d getCenterPos() {
-    return Vector2d.sum(pos, new Vector2d(WIDTH / 2, HEIGHT / 2));
+    return Vector2d.sum(getPos(), new Vector2d(WIDTH / 2, HEIGHT / 2));
   }
 
   public Vector2d getDirection() {
@@ -517,7 +520,7 @@ public final class Player extends Character {
   }
 
   public double getSizeOffset() {
-    return size_offset;
+    return 0;
   }
 
   public boolean isDie() {
