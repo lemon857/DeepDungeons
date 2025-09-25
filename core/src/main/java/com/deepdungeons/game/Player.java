@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.deepdungeons.game.effects.EffectsPanel;
 import com.deepdungeons.game.items.Edible;
 import com.deepdungeons.game.items.Item;
@@ -105,9 +104,11 @@ public final class Player extends Character {
   public Player() {
     super(MAX_HP, MOVE_SPEED, ATTCAK_SPEED, STRENGTH);
 
-    CircleShape shape = new CircleShape();
-    shape.setRadius(WIDTH);
-    setShape(shape, 4f, 0.5f);
+    // CircleShape shape = new CircleShape();
+    // PolygonShape shape = new PolygonShape();
+    // shape.setRadius(WIDTH);
+    // shape.setAsBox(10, 10);
+    // setShape(shape, 4f, 0.5f);
 
     this.effects_panel = new EffectsPanel(effects, EFFECT_PANEL_POS, EFFECT_SIZE, EFFECT_Y_SHIFT);
 

@@ -81,7 +81,7 @@ public class Main extends ApplicationAdapter {
 
   private Random rand;
 
-  public World world;
+  public static World world;
 
   private boolean show_map;
   private boolean show_item_info;
