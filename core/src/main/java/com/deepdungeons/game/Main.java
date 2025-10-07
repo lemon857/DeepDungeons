@@ -6,8 +6,11 @@ import java.util.Random;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
@@ -99,9 +102,16 @@ public class Main extends ApplicationAdapter {
   private static final int DEBUG_LINE_ROOM_POS = 4;
   private static final int DEBUG_LINE_ITEM_NAME = 5;
 
+
+  private Wall wall;
+
+	Box2DDebugRenderer debugRenderer;
+	Matrix4 debugMatrix;
+  OrthographicCamera camera;
+
   @Override
   public void create() {
-    world = new World(new Vector2(0f, 0f), true);
+    world = new World(new Vector2(0f, -0.5f), true);
 
     generator = new Generator(START_ROOM);
     rand = new Random();
@@ -134,6 +144,9 @@ public class Main extends ApplicationAdapter {
     });
 
     initStaticItems();
+
+    wall = new Wall("textures/items/leather.png", new Vector2(30, 30), new Vector2(10, 10));
+    debugRenderer = new Box2DDebugRenderer();
 
     Skin skin = new Skin(Gdx.files.internal("ui/uiskin.json"));
 
@@ -460,15 +473,22 @@ public class Main extends ApplicationAdapter {
     ScreenUtils.clear(0f, 0f, 0f, 1f);
     viewport.apply();
     batch.setProjectionMatrix(viewport.getCamera().combined);
+
+		debugMatrix = batch.getProjectionMatrix().cpy().scale(PhysicsObject.PIXELS_TO_METERS, PhysicsObject.PIXELS_TO_METERS, 0);
+
     batch.begin();
     current_room.draw(batch);
+    wall.draw(batch);
     player.draw(batch);
 
     if (show_map) {
       batch.draw(generator.getTexture(), (float)Room.SHIFT_X, 100, 100, -100);
     }
 
+
     batch.end();
+
+    debugRenderer.render(world, debugMatrix);
 
     stage.act(Gdx.graphics.getDeltaTime());
 	  stage.draw();
@@ -674,8 +694,7 @@ public class Main extends ApplicationAdapter {
 // 	OrthographicCamera camera;
 
 // 	final float PIXELS_TO_METERS = 100f;
-// 	final short PHYSICS_ENTITY = 0x1;    // 0001
-// 	final short WORLD_ENTITY = 0x1 << 1; // 0010 or 0x2 in hex
+
 // 	@Override
 // 	public void create () {
 // 		world = new World(new Vector2(0f, 0f), true);
@@ -692,6 +711,9 @@ public class Main extends ApplicationAdapter {
 // 		player = new Sprite(playerTexture);
 // 		wall = new Sprite(wallTexture);
 
+//     player.setSize(100, 100);
+//     wall.setSize(100, 100);
+
 // 		player.setPosition(-player.getWidth() / 2, -player.getHeight() / 2);
 // 		wall.setPosition(-wall.getWidth() / 2, -wall.getHeight() / 2 - 150);
 
@@ -699,13 +721,13 @@ public class Main extends ApplicationAdapter {
 // 		// Player body def
 // 		BodyDef playerDef = new BodyDef();
 // 		playerDef.type = BodyDef.BodyType.DynamicBody;
-// 		playerDef.position.set((player.getX() + player.getWidth()/2) / PIXELS_TO_METERS, (player.getY() + player.getHeight()/2) / PIXELS_TO_METERS);
+// 		// playerDef.position.set((player.getX() + player.getWidth()/2) / PIXELS_TO_METERS, (player.getY() + player.getHeight()/2) / PIXELS_TO_METERS);
 // 		playerBody = world.createBody(playerDef); // create body in world
 
 // 		// // Wall body def
 // 		BodyDef wallDef = new BodyDef();
 // 		wallDef.type = BodyDef.BodyType.StaticBody;
-// 		wallDef.position.set((wall.getX() + wall.getWidth()/2) / PIXELS_TO_METERS, (wall.getY() + wall.getHeight()/2) / PIXELS_TO_METERS);
+// 		// wallDef.position.set((wall.getX() + wall.getWidth()/2) / PIXELS_TO_METERS, (wall.getY() + wall.getHeight()/2) / PIXELS_TO_METERS);
 // 		wallBody = world.createBody(wallDef);
 
 // 		// // Shape
@@ -733,6 +755,9 @@ public class Main extends ApplicationAdapter {
 
 // 		playerBody.createFixture(fixtureDefPlayer);
 // 		wallBody.createFixture(fixtureDefWall);
+
+//     playerBody.setTransform(new Vector2((player.getX() + player.getWidth()/2) / PIXELS_TO_METERS, (player.getY() + player.getHeight()/2) / PIXELS_TO_METERS), 0);
+//     wallBody.setTransform(new Vector2((wall.getX() + wall.getWidth()/2) / PIXELS_TO_METERS, (wall.getY() + wall.getHeight()/2) / PIXELS_TO_METERS), 0);
 
 // 		shape.dispose();
 // 		wallShape.dispose();

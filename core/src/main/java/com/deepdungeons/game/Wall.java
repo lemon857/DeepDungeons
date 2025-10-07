@@ -20,14 +20,14 @@ public class Wall extends PhysicsObject {
     }
 
     PolygonShape shape = new PolygonShape();
-    shape.setAsBox(size.x, size.y);
+    shape.setAsBox(size.x / 2f, size.y / 2f);
     setShape(shape, 4f, 0.5f);
 
     sprite = new Sprite(new Texture(Gdx.files.internal(spritePath)));
     sprite.setPosition(position.x, position.y);
     sprite.setSize(size.x, size.y);
 
-    body.setTransform(new Vector2((position.x + size.x) / PIXELS_TO_METERS, (position.y + size.y) / PIXELS_TO_METERS), 0);
+    body.setTransform(new Vector2((position.x + size.x / 2f) / PIXELS_TO_METERS, (position.y + size.y / 2f) / PIXELS_TO_METERS), 0);
   }
 
   public final void draw(SpriteBatch batch) {

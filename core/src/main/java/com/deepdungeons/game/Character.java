@@ -3,11 +3,12 @@ package com.deepdungeons.game;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.deepdungeons.game.effects.CycleEffect;
 import com.deepdungeons.game.effects.Effect;
 
-public class Character extends PhysicsObject {
+public class Character extends PhysicsObject implements Movable {
   private double move_speed_modifier;
   private double attack_speed_modifier;
   private double strength_modifier;
@@ -99,6 +100,12 @@ public class Character extends PhysicsObject {
         it.remove();
       }
     }
+  }
+
+
+  @Override
+  public void setVelocity(Vector2 vel) {
+    body.setLinearVelocity(vel);
   }
 
   // True if it dead

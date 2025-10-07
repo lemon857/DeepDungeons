@@ -105,7 +105,7 @@ public final class Player extends Character {
     super(MAX_HP, MOVE_SPEED, ATTCAK_SPEED, STRENGTH);
 
     CircleShape shape = new CircleShape();
-    shape.setRadius(WIDTH);
+    shape.setRadius(WIDTH / 2.f);
     setShape(shape, 4f, 0.5f);
 
     this.effects_panel = new EffectsPanel(effects, EFFECT_PANEL_POS, EFFECT_SIZE, EFFECT_Y_SHIFT);
@@ -140,13 +140,15 @@ public final class Player extends Character {
 
     this.hearts = new Pixmap[]{ generateHeart(), generateHeart(), generateHeart() };
 
+    this.size = new Vector2(WIDTH, HEIGHT);
+
     generatePlayerImage();
     generateInventoryTexture();
     generateHealthTexture();
 
     generateRandomPos();
     updateSpritePos();
-    this.sprite.setSize(WIDTH, HEIGHT);
+    updateSpriteSize();
   }
   public final void generateRandomPos() {
     Vector2 pos = new Vector2();
@@ -157,11 +159,11 @@ public final class Player extends Character {
   }
 
   private void updateSpritePos() {
-    sprite.setPosition(body.getPosition().x, body.getPosition().y);
+    sprite.setPosition(body.getPosition().x - size.x / 2, body.getPosition().y - size.y / 2);
   }
 
   protected void updateSpriteSize() {
-    sprite.setSize((float)size.x, (float)size.y);
+    sprite.setSize(size.x, size.y);
   }
 
   private void generatePlayerImage() {
@@ -410,6 +412,16 @@ public final class Player extends Character {
     
   //   non_actual = true;
   // }
+
+  @Override
+  public void setVelocity(Vector2 vel) {
+    body.setLinearVelocity(vel);
+    if (Utility.getTranslateDirection(vel.x, vel.y) != Direction.Undefined) {
+      dir = Utility.getTranslateDirection(vel.x, vel.y);
+      
+      non_actual = true;
+    }
+  }
 
   public void setX(int x) {
     Vector2 pos = body.getPosition();
