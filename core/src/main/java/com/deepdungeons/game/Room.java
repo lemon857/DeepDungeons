@@ -197,7 +197,7 @@ public class Room {
     }
 
     if (non_actual) {
-      generateBackground();
+      //generateBackground();
       non_actual = false;
     }
 
@@ -324,7 +324,7 @@ public class Room {
 
   public void draw(SpriteBatch batch) {
     // correct coords for correct Pixmap drawing
-    batch.draw(background_texture, SHIFT_X, HEIGHT, WIDTH, -HEIGHT);
+    //batch.draw(background_texture, SHIFT_X, HEIGHT, WIDTH, -HEIGHT);
 
     for (Item item : items) {
       item.draw(batch);

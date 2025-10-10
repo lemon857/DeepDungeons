@@ -103,10 +103,12 @@ public class Main extends ApplicationAdapter {
 
 	private Box2DDebugRenderer debugRenderer;
 	private Matrix4 debugMatrix;
+  private RoomWall wall;
 
   @Override
   public void create() {
     world = new World(new Vector2(0f, 0f), true);
+    wall = new RoomWall("textures/wall.png");
 
     generator = new Generator(START_ROOM);
     rand = new Random();
@@ -261,34 +263,34 @@ public class Main extends ApplicationAdapter {
       pos.y += 1;
       vector.y += speed;
       // Top door
-      if (pos.x >= Room.DOOR_OFFSET.x - 3 && pos.x <= Room.DOOR_OFFSET.x + 4 && pos.y > Room.END_BORDER.y - Player.HEIGHT - Room.DOOR_HEIGHT) {
-        if (tryGoToNextRoom(0)) player.setY(Room.START_BORDER.y + Room.DOOR_HEIGHT);
-      }
+      // if (pos.x >= Room.DOOR_OFFSET.x - 3 && pos.x <= Room.DOOR_OFFSET.x + 4 && pos.y > Room.END_BORDER.y - Player.HEIGHT - Room.DOOR_HEIGHT) {
+      //   if (tryGoToNextRoom(0)) player.setY(Room.START_BORDER.y + Room.DOOR_HEIGHT);
+      // }
 
     } else if (Gdx.input.isKeyPressed(Input.Keys.S)) {
       pos.y -= 1;
       vector.y -= speed;
       // Bottom door
-      if (pos.x >= Room.DOOR_OFFSET.x - 3 && pos.x <= Room.DOOR_OFFSET.x + 4 && pos.y < Room.START_BORDER.y + Room.DOOR_HEIGHT + 1) {
-        if (tryGoToNextRoom(2)) player.setY(Room.END_BORDER.y - Player.HEIGHT - Room.DOOR_HEIGHT - 1);
-      }
+      // if (pos.x >= Room.DOOR_OFFSET.x - 3 && pos.x <= Room.DOOR_OFFSET.x + 4 && pos.y < Room.START_BORDER.y + Room.DOOR_HEIGHT + 1) {
+      //   if (tryGoToNextRoom(2)) player.setY(Room.END_BORDER.y - Player.HEIGHT - Room.DOOR_HEIGHT - 1);
+      // }
     }
     
     if (Gdx.input.isKeyPressed(Input.Keys.D)) {
       pos.x += 1;
       vector.x += speed;
       // Right door
-      if (pos.y >= Room.DOOR_OFFSET.y - 3 && pos.y <= Room.DOOR_OFFSET.y + 4 && pos.x > Room.END_BORDER.x - Player.WIDTH - Room.DOOR_HEIGHT - 1) {
-        if (tryGoToNextRoom(1)) player.setX(Room.START_BORDER.x + Room.DOOR_HEIGHT);
-      }
+      // if (pos.y >= Room.DOOR_OFFSET.y - 3 && pos.y <= Room.DOOR_OFFSET.y + 4 && pos.x > Room.END_BORDER.x - Player.WIDTH - Room.DOOR_HEIGHT - 1) {
+      //   if (tryGoToNextRoom(1)) player.setX(Room.START_BORDER.x + Room.DOOR_HEIGHT);
+      // }
       
     } else if (Gdx.input.isKeyPressed(Input.Keys.A)) {
       pos.x -= 1;
       vector.x -= speed;
       // Left door
-      if (pos.y >= Room.DOOR_OFFSET.y - 3 && pos.y <= Room.DOOR_OFFSET.y + 4 && pos.x < Room.START_BORDER.x + Room.DOOR_HEIGHT + 1) {
-        if (tryGoToNextRoom(3)) player.setX(Room.END_BORDER.x - Player.WIDTH - Room.DOOR_HEIGHT - 1);
-      }
+      // if (pos.y >= Room.DOOR_OFFSET.y - 3 && pos.y <= Room.DOOR_OFFSET.y + 4 && pos.x < Room.START_BORDER.x + Room.DOOR_HEIGHT + 1) {
+      //   if (tryGoToNextRoom(3)) player.setX(Room.END_BORDER.x - Player.WIDTH - Room.DOOR_HEIGHT - 1);
+      // }
     }
 
     player.setVelocity(vector);
@@ -473,6 +475,7 @@ public class Main extends ApplicationAdapter {
     batch.begin();
     current_room.draw(batch);
     player.draw(batch);
+    wall.draw(batch);
 
     if (show_map) {
       batch.draw(generator.getTexture(), (float)Room.SHIFT_X, 100, 100, -100);

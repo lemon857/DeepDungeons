@@ -12,7 +12,7 @@ public class Wall extends PhysicsObject {
 
   private Sprite sprite;
 
-  public Wall(String spritePath, Vector2 position, Vector2 size) {
+  public Wall(String spritePath, Vector2 position, Vector2 size, boolean isVertical) {
     super(BodyType.StaticBody);
 
     if (size.x < 0 || size.y < 0) {
@@ -26,6 +26,9 @@ public class Wall extends PhysicsObject {
     sprite = new Sprite(new Texture(Gdx.files.internal(spritePath)));
     sprite.setPosition(position.x, position.y);
     sprite.setSize(size.x, size.y);
+    if (isVertical) {
+      sprite.rotate90(true);
+    }
 
     body.setTransform(new Vector2(position.x + size.x / 2f, position.y + size.y / 2f), 0);
   }
