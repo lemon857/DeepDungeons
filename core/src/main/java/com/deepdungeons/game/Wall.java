@@ -27,7 +27,7 @@ public class Wall extends PhysicsObject {
     sprite.setPosition(position.x, position.y);
     sprite.setSize(size.x, size.y);
 
-    body.setTransform(new Vector2((position.x + size.x / 2f) / PIXELS_TO_METERS, (position.y + size.y / 2f) / PIXELS_TO_METERS), 0);
+    body.setTransform(new Vector2(position.x + size.x / 2f, position.y + size.y / 2f), 0);
   }
 
   public final void draw(SpriteBatch batch) {

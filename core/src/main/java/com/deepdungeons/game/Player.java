@@ -383,35 +383,6 @@ public final class Player extends Character {
     generateInventoryTexture();
     return res;
   }
-  // public void translate(Vector2d vector) {
-  //   translate(vector.x, vector.y);
-  // }
-  // public void translate(double x, double y) {
-  //   Vector2d old_pos = new Vector2d(pos);
-
-  //   pos.x += x;
-  //   pos.y += y;
-
-  //   if (pos.x < START_BORDER.x) pos.x = START_BORDER.x;
-  //   else if (pos.x > END_BORDER.x) pos.x = END_BORDER.x;
-
-  //   if (pos.y < START_BORDER.y) pos.y = START_BORDER.y;
-  //   else if (pos.y > END_BORDER.y) pos.y = END_BORDER.y;
-
-  //   current_walked_distance += Vector2d.distance(old_pos, pos);
-  //   if (current_walked_distance >= next_thirsty_distance) {
-  //     thirst(rand.nextInt(2, 5));
-  //     next_thirsty_distance = rand.nextDouble(MIN_THIRSTY_DISTANCED, MAX_THIRSTY_DISTANCE) + useLuck(-2.0 * Room.WIDTH, 2.0 * Room.WIDTH);
-  //     current_walked_distance = 0;
-  //   }
-
-  //   if (Utility.getTranslateDirection(x, y) != Direction.Undefined) {
-  //     dir = Utility.getTranslateDirection(x, y);
-  //     updateSpritePos();
-  //   }
-    
-  //   non_actual = true;
-  // }
 
   @Override
   public void setVelocity(Vector2 vel) {
@@ -482,12 +453,9 @@ public final class Player extends Character {
 
   public void draw(SpriteBatch batch) {
     Vector2 pos = body.getPosition();
-    // correct coords for Pixmap
     updateSpritePos();
     sprite.draw(batch);
     effects_panel.draw(batch);
-    //batch.draw(image, (float)pos.x, (float)pos.y + (float)size.y,
-    //(float)size.x, -(float)size.y);
     if (inventory != null) {
       if (inventory.isTextureFromFile()) {
         batch.draw(inventory_texture, (float)pos.x + WIDTH * 0.7f, (float)pos.y + HEIGHT * 0.65f, 

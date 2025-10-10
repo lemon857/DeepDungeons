@@ -227,27 +227,10 @@ public class Mob extends Character {
   public final void setSize(double width, double height) {
     start_border = Point.sum(Room.START_BORDER, new Point(1, 1));
     end_border = Point.sub(Room.END_BORDER, new Point((int)Math.ceil(width), (int)Math.ceil(height)));
-    // size_offset = size.length() / 5.0;
     size.x = (float)width;
     size.y = (float) height;
     updateSpriteSize();
   }
-  // public final void translate(Vector2d vector) {
-  //   translate(vector.x, vector.y);
-  // }
-
-  // public final void translate(double x, double y) {
-  //   pos.x += x;
-  //   pos.y += y;
-
-  //   if (pos.x < start_border.x) pos.x = start_border.x;
-  //   else if (pos.x > end_border.x) pos.x = end_border.x;
-
-  //   if (pos.y < start_border.y) pos.y = start_border.y;
-  //   else if (pos.y > end_border.y) pos.y = end_border.y;
-
-  //   if (Utility.getTranslateDirection(x, y) != Direction.Undefined) dir = Utility.getTranslateDirection(x, y);
-  // }
 
   private void generateInventoryTexture() {
     if (inventory != null) {

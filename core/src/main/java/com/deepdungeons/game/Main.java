@@ -6,7 +6,6 @@ import java.util.Random;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
@@ -102,16 +101,12 @@ public class Main extends ApplicationAdapter {
   private static final int DEBUG_LINE_ROOM_POS = 4;
   private static final int DEBUG_LINE_ITEM_NAME = 5;
 
-
-  private Wall wall;
-
-	Box2DDebugRenderer debugRenderer;
-	Matrix4 debugMatrix;
-  OrthographicCamera camera;
+	private Box2DDebugRenderer debugRenderer;
+	private Matrix4 debugMatrix;
 
   @Override
   public void create() {
-    world = new World(new Vector2(0f, -0.5f), true);
+    world = new World(new Vector2(0f, 0f), true);
 
     generator = new Generator(START_ROOM);
     rand = new Random();
@@ -145,7 +140,6 @@ public class Main extends ApplicationAdapter {
 
     initStaticItems();
 
-    wall = new Wall("textures/items/leather.png", new Vector2(30, 30), new Vector2(10, 10));
     debugRenderer = new Box2DDebugRenderer();
 
     Skin skin = new Skin(Gdx.files.internal("ui/uiskin.json"));
@@ -474,11 +468,10 @@ public class Main extends ApplicationAdapter {
     viewport.apply();
     batch.setProjectionMatrix(viewport.getCamera().combined);
 
-		debugMatrix = batch.getProjectionMatrix().cpy().scale(PhysicsObject.PIXELS_TO_METERS, PhysicsObject.PIXELS_TO_METERS, 0);
+		debugMatrix = batch.getProjectionMatrix().cpy();
 
     batch.begin();
     current_room.draw(batch);
-    wall.draw(batch);
     player.draw(batch);
 
     if (show_map) {
@@ -660,165 +653,3 @@ public class Main extends ApplicationAdapter {
     });
   }
 }
-
-// -------------------------------------------------------------
-
-// package com.deepdungeons.game;
-
-// import com.badlogic.gdx.ApplicationAdapter;
-// import com.badlogic.gdx.Gdx;
-// import com.badlogic.gdx.Input;
-// import com.badlogic.gdx.graphics.OrthographicCamera;
-// import com.badlogic.gdx.graphics.Texture;
-// import com.badlogic.gdx.graphics.g2d.Sprite;
-// import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-// import com.badlogic.gdx.math.Matrix4;
-// import com.badlogic.gdx.math.Vector2;
-// import com.badlogic.gdx.physics.box2d.Body;
-// import com.badlogic.gdx.physics.box2d.BodyDef;
-// import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
-// import com.badlogic.gdx.physics.box2d.FixtureDef;
-// import com.badlogic.gdx.physics.box2d.PolygonShape;
-// import com.badlogic.gdx.physics.box2d.World;
-// import com.badlogic.gdx.utils.ScreenUtils;
-
-// public class Main extends ApplicationAdapter {
-// 	World world;
-// 	SpriteBatch batch;
-// 	Sprite player, wall;
-// 	Texture playerTexture, wallTexture;
-// 	Body playerBody, wallBody;
-
-// 	Box2DDebugRenderer debugRenderer;
-// 	Matrix4 debugMatrix;
-// 	OrthographicCamera camera;
-
-// 	final float PIXELS_TO_METERS = 100f;
-
-// 	@Override
-// 	public void create () {
-// 		world = new World(new Vector2(0f, 0f), true);
-		
-// 		camera = new OrthographicCamera(Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
-
-// 		debugRenderer = new Box2DDebugRenderer();
-
-// 		batch = new SpriteBatch();
-
-// 		playerTexture = new Texture("textures/items/bone.png");
-// 		wallTexture = new Texture("textures/items/key.png");
-
-// 		player = new Sprite(playerTexture);
-// 		wall = new Sprite(wallTexture);
-
-//     player.setSize(100, 100);
-//     wall.setSize(100, 100);
-
-// 		player.setPosition(-player.getWidth() / 2, -player.getHeight() / 2);
-// 		wall.setPosition(-wall.getWidth() / 2, -wall.getHeight() / 2 - 150);
-
-
-// 		// Player body def
-// 		BodyDef playerDef = new BodyDef();
-// 		playerDef.type = BodyDef.BodyType.DynamicBody;
-// 		// playerDef.position.set((player.getX() + player.getWidth()/2) / PIXELS_TO_METERS, (player.getY() + player.getHeight()/2) / PIXELS_TO_METERS);
-// 		playerBody = world.createBody(playerDef); // create body in world
-
-// 		// // Wall body def
-// 		BodyDef wallDef = new BodyDef();
-// 		wallDef.type = BodyDef.BodyType.StaticBody;
-// 		// wallDef.position.set((wall.getX() + wall.getWidth()/2) / PIXELS_TO_METERS, (wall.getY() + wall.getHeight()/2) / PIXELS_TO_METERS);
-// 		wallBody = world.createBody(wallDef);
-
-// 		// // Shape
-// 		PolygonShape shape = new PolygonShape(); // create shape
-// 		shape.setAsBox(player.getWidth() / 2 / PIXELS_TO_METERS, player.getHeight() / 2 / PIXELS_TO_METERS);
-
-// 		PolygonShape wallShape = new PolygonShape(); // create shape
-// 		wallShape.setAsBox(wall.getWidth() / 2 / PIXELS_TO_METERS, wall.getHeight() / 2 / PIXELS_TO_METERS);
-
-// 		// // Player
-// 		FixtureDef fixtureDefPlayer = new FixtureDef(); // create fixture
-// 		fixtureDefPlayer.shape = shape; // shape
-// 		fixtureDefPlayer.density = 3f; // density
-// 		fixtureDefPlayer.restitution = 0.5f; // restitution: bounciness
-// 		// fixtureDefPlayer.filter.categoryBits = PHYSICS_ENTITY;
-// 		// fixtureDefPlayer.filter.maskBits = WORLD_ENTITY;
-
-// 		// // Wall
-// 		FixtureDef fixtureDefWall = new FixtureDef();
-// 		fixtureDefWall.shape = wallShape;
-// 		fixtureDefWall.density = 0.1f;
-// 		fixtureDefWall.restitution = 0.5f;
-// 		// fixtureDefWall.filter.categoryBits = WORLD_ENTITY;
-// 		// fixtureDefWall.filter.maskBits = PHYSICS_ENTITY; // sets collision with player
-
-// 		playerBody.createFixture(fixtureDefPlayer);
-// 		wallBody.createFixture(fixtureDefWall);
-
-//     playerBody.setTransform(new Vector2((player.getX() + player.getWidth()/2) / PIXELS_TO_METERS, (player.getY() + player.getHeight()/2) / PIXELS_TO_METERS), 0);
-//     wallBody.setTransform(new Vector2((wall.getX() + wall.getWidth()/2) / PIXELS_TO_METERS, (wall.getY() + wall.getHeight()/2) / PIXELS_TO_METERS), 0);
-
-// 		shape.dispose();
-// 		wallShape.dispose();
-// 	}
-
-// 	@Override
-// 	public void render () {
-// 		ScreenUtils.clear(1, 1, 1, 1);
-// 		world.step(Gdx.graphics.getDeltaTime(), 1, 1);
-
-// 		InputHandler();
-
-// 		playerBody.setFixedRotation(true);
-
-// 		player.setPosition((playerBody.getPosition().x * PIXELS_TO_METERS) - player.getWidth() / 2 , (playerBody.getPosition().y * PIXELS_TO_METERS) - player.getHeight() / 2);
-// 		player.setRotation((float)Math.toDegrees(playerBody.getAngle()));
-
-// 		wall.setPosition((wallBody.getPosition().x * PIXELS_TO_METERS) - wall.getWidth()/2 , (wallBody.getPosition().y * PIXELS_TO_METERS) -wall.getHeight()/2 );
-// 		wall.setRotation((float)Math.toDegrees(wallBody.getAngle()));
-
-// 		batch.setProjectionMatrix(camera.combined);
-// 		debugMatrix = batch.getProjectionMatrix().cpy().scale(PIXELS_TO_METERS, PIXELS_TO_METERS, 0);
-
-// 		batch.begin();
-
-// 		batch.draw(player, player.getX(), player.getY(), player.getOriginX(), player.getOriginY(), player.getWidth(), player.getHeight(), player.getScaleX(), player.getScaleY(),player.getRotation());
-// 		batch.draw(wall, wall.getX(), wall.getY(),wall.getOriginX(), wall.getOriginY(), wall.getWidth(),wall.getHeight(),wall.getScaleX(),wall.getScaleY(),wall.getRotation());
-
-// 		batch.end();
-
-// 		debugRenderer.render(world, debugMatrix);
-// 	}
-
-// 	public void InputHandler() {
-// 		Vector2 vec = new Vector2(0, 0);
-// 		float speed = 3;
-// 		if (Gdx.input.isKeyPressed(Input.Keys.W)) {
-// 			vec.y += speed;
-			
-// 		}
-// 		if (Gdx.input.isKeyPressed(Input.Keys.S)) {
-// 			vec.y -= speed;
-
-// 		}
-// 		if (Gdx.input.isKeyPressed(Input.Keys.A)) {
-// 			vec.x -= speed;
-
-// 		}
-// 		if (Gdx.input.isKeyPressed(Input.Keys.D)) {
-// 			vec.x += speed;
-
-// 		}
-
-// 		playerBody.setLinearVelocity(vec);
-// 	}
-
-// 	@Override
-// 	public void dispose () {
-// 		batch.dispose();
-// 		world.dispose();
-// 		playerTexture.dispose();
-
-// 	}
-// }
