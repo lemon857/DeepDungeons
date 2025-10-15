@@ -105,10 +105,14 @@ public class Main extends ApplicationAdapter {
 	private Matrix4 debugMatrix;
   private RoomWall wall;
 
+  private PhysicsContactListener contactListener;
+
   @Override
   public void create() {
     world = new World(new Vector2(0f, 0f), true);
     wall = new RoomWall("textures/wall.png");
+
+    world.setContactListener(contactListener);
 
     generator = new Generator(START_ROOM);
     rand = new Random();

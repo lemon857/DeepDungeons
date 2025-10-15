@@ -35,6 +35,7 @@ public class Character extends PhysicsObject implements Movable {
     this.strength_modifier = 1.0;
 
     this.health_points = health_points;
+    setUserData("character");
   }
 
   public final double getMoveSpeed() {

@@ -27,4 +27,16 @@ public class PhysicsObject {
 
     body.createFixture(fixtureDef);
   }
+
+  protected void setUserData(String data) {
+    body.setUserData(data);
+  }
+
+  protected void setPosition(Vector2 pos) {
+    body.setTransform(pos, 0);
+  }
+  
+  protected void setPosition(float x, float y) {
+    body.setTransform(x, y, 0);
+  }
 }

@@ -149,12 +149,13 @@ public final class Player extends Character {
     generateRandomPos();
     updateSpritePos();
     updateSpriteSize();
+    setUserData("player");
   }
   public final void generateRandomPos() {
     Vector2 pos = new Vector2();
     pos.x = rand.nextFloat(WIDTH + Room.START_BORDER.x + 1, Room.END_BORDER.x - WIDTH - 1);
     pos.y = rand.nextFloat(Room.START_BORDER.y + HEIGHT + 1, Room.END_BORDER.y - HEIGHT - 1);
-    body.setTransform(pos, 0);
+    setPosition(pos);
     updateSpritePos();
   }
 

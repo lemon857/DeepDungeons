@@ -30,7 +30,8 @@ public class Wall extends PhysicsObject {
       sprite.rotate90(true);
     }
 
-    body.setTransform(new Vector2(position.x + size.x / 2f, position.y + size.y / 2f), 0);
+    setPosition(position.x + size.x / 2f, position.y + size.y / 2f);
+    setUserData("wall");
   }
 
   public final void draw(SpriteBatch batch) {
