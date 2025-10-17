@@ -7,10 +7,13 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.deepdungeons.game.renderer.Drawable;
 
-public class Wall extends PhysicsObject {
+public final class Wall extends PhysicsObject implements Drawable {
 
   private Sprite sprite;
+
+  private boolean is_active;
 
   public Wall(String spritePath, Vector2 position, Vector2 size, boolean isVertical) {
     super(BodyType.StaticBody);
@@ -23,6 +26,7 @@ public class Wall extends PhysicsObject {
     shape.setAsBox(size.x / 2f, size.y / 2f);
     setShape(shape, 4f, 0.5f);
 
+    is_active = true;
     sprite = new Sprite(new Texture(Gdx.files.internal(spritePath)));
     sprite.setPosition(position.x, position.y);
     sprite.setSize(size.x, size.y);
@@ -34,6 +38,12 @@ public class Wall extends PhysicsObject {
     setUserData("wall");
   }
 
+  @Override
+  public void setActive(boolean value) {
+    is_active = value;
+  }
+
+  @Override
   public final void draw(SpriteBatch batch) {
     sprite.draw(batch);
   }

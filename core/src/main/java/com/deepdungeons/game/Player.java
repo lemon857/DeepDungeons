@@ -12,12 +12,13 @@ import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.deepdungeons.game.effects.EffectsPanel;
 import com.deepdungeons.game.items.Edible;
 import com.deepdungeons.game.items.Item;
+import com.deepdungeons.game.renderer.Drawable;
 import com.deepdungeons.game.utils.Direction;
 import com.deepdungeons.game.utils.Point;
 import com.deepdungeons.game.utils.Utility;
 import com.deepdungeons.game.utils.Vector2d;
 
-public final class Player extends Character {
+public final class Player extends Character implements Drawable {
   public static final int WIDTH = 7;
   public static final int HEIGHT = 7;
 
@@ -69,6 +70,8 @@ public final class Player extends Character {
   protected boolean damage_anim_play;
   protected static final double DAMAGE_ANIM_TIME = 0.25;
 
+  private boolean is_active;
+
   private Sprite sprite;
 
   private Texture inventory_texture;
@@ -103,6 +106,8 @@ public final class Player extends Character {
 
   public Player() {
     super(MAX_HP, MOVE_SPEED, ATTCAK_SPEED, STRENGTH);
+
+    is_active = true;
 
     CircleShape shape = new CircleShape();
     shape.setRadius(WIDTH / 2.f);
@@ -452,7 +457,15 @@ public final class Player extends Character {
     }
   }
 
+  @Override
+  public void setActive(boolean value) {
+    is_active = value;
+  }
+
+  @Override
   public void draw(SpriteBatch batch) {
+    if (!is_active) return;
+
     Vector2 pos = body.getPosition();
     updateSpritePos();
     sprite.draw(batch);

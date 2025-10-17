@@ -13,6 +13,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.deepdungeons.game.Character;
 import com.deepdungeons.game.Room;
 import com.deepdungeons.game.items.Item;
+import com.deepdungeons.game.renderer.Drawable;
 import com.deepdungeons.game.utils.Direction;
 import com.deepdungeons.game.utils.LootTable;
 import com.deepdungeons.game.utils.Point;
@@ -20,7 +21,7 @@ import com.deepdungeons.game.utils.Vector2d;
 import com.deepdungeons.game.weapons.CloseRangeWeapon;
 import com.deepdungeons.game.weapons.Hand;
 
-public class Mob extends Character {
+public class Mob extends Character implements Drawable {
   private static HashMap<String, Mob> static_mobs;
 
   public static void initStaticMobs() {
@@ -89,6 +90,8 @@ public class Mob extends Character {
 
   private final Tier tier;
 
+  private boolean is_active;
+
   public enum Tier {
     Humble, General, Wicked, Aggressive
   }
@@ -96,6 +99,7 @@ public class Mob extends Character {
   public Mob(String path_to_texture, Tier tier, double move_speed, double attack_speed, double strength, LootTable table) {
     super(1, move_speed, attack_speed, strength);
 
+    this.is_active = true;
     this.tier = tier;
     this.table = table;
     this.id = current_id;
@@ -115,6 +119,7 @@ public class Mob extends Character {
   public Mob(Pixmap map, Tier tier, double move_speed, double attack_speed, double strength, LootTable table) {
     super(1, move_speed, attack_speed, strength);
 
+    this.is_active = true;
     this.tier = tier;
     this.table = table;
     this.id = current_id;
@@ -251,7 +256,15 @@ public class Mob extends Character {
     generateInventoryTexture();
   }
 
+  @Override
+  public void setActive(boolean value) {
+    is_active = value;
+  }
+
+  @Override
   public final void draw(SpriteBatch batch) {
+    if (!is_active) return;
+    
     Vector2 pos = body.getPosition();
     updateSpritePos();
     sprite.draw(batch);

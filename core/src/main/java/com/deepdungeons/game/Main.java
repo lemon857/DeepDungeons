@@ -7,17 +7,13 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.utils.ScreenUtils;
-import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.deepdungeons.game.effects.CycleEffect;
 import com.deepdungeons.game.effects.Effect;
 import com.deepdungeons.game.effects.EffectsPanel;
@@ -29,6 +25,8 @@ import com.deepdungeons.game.items.ItemForCraft;
 import com.deepdungeons.game.items.Key;
 import com.deepdungeons.game.mobs.DefaultEnemy;
 import com.deepdungeons.game.mobs.Mob;
+import com.deepdungeons.game.renderer.BaseRenderer;
+import com.deepdungeons.game.renderer.DebugRenderer;
 import com.deepdungeons.game.utils.Generator;
 import com.deepdungeons.game.utils.LootTable;
 import com.deepdungeons.game.utils.Point;
@@ -48,8 +46,7 @@ import com.deepdungeons.game.weapons.Hand;
 // I fix it with crutch - flag for check loaded from file
 
 public class Main extends ApplicationAdapter {
-  private SpriteBatch batch;
-  private FitViewport viewport;
+  private BaseRenderer renderer;
 
   private Stage stage;
 
@@ -101,23 +98,24 @@ public class Main extends ApplicationAdapter {
   private static final int DEBUG_LINE_ROOM_POS = 4;
   private static final int DEBUG_LINE_ITEM_NAME = 5;
 
-	private Box2DDebugRenderer debugRenderer;
-	private Matrix4 debugMatrix;
   private RoomWall wall;
 
   private PhysicsContactListener contactListener;
 
   @Override
-  public void create() {
-    world = new World(new Vector2(0f, 0f), true);
-    wall = new RoomWall("textures/wall.png");
-
-    world.setContactListener(contactListener);
-
+  public void create() {   
     generator = new Generator(START_ROOM);
     rand = new Random();
-    batch = new SpriteBatch();
-    viewport = new FitViewport(Room.SCREEN_WIDTH, Room.SCREEN_HEIGHT);
+
+    world = new World(new Vector2(0f, 0f), true);
+    world.setContactListener(contactListener);
+
+    renderer = new DebugRenderer(new SpriteBatch(), Room.SCREEN_WIDTH, Room.SCREEN_HEIGHT, world);
+    
+    wall = new RoomWall("textures/wall.png");
+
+    renderer.addDrawable(wall);
+
     stage = new Stage();
     Gdx.input.setInputProcessor(stage);
 
@@ -145,8 +143,6 @@ public class Main extends ApplicationAdapter {
     });
 
     initStaticItems();
-
-    debugRenderer = new Box2DDebugRenderer();
 
     Skin skin = new Skin(Gdx.files.internal("ui/uiskin.json"));
 
@@ -192,12 +188,14 @@ public class Main extends ApplicationAdapter {
     pause_tip_label.setVisible(false);
 
     player = new Player();
+    renderer.addDrawable(player);
 
     rooms = new HashMap<>();
 
     Generator.RoomMark mark = generator.getRoomMark(START_ROOM);
 
     Room new_room = new Room(new Point(0, 0), mark.doors, mark.lock_doors, mark.lock_doors_color);
+    renderer.addDrawable(new_room);
 
     if (!mark.require_keys.isEmpty()) {
       for (int i = 0; i < mark.require_keys.size(); ++i) {
@@ -470,25 +468,11 @@ public class Main extends ApplicationAdapter {
   }
 
   private void draw() {
-    ScreenUtils.clear(0f, 0f, 0f, 1f);
-    viewport.apply();
-    batch.setProjectionMatrix(viewport.getCamera().combined);
-
-		debugMatrix = batch.getProjectionMatrix().cpy();
-
-    batch.begin();
-    current_room.draw(batch);
-    player.draw(batch);
-    wall.draw(batch);
-
-    if (show_map) {
-      batch.draw(generator.getTexture(), (float)Room.SHIFT_X, 100, 100, -100);
-    }
-
-
-    batch.end();
-
-    debugRenderer.render(world, debugMatrix);
+    renderer.render();
+    
+    // if (show_map) {
+    //   batch.draw(generator.getTexture(), (float)Room.SHIFT_X, 100, 100, -100);
+    // }
 
     stage.act(Gdx.graphics.getDeltaTime());
 	  stage.draw();
@@ -496,13 +480,13 @@ public class Main extends ApplicationAdapter {
 
   @Override
   public void dispose() {
-    batch.dispose();
+    renderer.dispose();
     world.dispose();
   }
 
   @Override
   public void resize(int width, int height) {
-    viewport.update(width, height, true);
+    renderer.resize(width, height);
   }
 
   private boolean tryGoToNextRoom(int door_id) {
@@ -523,6 +507,7 @@ public class Main extends ApplicationAdapter {
 
       Generator.RoomMark mark = generator.getRoomMark(current_room_pos);
       Room new_room = new Room(current_room_pos, mark.doors, mark.lock_doors, mark.lock_doors_color);
+      renderer.addDrawable(new_room);
 
       if (!mark.require_keys.isEmpty()) {
         for (int i = 0; i < mark.require_keys.size(); ++i) {
@@ -560,7 +545,9 @@ public class Main extends ApplicationAdapter {
       current_room_pos = new_pos;
     }
 
+    current_room.setActive(false);
     current_room = rooms.get(current_room_pos);
+    current_room.setActive(true);
 
     debug_info[DEBUG_LINE_ROOM_POS].setText("Room X: " + current_room_pos.x + " Y: " + current_room_pos.y);
     return true;

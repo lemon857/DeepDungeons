@@ -12,10 +12,11 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.deepdungeons.game.items.Item;
 import com.deepdungeons.game.items.Key;
 import com.deepdungeons.game.mobs.Mob;
+import com.deepdungeons.game.renderer.Drawable;
 import com.deepdungeons.game.utils.Point;
 import com.deepdungeons.game.utils.Vector2d;
 
-public class Room {
+public class Room implements Drawable {
   public static final int SCREEN_WIDTH = 150;
   public static final int SCREEN_HEIGHT = 100;
 
@@ -49,6 +50,8 @@ public class Room {
   private final Point pos;
 
   private Texture background_texture;
+
+  private boolean is_active;
 
   //private Texture debug_texture;
 
@@ -92,6 +95,7 @@ public class Room {
   public Room(Point pos, boolean[] doors, int[] lock_doors, Color[] lock_doors_color) {
     this.rand = new Random();
     this.pos = pos;
+    this.is_active = true;
 
     this.doors = doors;
     this.lock_doors = lock_doors;
@@ -322,7 +326,14 @@ public class Room {
     return is_hit;
   }
 
+  @Override
+  public void setActive(boolean value) {
+    is_active = value;
+  }
+
+  @Override
   public void draw(SpriteBatch batch) {
+    if (!is_active) return;
     // correct coords for correct Pixmap drawing
     //batch.draw(background_texture, SHIFT_X, HEIGHT, WIDTH, -HEIGHT);
 

@@ -101,7 +101,7 @@ public class Item {
     this.sound = null;
   }
 
-  protected void updateSize(double koef) {
+  protected final void updateSize(double koef) {
     this.size = new Vector2d(this.image.getWidth() * koef, this.image.getHeight() * koef);
   }
 

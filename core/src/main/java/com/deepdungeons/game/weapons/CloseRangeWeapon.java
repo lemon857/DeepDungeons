@@ -71,9 +71,4 @@ public class CloseRangeWeapon extends Item implements Weapon {
   public boolean isAllowSplash() {
     return allow_splash;
   }
-
-  @Override
-  public Weapon.Type getWeaponType() {
-    return Weapon.Type.CloseRangeWeapon;
-  }
 }
