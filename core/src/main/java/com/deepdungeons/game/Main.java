@@ -82,7 +82,6 @@ public class Main extends ApplicationAdapter {
 
   public static World world;
 
-  private boolean show_map;
   private boolean show_item_info;
 
   private Label[] debug_info;
@@ -103,18 +102,20 @@ public class Main extends ApplicationAdapter {
   private PhysicsContactListener contactListener;
 
   @Override
-  public void create() {   
-    generator = new Generator(START_ROOM);
+  public void create() {
     rand = new Random();
 
     world = new World(new Vector2(0f, 0f), true);
     world.setContactListener(contactListener);
 
     renderer = new DebugRenderer(new SpriteBatch(), Room.SCREEN_WIDTH, Room.SCREEN_HEIGHT, world);
-    
-    wall = new RoomWall("textures/wall.png");
 
+    wall = new RoomWall("textures/wall.png");
     renderer.addDrawable(wall);
+
+    generator = new Generator(START_ROOM, new Vector2((float)Room.SHIFT_X, 100));
+    generator.setActive(false);
+    renderer.addDrawable(generator);
 
     stage = new Stage();
     Gdx.input.setInputProcessor(stage);
@@ -221,7 +222,6 @@ public class Main extends ApplicationAdapter {
     cooldown = 0;
     show_item_info = false;
     is_pause = false;
-    show_map = false;
   }
 
   @Override
@@ -380,7 +380,7 @@ public class Main extends ApplicationAdapter {
 
     // [DEBUG] Show map
     if (Gdx.input.isKeyJustPressed(Input.Keys.M)) {
-      show_map = !show_map;
+      generator.setActive(!generator.getActive());
     }
 
     // [DEBUG] Spawn new mob
@@ -470,10 +470,6 @@ public class Main extends ApplicationAdapter {
   private void draw() {
     renderer.render();
     
-    // if (show_map) {
-    //   batch.draw(generator.getTexture(), (float)Room.SHIFT_X, 100, 100, -100);
-    // }
-
     stage.act(Gdx.graphics.getDeltaTime());
 	  stage.draw();
   }

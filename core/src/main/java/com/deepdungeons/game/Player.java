@@ -463,6 +463,11 @@ public final class Player extends Character implements Drawable {
   }
 
   @Override
+  public boolean getActive() {
+    return is_active;
+  }
+
+  @Override
   public void draw(SpriteBatch batch) {
     if (!is_active) return;
 

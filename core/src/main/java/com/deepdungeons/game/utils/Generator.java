@@ -10,9 +10,12 @@ import java.util.Random;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Vector2;
 import com.deepdungeons.game.Room;
+import com.deepdungeons.game.renderer.Drawable;
 
-public class Generator {
+public class Generator implements Drawable {
 
   public static Point getRoomDeltaFromDoor(int door_id) {
     Point delta = new Point();
@@ -81,7 +84,11 @@ public class Generator {
   private Pixmap map;
   private final Point offset;
 
-  public Generator(Point start_pos) {
+  private final Vector2 pos;
+
+  private boolean is_active;
+
+  public Generator(Point start_pos, Vector2 map_offset) {
     this.next_rooms = new PriorityQueue<>(Comparator.comparingInt(NextRoomInfo::isLock).reversed());
     this.skeleton = new HashMap<>();
     this.zones = new HashMap<>();
@@ -90,8 +97,10 @@ public class Generator {
     this.prev_zones = new int[ZONES_LIMIT];
     this.require_keys = new int[ZONES_LIMIT];
     this.require_key_colors = new Color[ZONES_LIMIT];
+    this.is_active = true;
 
-    this.offset = new Point(50, 50);
+    this.pos = map_offset;
+    this.offset = new Point(50,50);
   }
 
   public void clearSkeleton() {
@@ -125,7 +134,6 @@ public class Generator {
     for (Map.Entry<Point, RoomMark> e : skeleton.entrySet()) {
       Point pos = e.getKey();
       RoomMark mark = e.getValue();
-      // System.out.printf("Pos: x: %d, y: %d -- zone: %d -- doors: ", pos.x, pos.y, mark.zone);
 
       Point map_pos = Point.sum(offset, Point.mul(pos, 3));
 
@@ -147,37 +155,41 @@ public class Generator {
       }
       map.drawPixel(map_pos.x, map_pos.y);
 
-
       map.setColor(Color.BROWN);
       for (int i = 0; i < Room.MAX_DOORS_COUNT; ++i) {
-        // System.out.printf("%d ", mark.doors[i] ? 1 : 0);
         if (mark.doors[i]) {
           Point door_pos = Point.sum(map_pos, getRoomDeltaFromDoor(i));
           map.drawPixel(door_pos.x, door_pos.y);
         }
       }
 
-      // System.out.print(" -- lock doors: ");
-
       map.setColor(Color.RED);
       for (int i = 0; i < Room.MAX_DOORS_COUNT; ++i) {
-        // System.out.printf("%d ", mark.lock_doors[i]);
         if (mark.lock_doors[i] != 0) {
           Point door_pos = Point.sum(map_pos, getRoomDeltaFromDoor(i));
           map.drawPixel(door_pos.x, door_pos.y);
         }
       }
-
-      // System.out.print("\n");
     }
-
-    // System.out.print("=====================================================\n");
 
     image = new Texture(map);
   }
 
-  public Texture getTexture() {
-    return image;
+  @Override
+  public void setActive(boolean value) {
+    is_active = value;
+  }
+  
+  @Override
+  public boolean getActive() {
+    return is_active;
+  }
+
+  @Override
+  public void draw(SpriteBatch batch) {
+    if (!is_active) return;
+
+    batch.draw(image, pos.x, pos.y, 100, -100);
   }
 
   public RoomMark getRoomMark(int x, int y) {

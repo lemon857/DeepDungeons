@@ -27,6 +27,11 @@ public final class RoomWall implements Drawable {
   }
 
   @Override
+  public boolean getActive() {
+    return is_active;
+  }
+
+  @Override
   public final void draw(SpriteBatch batch) {
     if (!is_active) return;
 

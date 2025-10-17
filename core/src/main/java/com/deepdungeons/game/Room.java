@@ -332,6 +332,11 @@ public class Room implements Drawable {
   }
 
   @Override
+  public boolean getActive() {
+    return is_active;
+  }
+
+  @Override
   public void draw(SpriteBatch batch) {
     if (!is_active) return;
     // correct coords for correct Pixmap drawing

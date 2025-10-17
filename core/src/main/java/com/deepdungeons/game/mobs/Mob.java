@@ -262,9 +262,14 @@ public class Mob extends Character implements Drawable {
   }
 
   @Override
+  public boolean getActive() {
+    return is_active;
+  }
+
+  @Override
   public final void draw(SpriteBatch batch) {
     if (!is_active) return;
-    
+
     Vector2 pos = body.getPosition();
     updateSpritePos();
     sprite.draw(batch);

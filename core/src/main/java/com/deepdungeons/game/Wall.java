@@ -44,6 +44,11 @@ public final class Wall extends PhysicsObject implements Drawable {
   }
 
   @Override
+  public boolean getActive() {
+    return is_active;
+  }
+
+  @Override
   public final void draw(SpriteBatch batch) {
     sprite.draw(batch);
   }
