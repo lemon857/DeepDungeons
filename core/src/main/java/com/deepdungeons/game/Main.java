@@ -55,7 +55,7 @@ public class Main extends ApplicationAdapter {
   private Point current_room_pos;
   private Room current_room;
 
-  public static Player player;
+  private Player player;
   private boolean is_pause;
   private double timer;
   private double cooldown;
@@ -101,6 +101,8 @@ public class Main extends ApplicationAdapter {
 
   private PhysicsContactListener contactListener;
 
+  private Door door;
+
   @Override
   public void create() {
     rand = new Random();
@@ -112,6 +114,10 @@ public class Main extends ApplicationAdapter {
 
     wall = new RoomWall(world, "textures/wall.png");
     renderer.addDrawable(wall);
+
+    door = new Door(world, "textures/door.png", DEBUG_LINES, 
+      new Vector2(Room.START_BORDER.x + 30, 30), new Vector2(64, 16), false);
+    renderer.addDrawable(door);
 
     generator = new Generator(START_ROOM, new Vector2((float)Room.SHIFT_X, 100));
     generator.setActive(false);
