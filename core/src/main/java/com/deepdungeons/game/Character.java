@@ -5,6 +5,7 @@ import java.util.Iterator;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.World;
 import com.deepdungeons.game.effects.CycleEffect;
 import com.deepdungeons.game.effects.Effect;
 
@@ -21,8 +22,8 @@ public class Character extends PhysicsObject implements Movable {
 
   protected double health_points;
 
-  public Character(double health_points, double move_speed, double attack_speed, double strength) {
-    super(BodyDef.BodyType.DynamicBody);
+  public Character(World world, double health_points, double move_speed, double attack_speed, double strength) {
+    super(world, BodyDef.BodyType.DynamicBody);
 
     this.move_speed = move_speed;
     this.attack_speed = attack_speed;

@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.CircleShape;
+import com.badlogic.gdx.physics.box2d.World;
 import com.deepdungeons.game.effects.EffectsPanel;
 import com.deepdungeons.game.items.Edible;
 import com.deepdungeons.game.items.Item;
@@ -104,8 +105,8 @@ public final class Player extends Character implements Drawable {
 
   private double luck;
 
-  public Player() {
-    super(MAX_HP, MOVE_SPEED, ATTCAK_SPEED, STRENGTH);
+  public Player(World world) {
+    super(world, MAX_HP, MOVE_SPEED, ATTCAK_SPEED, STRENGTH);
 
     is_active = true;
 

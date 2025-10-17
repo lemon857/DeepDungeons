@@ -80,7 +80,7 @@ public class Main extends ApplicationAdapter {
 
   private Random rand;
 
-  public static World world;
+  private World world;
 
   private boolean show_item_info;
 
@@ -110,7 +110,7 @@ public class Main extends ApplicationAdapter {
 
     renderer = new DebugRenderer(new SpriteBatch(), Room.SCREEN_WIDTH, Room.SCREEN_HEIGHT, world);
 
-    wall = new RoomWall("textures/wall.png");
+    wall = new RoomWall(world, "textures/wall.png");
     renderer.addDrawable(wall);
 
     generator = new Generator(START_ROOM, new Vector2((float)Room.SHIFT_X, 100));
@@ -188,7 +188,7 @@ public class Main extends ApplicationAdapter {
     pause_info_label.setVisible(false);
     pause_tip_label.setVisible(false);
 
-    player = new Player();
+    player = new Player(world);
     renderer.addDrawable(player);
 
     rooms = new HashMap<>();
@@ -577,11 +577,11 @@ public class Main extends ApplicationAdapter {
      1.2, 2, Math.PI / 3, 1.5, 1, true));
 
     Mob.initStaticMobs();
-    Mob.addStaticMob("mobs/skeleton", new DefaultEnemy("textures/mobs/skeleton.png", 
+    Mob.addStaticMob("mobs/skeleton", new DefaultEnemy(world, "textures/mobs/skeleton.png", 
     25, 1.1, 0.8, 1, 3,
      new LootTable(new String[][]{{}, {"forcraft/bone"}, {"forcraft/rope"}}, new double[]{0.8, 0.15, 0.05})));
 
-     Mob.addStaticMob("mobs/zombie", new DefaultEnemy("textures/mobs/zombie.png", 
+     Mob.addStaticMob("mobs/zombie", new DefaultEnemy(world, "textures/mobs/zombie.png", 
      20, 0.9, 1.2, 2, 3,
       new LootTable(new String[][]{{}, {"forcraft/leather"}, {"forcraft/rope"}}, new double[]{0.8, 0.15, 0.05})));
 

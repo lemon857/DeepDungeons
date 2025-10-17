@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.World;
 import com.deepdungeons.game.Character;
 import com.deepdungeons.game.Room;
 import com.deepdungeons.game.items.Item;
@@ -92,12 +93,14 @@ public class Mob extends Character implements Drawable {
 
   private boolean is_active;
 
+  protected final World world;
+
   public enum Tier {
     Humble, General, Wicked, Aggressive
   }
 
-  public Mob(String path_to_texture, Tier tier, double move_speed, double attack_speed, double strength, LootTable table) {
-    super(1, move_speed, attack_speed, strength);
+  public Mob(World world, String path_to_texture, Tier tier, double move_speed, double attack_speed, double strength, LootTable table) {
+    super(world, 1, move_speed, attack_speed, strength);
 
     this.is_active = true;
     this.tier = tier;
@@ -114,10 +117,11 @@ public class Mob extends Character implements Drawable {
     this.attack_anim_play = false;
     this.image = new Pixmap(Gdx.files.internal(path_to_texture));
     this.sprite = new Sprite(new Texture(image));
+    this.world = world;
   }
 
-  public Mob(Pixmap map, Tier tier, double move_speed, double attack_speed, double strength, LootTable table) {
-    super(1, move_speed, attack_speed, strength);
+  public Mob(World world, Pixmap map, Tier tier, double move_speed, double attack_speed, double strength, LootTable table) {
+    super(world, 1, move_speed, attack_speed, strength);
 
     this.is_active = true;
     this.tier = tier;
@@ -135,6 +139,7 @@ public class Mob extends Character implements Drawable {
     this.image = new Pixmap(map.getWidth(), map.getHeight(), map.getFormat());
     this.image.drawPixmap(map, 0, 0);
     this.sprite = new Sprite(new Texture(image));
+    this.world = world;
   }
   public void update(double delta) {
     updateTimers(delta);
@@ -340,7 +345,7 @@ public class Mob extends Character implements Drawable {
 
   @Override
   public Mob clone() {
-    Mob mob = new Mob(image, this.tier, getMoveSpeed(), getAttackSpeed(), getStrength(), this.table);
+    Mob mob = new Mob(world, image, this.tier, getMoveSpeed(), getAttackSpeed(), getStrength(), this.table);
 
     mob.health_points = this.health_points;
     mob.cooldown = this.cooldown;

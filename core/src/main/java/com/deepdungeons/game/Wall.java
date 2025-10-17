@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.badlogic.gdx.physics.box2d.World;
 import com.deepdungeons.game.renderer.Drawable;
 
 public final class Wall extends PhysicsObject implements Drawable {
@@ -15,8 +16,8 @@ public final class Wall extends PhysicsObject implements Drawable {
 
   private boolean is_active;
 
-  public Wall(String spritePath, Vector2 position, Vector2 size, boolean isVertical) {
-    super(BodyType.StaticBody);
+  public Wall(World world, String spritePath, Vector2 position, Vector2 size, boolean isVertical) {
+    super(world, BodyType.StaticBody);
 
     if (size.x < 0 || size.y < 0) {
       throw new IllegalArgumentException("Size mustn't be negative");
