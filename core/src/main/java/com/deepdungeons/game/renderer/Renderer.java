@@ -12,7 +12,7 @@ public final class Renderer implements BaseRenderer {
   private final FitViewport viewport;
   private final ArrayList<Drawable> drawables;
 
-  public Renderer(SpriteBatch batch, float width, float height) {
+  public Renderer(SpriteBatch batch, int width, int height) {
     this.batch = batch;
     this.drawables = new ArrayList<>();
     this.viewport = new FitViewport(width, height);
@@ -41,6 +41,16 @@ public final class Renderer implements BaseRenderer {
   @Override
   public void addDrawable(Drawable drawable) {
     drawables.add(drawable);
+  }
+
+  @Override
+  public int getWidth() {
+    return viewport.getScreenWidth();
+  }
+
+  @Override
+  public int getHeight() {
+    return viewport.getScreenHeight();
   }
 
   @Override

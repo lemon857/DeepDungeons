@@ -9,7 +9,7 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
-public class DebugRenderer implements BaseRenderer {
+public final class PhysicsDebugRenderer implements BaseRenderer {
 
   private final SpriteBatch batch;
   private final FitViewport viewport;
@@ -19,7 +19,7 @@ public class DebugRenderer implements BaseRenderer {
 	private final Box2DDebugRenderer debugRenderer;
 	private Matrix4 debugMatrix;
 
-  public DebugRenderer(SpriteBatch batch, float width, float height, World world) {
+  public PhysicsDebugRenderer(SpriteBatch batch, int width, int height, World world) {
     this.batch = batch;
     this.drawables = new ArrayList<>();
     this.viewport = new FitViewport(width, height);
@@ -55,6 +55,16 @@ public class DebugRenderer implements BaseRenderer {
   @Override
   public void addDrawable(Drawable drawable) {
     drawables.add(drawable);
+  }
+
+  @Override
+  public int getWidth() {
+    return viewport.getScreenWidth();
+  }
+
+  @Override
+  public int getHeight() {
+    return viewport.getScreenHeight();
   }
 
   @Override

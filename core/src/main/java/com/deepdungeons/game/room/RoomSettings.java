@@ -1,4 +1,4 @@
-package com.deepdungeons.game;
+package com.deepdungeons.game.room;
 
 import com.deepdungeons.game.utils.Point;
 
@@ -19,7 +19,6 @@ public class RoomSettings {
   public int door_key_with = door_width - 8;
   public int door_height = 1;
 
-  // x - for x axis, y - for y axis
   public Point door_offset = new Point(start_border.x + (width - door_width) / 2, start_border.y + (height - door_width) / 2);
   public Point door_key_offset = new Point(start_border.x + (width - door_key_with) / 2, start_border.y + (height - door_key_with) / 2);
 
