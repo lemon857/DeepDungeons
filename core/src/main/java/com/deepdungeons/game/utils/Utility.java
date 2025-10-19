@@ -8,23 +8,7 @@ import com.badlogic.gdx.graphics.Pixmap;
 public class Utility {
 
   private static final double HALF_SQUARE_SUM = Math.sqrt(2)/2;
-
-  public static Vector2d getDirectionVector(Direction dir) {
-    Vector2d delta = new Vector2d();
-    switch (dir) {
-      case Up: delta.y = 1; break;
-      case Right: delta.x = 1; break;
-      case Down: delta.y = -1; break;
-      case Left: delta.x = -1; break;
-      case UpLeft: delta.x = -HALF_SQUARE_SUM; delta.y = HALF_SQUARE_SUM; break;
-      case UpRight: delta.x = HALF_SQUARE_SUM; delta.y = HALF_SQUARE_SUM; break;
-      case DownLeft: delta.x = -HALF_SQUARE_SUM; delta.y = -HALF_SQUARE_SUM; break;
-      case DownRight: delta.x = HALF_SQUARE_SUM; delta.y = -HALF_SQUARE_SUM; break;
-      default: break;
-    }
-    return delta;
-  }
-
+  
   public static Direction getTranslateDirection(double dx, double dy) {
     if (dx > 0) {
       if (dy > 0) {
@@ -65,10 +49,6 @@ public class Utility {
     case 7: return Direction.UpLeft;
     }
     return Direction.Undefined;
-  }
-
-  public static Vector2d getRandomDirectionVector(Random rand) {
-    return getDirectionVector(getRandomDirection(rand));
   }
 
   public static int getRandomWeightedNumber(Random rand, double[] weights) {

@@ -8,7 +8,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
-import com.deepdungeons.game.PhysicsObject;
+import com.deepdungeons.game.physics.PhysicsObject;
 import com.deepdungeons.game.renderer.Drawable;
 
 public final class Wall extends PhysicsObject implements Drawable {

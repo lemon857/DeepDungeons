@@ -1,4 +1,4 @@
-package com.deepdungeons.game;
+package com.deepdungeons.game.physics;
 
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.ContactImpulse;
