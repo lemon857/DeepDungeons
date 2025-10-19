@@ -6,17 +6,21 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.Shape;
 import com.badlogic.gdx.physics.box2d.World;
+import com.deepdungeons.game.utils.Activable;
 
-public class PhysicsObject {
+public class PhysicsObject implements Activable {
   protected Body body;
 
   protected Vector2 size;
+
+  protected boolean is_active;
 
   protected PhysicsObject(World world, BodyDef.BodyType type) {
     this.size = new Vector2();
     BodyDef def = new BodyDef();
     def.type = type;
     body = world.createBody(def);
+    is_active = true;
   }
 
   protected void setShape(Shape shape, float density, float restitution) {
@@ -25,6 +29,8 @@ public class PhysicsObject {
     fixtureDef.shape = shape;
 		fixtureDef.density = density;
 		fixtureDef.restitution = restitution;
+    // fixtureDef.filter.categoryBits = 1;
+		// fixtureDef.filter.maskBits = 1 << 2;
 
     body.createFixture(fixtureDef);
   }
@@ -39,5 +45,16 @@ public class PhysicsObject {
   
   protected void setPosition(float x, float y) {
     body.setTransform(x, y, 0);
+  }
+
+  @Override
+  public void setActive(boolean value) {
+    is_active = value;
+    body.setActive(value);
+  }
+
+  @Override
+  public boolean getActive() {
+    return is_active;
   }
 }

@@ -14,6 +14,7 @@ import com.deepdungeons.game.effects.EffectsPanel;
 import com.deepdungeons.game.items.Edible;
 import com.deepdungeons.game.items.Item;
 import com.deepdungeons.game.renderer.Drawable;
+import com.deepdungeons.game.room.Room;
 import com.deepdungeons.game.utils.Direction;
 import com.deepdungeons.game.utils.Point;
 import com.deepdungeons.game.utils.Utility;
@@ -70,8 +71,6 @@ public final class Player extends Character implements Drawable {
   protected double damage_anim_timer;
   protected boolean damage_anim_play;
   protected static final double DAMAGE_ANIM_TIME = 0.25;
-
-  private boolean is_active;
 
   private Sprite sprite;
 

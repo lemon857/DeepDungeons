@@ -1,4 +1,4 @@
-package com.deepdungeons.game;
+package com.deepdungeons.game.room;
 
 import java.util.ArrayList;
 import java.util.Random;

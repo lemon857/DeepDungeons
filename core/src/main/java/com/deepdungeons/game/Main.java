@@ -27,6 +27,8 @@ import com.deepdungeons.game.mobs.DefaultEnemy;
 import com.deepdungeons.game.mobs.Mob;
 import com.deepdungeons.game.renderer.BaseRenderer;
 import com.deepdungeons.game.renderer.DebugRenderer;
+import com.deepdungeons.game.room.Door;
+import com.deepdungeons.game.room.Room;
 import com.deepdungeons.game.utils.Generator;
 import com.deepdungeons.game.utils.LootTable;
 import com.deepdungeons.game.utils.Point;
@@ -97,10 +99,6 @@ public class Main extends ApplicationAdapter {
   private static final int DEBUG_LINE_ROOM_POS = 4;
   private static final int DEBUG_LINE_ITEM_NAME = 5;
 
-  private RoomWall wall;
-
-  private PhysicsContactListener contactListener;
-
   private Door door;
 
   @Override
@@ -108,12 +106,12 @@ public class Main extends ApplicationAdapter {
     rand = new Random();
 
     world = new World(new Vector2(0f, 0f), true);
-    world.setContactListener(contactListener);
+    world.setContactListener(new PhysicsContactListener());
 
     renderer = new DebugRenderer(new SpriteBatch(), Room.SCREEN_WIDTH, Room.SCREEN_HEIGHT, world);
 
-    wall = new RoomWall(world, "textures/wall.png");
-    renderer.addDrawable(wall);
+    // wall = new SquareRoomWall(world, "textures/wall.png");
+    // renderer.addDrawable(wall);
 
     door = new Door(world, "textures/door.png", DEBUG_LINES, 
       new Vector2(Room.START_BORDER.x + 30, 30), new Vector2(64, 16), false);

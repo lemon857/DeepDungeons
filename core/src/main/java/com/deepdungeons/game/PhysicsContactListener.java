@@ -16,8 +16,7 @@ public class PhysicsContactListener implements ContactListener {
 
 @Override
 public void endContact(Contact contact) {
-  // TODO Auto-generated method stub
-  // throw new UnsupportedOperationException("Unimplemented method 'endContact'");
+  
 }
 
 @Override

@@ -8,7 +8,7 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.deepdungeons.game.Room;
+import com.deepdungeons.game.room.Room;
 import com.deepdungeons.game.utils.Vector2d;
 
 public class Item {

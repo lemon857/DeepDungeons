@@ -1,4 +1,4 @@
-package com.deepdungeons.game;
+package com.deepdungeons.game.room;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
@@ -8,15 +8,15 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
+import com.deepdungeons.game.PhysicsObject;
 import com.deepdungeons.game.renderer.Drawable;
 
-public final class Wall extends PhysicsObject implements Drawable {
-
+public final class Door extends PhysicsObject implements Drawable {
   private Sprite sprite;
 
   private boolean is_active;
 
-  public Wall(World world, String spritePath, Vector2 position, Vector2 size, boolean isVertical) {
+  public Door(World world, String spritePath, int door_number, Vector2 position, Vector2 size, boolean isVertical) {
     super(world, BodyType.StaticBody);
 
     if (size.x < 0 || size.y < 0) {
@@ -36,7 +36,7 @@ public final class Wall extends PhysicsObject implements Drawable {
     }
 
     setPosition(position.x + size.x / 2f, position.y + size.y / 2f);
-    setUserData("wall");
+    setUserData("door-" + door_number);
   }
 
   @Override

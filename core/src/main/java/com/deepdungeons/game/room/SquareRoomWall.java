@@ -1,18 +1,17 @@
-package com.deepdungeons.game;
+package com.deepdungeons.game.room;
 
 import java.util.ArrayList;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
-import com.deepdungeons.game.renderer.Drawable;
 
-public final class RoomWall implements Drawable {
+public final class SquareRoomWall implements RoomWall {
   private final ArrayList<Wall> walls;
 
   private boolean is_active;
 
-  public RoomWall(World world, String wall_texture_path) {
+  public SquareRoomWall(World world, String wall_texture_path) {
     walls = new ArrayList<>();
     is_active = true;
 
