@@ -7,8 +7,6 @@ import com.badlogic.gdx.graphics.Pixmap;
 
 public class Utility {
 
-  private static final double HALF_SQUARE_SUM = Math.sqrt(2)/2;
-  
   public static Direction getTranslateDirection(double dx, double dy) {
     if (dx > 0) {
       if (dy > 0) {
@@ -53,7 +51,7 @@ public class Utility {
 
   public static int getRandomWeightedNumber(Random rand, double[] weights) {
     double res = rand.nextDouble();
-    double low = 0;
+    double low;
     double high = 0;
     for (int i = 0; i < weights.length; ++i) {
       low = high;

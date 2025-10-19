@@ -14,8 +14,6 @@ import com.deepdungeons.game.renderer.Drawable;
 public final class Door extends PhysicsObject implements Drawable {
   private Sprite sprite;
 
-  private boolean is_active;
-
   public Door(World world, String spritePath, int door_number, Vector2 position, Vector2 size, boolean isVertical) {
     super(world, BodyType.StaticBody);
 
@@ -37,16 +35,6 @@ public final class Door extends PhysicsObject implements Drawable {
 
     setPosition(position.x + size.x / 2f, position.y + size.y / 2f);
     setUserData("door-" + door_number);
-  }
-
-  @Override
-  public void setActive(boolean value) {
-    is_active = value;
-  }
-
-  @Override
-  public boolean getActive() {
-    return is_active;
   }
 
   @Override
