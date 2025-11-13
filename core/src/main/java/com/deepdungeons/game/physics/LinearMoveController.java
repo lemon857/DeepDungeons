@@ -35,7 +35,7 @@ public class LinearMoveController implements MoveController {
 
       target.getBody().setLinearVelocity(direction.scl(maxSpeed));
       
-      System.out.printf("Cur vel: %f\n", target.getBody().getLinearVelocity().len());
+      // System.out.printf("Cur vel: %f\n", target.getBody().getLinearVelocity().len());
 
     } else {
       target.getBody().setLinearVelocity(direction);

@@ -51,8 +51,7 @@ public class SmoothMoveController implements MoveController {
         Vector2 forceVec = new Vector2(direction).scl(force);
 
         body.applyForceToCenter(forceVec, true);
-
-        System.out.printf("Force: %f, Cur speed: %f, Delta vel: %f\n", force, currentSpeed, requiredAddSpeed);
+        // System.out.printf("Force: %f, Cur speed: %f, Delta vel: %f\n", force, currentSpeed, requiredAddSpeed);
       }
     } else if (!vel.isZero()) {
       float requireBrake = Math.max(0.5f * (vel.len()), 10f);

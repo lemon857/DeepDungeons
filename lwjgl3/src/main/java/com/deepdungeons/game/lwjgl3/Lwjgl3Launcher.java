@@ -11,7 +11,7 @@ public class Lwjgl3Launcher {
     }
 
     private static Lwjgl3Application createApplication() {
-        double width_to_height_koef = 16.0 / 9.0;
+        double width_to_height_koef = 9.0 / 16.0;
         return new Lwjgl3Application(new Main(width_to_height_koef), getDefaultConfiguration(width_to_height_koef));
     }
 
