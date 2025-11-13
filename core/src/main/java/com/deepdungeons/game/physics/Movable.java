@@ -1,7 +1,7 @@
 package com.deepdungeons.game.physics;
 
-import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
 
 public interface Movable {
-  public void setVelocity(Vector2 vel);
+  public Body getBody();
 }
