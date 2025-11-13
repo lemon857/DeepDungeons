@@ -27,7 +27,7 @@ public final class Door extends PhysicsObject implements Drawable {
 
     is_active = true;
     sprite = new Sprite(new Texture(Gdx.files.internal(spritePath)));
-    sprite.setPosition(position.x, position.y);
+    sprite.setPosition(position.x - size.x / 2f, position.y - size.x / 2f);
     sprite.setSize(size.x, size.y);
     if (isVertical) {
       sprite.rotate90(true);
