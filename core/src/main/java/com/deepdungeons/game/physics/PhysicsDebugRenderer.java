@@ -6,6 +6,7 @@ import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.deepdungeons.game.renderer.BaseRenderer;
 import com.deepdungeons.game.renderer.Drawable;
+import com.deepdungeons.game.utils.Constants;
 
 public final class PhysicsDebugRenderer implements BaseRenderer {
 
@@ -32,6 +33,7 @@ public final class PhysicsDebugRenderer implements BaseRenderer {
     renderer.render();
 
 		debugMatrix = renderer.getCamera().combined.cpy();
+    debugMatrix.scl(Constants.PIXELS_PER_METER, Constants.PIXELS_PER_METER, 1f);
     
     debugRenderer.render(world, debugMatrix);
   }

@@ -13,17 +13,19 @@ import com.deepdungeons.game.renderer.Drawable;
 
 public final class Wall extends PhysicsObject implements Drawable {
 
-  private Sprite sprite;
+  private final Sprite sprite;
+
+  private final Vector2 size;
 
   public Wall(World world, String spritePath, Vector2 position, Vector2 size, boolean isVertical) {
-    super(world, BodyType.StaticBody);
+    super(world, BodyType.StaticBody, position);
 
     if (size.x < 0 || size.y < 0) {
       throw new IllegalArgumentException("Size mustn't be negative");
     }
 
     PolygonShape shape = new PolygonShape();
-    shape.setAsBox(size.x / 2f, size.y / 2f);
+    shape.setAsBox(PixelsToMeters(size.x / 2f), PixelsToMeters(size.y / 2f));
     setShape(shape, 4f, 0.5f);
 
     is_active = true;
@@ -33,9 +35,7 @@ public final class Wall extends PhysicsObject implements Drawable {
     if (isVertical) {
       sprite.rotate90(true);
     }
-
-    setPosition(position.x + size.x / 2f, position.y + size.y / 2f);
-    setUserData("wall");
+    this.size = size;
   }
 
   @Override
