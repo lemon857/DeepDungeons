@@ -2,27 +2,34 @@ package com.deepdungeons.game.renderer;
 
 import java.util.ArrayList;
 
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.badlogic.gdx.utils.viewport.FitViewport;
 
 public final class Renderer implements BaseRenderer {
 
   private final SpriteBatch batch;
-  private final FitViewport viewport;
   private final ArrayList<Drawable> drawables;
+  private final Camera camera;
 
-  public Renderer(SpriteBatch batch, int width, int height) {
+  public Renderer(SpriteBatch batch, Camera camera) {
     this.batch = batch;
     this.drawables = new ArrayList<>();
-    this.viewport = new FitViewport(width, height);
+    this.camera = camera;
+    this.camera.update();
+  }
+
+  @Override
+  public Camera getCamera() {
+    return camera;
   }
 
   @Override
   public void render() {
     ScreenUtils.clear(0f, 0f, 0f, 1f);
-    viewport.apply();
-    batch.setProjectionMatrix(viewport.getCamera().combined);
+
+    camera.update();
+    batch.setProjectionMatrix(camera.combined);
     
     batch.begin();
 
@@ -35,7 +42,9 @@ public final class Renderer implements BaseRenderer {
 
   @Override
   public void resize(int width, int height) {
-    viewport.update(width, height, true);
+    camera.viewportWidth = width;
+    camera.viewportHeight = height;
+    camera.update();
   }
 
   @Override
@@ -44,13 +53,13 @@ public final class Renderer implements BaseRenderer {
   }
 
   @Override
-  public int getWidth() {
-    return viewport.getScreenWidth();
+  public float getWidth() {
+    return camera.viewportWidth;
   }
 
   @Override
-  public int getHeight() {
-    return viewport.getScreenHeight();
+  public float getHeight() {
+    return camera.viewportHeight;
   }
 
   @Override
