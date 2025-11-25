@@ -13,9 +13,9 @@ public class SimpleCameraMoveContorller implements MoveController {
 
   private Movable target;
 
-  public SimpleCameraMoveContorller(Camera camera, MoveController controller) {
+  public SimpleCameraMoveContorller(Camera camera, MoveController playerController) {
     this.camera = camera;
-    this.controller = controller;
+    this.controller = playerController;
   }
 
   @Override

@@ -55,10 +55,10 @@ public class PhysicsObject implements Activable, Transformable {
     FixtureDef fixtureDef = new FixtureDef();
 
     fixtureDef.shape = shape;
-		fixtureDef.density = density;
-		fixtureDef.restitution = restitution;
+    fixtureDef.density = density;
+    fixtureDef.restitution = restitution;
     fixtureDef.filter.categoryBits = categoryBits;
-		fixtureDef.filter.maskBits = maskBits;
+	fixtureDef.filter.maskBits = maskBits;
 
     body.createFixture(fixtureDef);
   }

@@ -10,6 +10,7 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.deepdungeons.game.physics.PhysicsObject;
 import com.deepdungeons.game.renderer.Drawable;
+import com.deepdungeons.game.utils.Constants;
 
 public final class Wall extends PhysicsObject implements Drawable {
 
@@ -24,11 +25,11 @@ public final class Wall extends PhysicsObject implements Drawable {
 
     PolygonShape shape = new PolygonShape();
     shape.setAsBox(PixelsToMeters(size.x / 2f), PixelsToMeters(size.y / 2f));
-    setShape(shape, 4f, 0.5f);
+    setShape(shape, 4f, 0.5f, Constants.PHYSICS_ENTITY_CATEGORY_BITS, Constants.WALL_MASK_BITS);
 
     is_active = true;
     sprite = new Sprite(new Texture(Gdx.files.internal(spritePath)));
-    sprite.setPosition(position.x - size.x / 2f, position.y - size.x / 2f);
+    sprite.setPosition(position.x - size.x / 2f, position.y - size.y / 2f);
     sprite.setSize(size.x, size.y);
     if (isVertical) {
       sprite.rotate90(true);

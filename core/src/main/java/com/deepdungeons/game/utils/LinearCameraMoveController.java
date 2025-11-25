@@ -15,9 +15,9 @@ public class LinearCameraMoveController implements MoveController {
 
   private Movable target;
 
-  public LinearCameraMoveController(Camera camera, float frameSizeKoef, MoveController controller) {
+  public LinearCameraMoveController(Camera camera, float frameSizeKoef, MoveController playerController) {
     this.camera = camera;
-    this.controller = controller;
+    this.controller = playerController;
 
     this.frameSizeKoef = frameSizeKoef;
   }

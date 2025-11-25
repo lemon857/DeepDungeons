@@ -12,6 +12,7 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.deepdungeons.game.physics.Movable;
 import com.deepdungeons.game.physics.PhysicsObject;
 import com.deepdungeons.game.renderer.Drawable;
+import com.deepdungeons.game.utils.Constants;
 
 public class Player extends PhysicsObject implements Drawable, Movable {
 
@@ -28,7 +29,7 @@ public class Player extends PhysicsObject implements Drawable, Movable {
 
     PolygonShape shape = new PolygonShape();
     shape.setAsBox(PixelsToMeters(size.x / 2f), PixelsToMeters(size.y / 2f));
-    setShape(shape, 4f, 0.5f);
+    setShape(shape, 4f, 0.5f, Constants.PHYSICS_ENTITY_CATEGORY_BITS, Constants.PLAYER_MASK_BITS);
 
     setMassData(new Vector2(), 70, 10);
 

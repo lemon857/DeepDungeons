@@ -14,12 +14,16 @@ import com.deepdungeons.game.physics.PhysicsDebugRenderer;
 import com.deepdungeons.game.physics.SmoothMoveController;
 import com.deepdungeons.game.renderer.BaseRenderer;
 import com.deepdungeons.game.renderer.Renderer;
+import com.deepdungeons.game.room.Room;
+import com.deepdungeons.game.room.SquareRoomWall;
 import com.deepdungeons.game.room.Wall;
 import com.deepdungeons.game.utils.LinearCameraMoveController;
+import com.deepdungeons.game.utils.SimpleCameraMoveContorller;
+import com.deepdungeons.game.utils.SmoothCameraMoveController;
 
 public class Game implements Disposable {
   
-  private static final float STEP = 1/128f;
+  private static final float STEP = 1 / 128f;
 
   private final BaseRenderer renderer;
 
@@ -33,6 +37,8 @@ public class Game implements Disposable {
 
   private final MoveController controller;
 
+  private final Room room;
+
   private float accumulator;
 
   public Game(int width, int height) {
@@ -44,35 +50,38 @@ public class Game implements Disposable {
     // renderer = new Renderer(new SpriteBatch(), camera));
     renderer = new PhysicsDebugRenderer(new Renderer(new SpriteBatch(), camera), world);
 
-    wall = new Wall(world, "textures/items/bone.png", new Vector2(100, 100), new Vector2(100, 100), false);
+    wall = new Wall(world, "textures/items/bone.png", new Vector2(200, 200), new Vector2(100, 100), false);
     renderer.addDrawable(wall);
 
     player = new Player(world, "textures/weapons/knife.png", new Vector2(0, 0), new Vector2(100, 100));
     renderer.addDrawable(player);
 
-    controller = new LinearCameraMoveController(camera, 1 / 3f, new SmoothMoveController());
-    //controller = new SimpleCameraMoveContorller(camera, new SmoothMoveController());
+    controller = new SmoothCameraMoveController(camera, 1 / 3f, new SmoothMoveController());
+//    controller = new SimpleCameraMoveContorller(camera, new SmoothMoveController());
     // controller = new LinearMoveController();
     controller.setTarget(player);
-    controller.setMaxSpeed(5);
+    controller.setMaxSpeed(10);
 
     accumulator = 0;
+
+    room = new Room(new SquareRoomWall(world, "textures/wall.png", new Vector2(-350, -350), new Vector2(700, 10)));
+    renderer.addDrawable(room);
   }
 
   public void input() {
     Vector2 direction = new Vector2(0f, 0f);
-    if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+    if (Gdx.input.isKeyPressed(Input.Keys.A)) {
       direction.x -= 1;
-		}
-		if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+    }
+    if (Gdx.input.isKeyPressed(Input.Keys.D)) {
       direction.x += 1;
-		}
-		if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
+    }
+    if (Gdx.input.isKeyPressed(Input.Keys.S)) {
       direction.y -= 1;
-		}
-		if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
+    }
+    if (Gdx.input.isKeyPressed(Input.Keys.W)) {
       direction.y += 1;
-		}
+    }
     controller.setDirection(direction);
   }
 
