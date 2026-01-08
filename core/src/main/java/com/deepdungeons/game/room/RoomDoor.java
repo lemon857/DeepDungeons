@@ -48,7 +48,7 @@ public final class RoomDoor extends PhysicsObject implements Drawable, Door {
   }
 
   @Override
-  public final void draw(SpriteBatch batch) {
+  public void draw(SpriteBatch batch) {
     if (!is_active) return;
     sprite.draw(batch);
   }

@@ -25,13 +25,7 @@ public class Game implements Disposable {
 
   private final World world;
 
-  private final Wall wall;
-
-  private final Player player;
-
   private final MoveController controller;
-
-  private final Room room;
 
   private float accumulator;
 
@@ -47,10 +41,10 @@ public class Game implements Disposable {
     camera = new OrthographicCamera(width, height);
     renderer = new PhysicsDebugRenderer(new Renderer(new SpriteBatch(), camera), world);
 
-    wall = new Wall(world, "textures/items/bone.png", new Vector2(240, 200), new Vector2(100, 100), false);
+    Wall wall = new Wall(world, "textures/items/bone.png", new Vector2(240, 200), new Vector2(100, 100), false);
     renderer.addDrawable(wall);
 
-    player = new Player(world, "textures/weapons/knife.png", new Vector2(-200, -200), new Vector2(100, 100));
+    Player player = new Player(world, "textures/weapons/knife.png", new Vector2(-200, -200), new Vector2(100, 100));
     renderer.addDrawable(player);
 
     controller = new LinearCameraMoveController(camera, 1 / 3f, new SmoothMoveController());
@@ -60,7 +54,7 @@ public class Game implements Disposable {
 
     accumulator = 0;
 
-    room = new Room(new SquareRoomWall(world, "textures/wall.png", new Vector2(-350, -350), new Vector2(700, 10)));
+    Room room = new Room(new SquareRoomWall(world, "textures/wall.png", new Vector2(-350, -350), new Vector2(700, 10)));
     renderer.addDrawable(room);
 
     RoomDoor door1 = new RoomDoor(world, "textures/door.png", new Vector2(500, 0), new Vector2(100, 10), false, true);
