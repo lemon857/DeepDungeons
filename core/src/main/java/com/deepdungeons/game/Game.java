@@ -9,17 +9,11 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Disposable;
 import com.deepdungeons.game.characters.Player;
-import com.deepdungeons.game.physics.MoveController;
-import com.deepdungeons.game.physics.PhysicsDebugRenderer;
-import com.deepdungeons.game.physics.SmoothMoveController;
+import com.deepdungeons.game.physics.*;
 import com.deepdungeons.game.renderer.BaseRenderer;
 import com.deepdungeons.game.renderer.Renderer;
-import com.deepdungeons.game.room.Room;
-import com.deepdungeons.game.room.SquareRoomWall;
-import com.deepdungeons.game.room.Wall;
+import com.deepdungeons.game.room.*;
 import com.deepdungeons.game.utils.LinearCameraMoveController;
-import com.deepdungeons.game.utils.SimpleCameraMoveContorller;
-import com.deepdungeons.game.utils.SmoothCameraMoveController;
 
 public class Game implements Disposable {
   
@@ -46,19 +40,21 @@ public class Game implements Disposable {
 
     world = new World(new Vector2(0f, 0f), false);
 
+    PhysicsContactListener listener = new PhysicsContactListener();
+    listener.addProcessor(new PlayerDoorCollisionProcessor());
+    world.setContactListener(listener);
+
     camera = new OrthographicCamera(width, height);
-    // renderer = new Renderer(new SpriteBatch(), camera));
     renderer = new PhysicsDebugRenderer(new Renderer(new SpriteBatch(), camera), world);
 
-    wall = new Wall(world, "textures/items/bone.png", new Vector2(200, 200), new Vector2(100, 100), false);
+    wall = new Wall(world, "textures/items/bone.png", new Vector2(240, 200), new Vector2(100, 100), false);
     renderer.addDrawable(wall);
 
-    player = new Player(world, "textures/weapons/knife.png", new Vector2(0, 0), new Vector2(100, 100));
+    player = new Player(world, "textures/weapons/knife.png", new Vector2(-200, -200), new Vector2(100, 100));
     renderer.addDrawable(player);
 
-    controller = new SmoothCameraMoveController(camera, 1 / 3f, new SmoothMoveController());
-//    controller = new SimpleCameraMoveContorller(camera, new SmoothMoveController());
-    // controller = new LinearMoveController();
+    controller = new LinearCameraMoveController(camera, 1 / 3f, new SmoothMoveController());
+
     controller.setTarget(player);
     controller.setMaxSpeed(10);
 
@@ -66,6 +62,15 @@ public class Game implements Disposable {
 
     room = new Room(new SquareRoomWall(world, "textures/wall.png", new Vector2(-350, -350), new Vector2(700, 10)));
     renderer.addDrawable(room);
+
+    RoomDoor door1 = new RoomDoor(world, "textures/door.png", new Vector2(500, 0), new Vector2(100, 10), false, true);
+    RoomDoor door2 = new RoomDoor(world, "textures/door.png", new Vector2(0, 0), new Vector2(100, 10), false, false);
+
+    door1.setDoorPair(door2);
+    door2.setDoorPair(door1);
+
+    room.addDoor(door1);
+    room.addDoor(door2);
   }
 
   public void input() {
