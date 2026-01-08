@@ -35,7 +35,7 @@ public final class Wall extends PhysicsObject implements Drawable {
       sprite.rotate90(true);
     }
 
-    setUserData("wall");
+    setUserData(this);
   }
 
   @Override

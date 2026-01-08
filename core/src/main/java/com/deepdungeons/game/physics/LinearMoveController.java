@@ -21,7 +21,7 @@ public class LinearMoveController implements MoveController {
   @Override
   public void setTarget(Movable movable) {
     target = movable;
-    }
+  }
 
   @Override
   public void setDirection(Vector2 direction) {
@@ -30,12 +30,14 @@ public class LinearMoveController implements MoveController {
 
   @Override
   public void move(float delta) {
+    if (target == null) return;
+
     if (!direction.isZero()) {
       direction.nor();
 
       target.getBody().setLinearVelocity(direction.scl(maxSpeed));
       
-      // System.out.printf("Cur vel: %f\n", target.getBody().getLinearVelocity().len());
+//       System.out.printf("Cur vel: %f\n", target.getBody().getLinearVelocity().len());
 
     } else {
       target.getBody().setLinearVelocity(direction);

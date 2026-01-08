@@ -58,7 +58,7 @@ public class PhysicsObject implements Activable, Transformable {
     fixtureDef.density = density;
     fixtureDef.restitution = restitution;
     fixtureDef.filter.categoryBits = categoryBits;
-	fixtureDef.filter.maskBits = maskBits;
+	  fixtureDef.filter.maskBits = maskBits;
 
     body.createFixture(fixtureDef);
   }
@@ -79,17 +79,31 @@ public class PhysicsObject implements Activable, Transformable {
     return body.getUserData();
   }
   
-  protected void setPosition(float x, float y) {
+  protected void setPixelPosition(float x, float y) {
     body.setTransform(PixelsToMeters(x), PixelsToMeters(y), 0);
   }
 
-  @Override
-  public final void setPosition(Vector2 pos) {
-    body.setTransform(PixelsToMeters(pos), 0);
+  protected void clearBodyVelocity() {
+    body.setLinearVelocity(0, 0);
   }
 
   @Override
-  public final Vector2 getPosition() {
+  public void setPosition(Vector2 position) {
+    body.setTransform(position, 0);
+  }
+
+  @Override
+  public Vector2 getPosition() {
+    return body.getPosition();
+  }
+
+  @Override
+  public final void setPixelPosition(Vector2 position) {
+    body.setTransform(PixelsToMeters(position), 0);
+  }
+
+  @Override
+  public final Vector2 getPixelPosition() {
     return MetersToPixels(body.getPosition());
   }
 

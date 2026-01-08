@@ -18,7 +18,9 @@ public class Player extends PhysicsObject implements Drawable, Movable {
 
   private final Sprite sprite;
 
-  private final Vector2 size;
+  private final Vector2 pixelSize;
+
+  public Vector2 newPos;
 
   public Player(World world, String spritePath, Vector2 position, Vector2 size) {
     super(world, BodyType.DynamicBody, position);
@@ -39,14 +41,23 @@ public class Player extends PhysicsObject implements Drawable, Movable {
     sprite.setPosition(position.x, position.y);
     sprite.setSize(size.x, size.y);
 
-    this.size = size;
+    this.pixelSize = size;
+    this.newPos = null;
+
+    setUserData(this);
   }
 
   @Override
   public void draw(SpriteBatch batch) {
+    if (newPos != null) {
+      setPixelPosition(newPos);
+      clearBodyVelocity();
+      newPos = null;
+    }
     if (!is_active) return;
 
-    sprite.setPosition(getPosition().x - size.x / 2f, getPosition().y - size.y / 2f);
+//    System.out.printf("New sprite pos: %f, %f\n", getPosition().x - size.x / 2f, getPosition().y - size.y / 2f);
+    sprite.setPosition(getPixelPosition().x - pixelSize.x / 2f, getPixelPosition().y - pixelSize.y / 2f);
 
     sprite.draw(batch);
   }
@@ -54,5 +65,9 @@ public class Player extends PhysicsObject implements Drawable, Movable {
   @Override
   public Body getBody() {
     return body;
+  }
+
+  public void requestChangePosition(Vector2 pixelPosition, Vector2 direction) {
+    newPos = pixelPosition.add(new Vector2(pixelSize.x * direction.x / 2f, pixelSize.y * direction.y / 2f));
   }
 }
