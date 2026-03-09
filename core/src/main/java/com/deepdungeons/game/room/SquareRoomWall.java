@@ -8,18 +8,20 @@ import com.badlogic.gdx.physics.box2d.World;
 
 public final class SquareRoomWall extends RoomWall {
   private final ArrayList<Wall> walls;
+  private final Vector2 leftBottomPosition;
 
-  public SquareRoomWall(World world, String wall_texture_path, Vector2 from, Vector2 size) {
+  public SquareRoomWall(World world, String wallTexturePath, Vector2 from, Vector2 size) {
     walls = new ArrayList<>();
     isActive = true;
+    leftBottomPosition = from;
 
     // left down corner
-    walls.add(new Wall(world, wall_texture_path, new Vector2(from.x - size.y / 2f + size.x / 2f, from.y), new Vector2(size.x - size.y, size.y), false));
-    walls.add(new Wall(world, wall_texture_path, new Vector2(from.x + size.y / 2f, from.y + size.x / 2f), new Vector2(size.y, size.x - size.y), true));
+    walls.add(new Wall(world, wallTexturePath, new Vector2(from.x - size.y / 2f + size.x / 2f, from.y), new Vector2(size.x - size.y, size.y), false));
+    walls.add(new Wall(world, wallTexturePath, new Vector2(from.x + size.y / 2f, from.y + size.x / 2f), new Vector2(size.y, size.x - size.y), true));
 
     // right up corner
-    walls.add(new Wall(world, wall_texture_path, new Vector2(from.x + size.y / 2f + size.x / 2f, from.y + size.x - size.y), new Vector2(size.x - size.y, size.y), false));
-    walls.add(new Wall(world, wall_texture_path, new Vector2(from.x - size.y / 2f + size.x, from.y + size.x / 2f - size.y), new Vector2(size.y, size.x - size.y), true));
+    walls.add(new Wall(world, wallTexturePath, new Vector2(from.x + size.y / 2f + size.x / 2f, from.y + size.x - size.y), new Vector2(size.x - size.y, size.y), false));
+    walls.add(new Wall(world, wallTexturePath, new Vector2(from.x - size.y / 2f + size.x, from.y + size.x / 2f - size.y), new Vector2(size.y, size.x - size.y), true));
   }
 
 
@@ -30,5 +32,10 @@ public final class SquareRoomWall extends RoomWall {
     for (Wall wall : walls) {
       wall.draw(batch);
     }
+  }
+
+  @Override
+  public Vector2 getLeftBottom() {
+    return leftBottomPosition;
   }
 }

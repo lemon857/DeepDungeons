@@ -1,9 +1,10 @@
 package com.deepdungeons.game.room;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Vector2;
 import com.deepdungeons.game.renderer.Drawable;
 
-public abstract class RoomWall implements  Drawable {
+public abstract class RoomWall implements Drawable {
 
   protected boolean isActive;
 
@@ -19,4 +20,6 @@ public abstract class RoomWall implements  Drawable {
 
   @Override
   public abstract void draw(SpriteBatch batch);
+
+  public abstract Vector2 getLeftBottom();
 }

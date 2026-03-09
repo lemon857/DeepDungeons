@@ -26,16 +26,20 @@ public final class RoomDoor extends PhysicsObject implements Drawable, Door {
       throw new IllegalArgumentException("Size mustn't be negative");
     }
 
-    PolygonShape shape = new PolygonShape();
-    shape.setAsBox(PixelsToMeters(pixelSize.x / 2f), PixelsToMeters(pixelSize.y / 2f));
-    setShape(shape, 4f, 0.5f);
-
     is_active = true;
     sprite = new Sprite(new Texture(Gdx.files.internal(spritePath)));
     sprite.setPosition(position.x - pixelSize.x / 2f, position.y - pixelSize.y / 2f);
     sprite.setSize(pixelSize.x, pixelSize.y);
     if (isVertical) {
       sprite.rotate90(true);
+
+      PolygonShape shape = new PolygonShape();
+      shape.setAsBox(PixelsToMeters(pixelSize.y / 2f), PixelsToMeters(pixelSize.x / 2f));
+      setShape(shape, 4f, 0.5f);
+    } else {
+      PolygonShape shape = new PolygonShape();
+      shape.setAsBox(PixelsToMeters(pixelSize.x / 2f), PixelsToMeters(pixelSize.y / 2f));
+      setShape(shape, 4f, 0.5f);
     }
     this.door = null;
     if (isVertical) {
@@ -63,7 +67,10 @@ public final class RoomDoor extends PhysicsObject implements Drawable, Door {
 
   @Override
   public void comeOut(Player player) {
-    player.requestChangePosition(getPixelPosition().add(new Vector2(directionToOut).scl(sprite.getY() * -1.5f)), directionToOut);
+    Vector2 startPosition = getPixelPosition();
+    Vector2 endPosition = new Vector2(directionToOut).scl(sprite.getHeight() * 0.75f);
+    Vector2 position = startPosition.add(endPosition);
+    player.requestChangePosition(position, directionToOut);
   }
 
   @Override

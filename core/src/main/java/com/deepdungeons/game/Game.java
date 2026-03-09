@@ -9,11 +9,15 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Disposable;
 import com.deepdungeons.game.characters.Player;
+import com.deepdungeons.game.generator.Graph;
+import com.deepdungeons.game.generator.GraphGenerator;
+import com.deepdungeons.game.generator.MstGraphGenerator;
 import com.deepdungeons.game.physics.*;
 import com.deepdungeons.game.renderer.BaseRenderer;
 import com.deepdungeons.game.renderer.Renderer;
 import com.deepdungeons.game.room.*;
 import com.deepdungeons.game.utils.LinearCameraMoveController;
+import com.deepdungeons.game.utils.SimpleCameraMoveContorller;
 
 public class Game implements Disposable {
   
@@ -47,24 +51,39 @@ public class Game implements Disposable {
     Player player = new Player(world, "textures/weapons/knife.png", new Vector2(-200, -200), new Vector2(100, 100));
     renderer.addDrawable(player);
 
-    controller = new LinearCameraMoveController(camera, 1 / 3f, new SmoothMoveController());
+//    controller = new LinearCameraMoveController(camera, 1 / 3f, new SmoothMoveController());
+    controller = new SimpleCameraMoveContorller(camera, new SmoothMoveController());
 
     controller.setTarget(player);
     controller.setMaxSpeed(10);
 
     accumulator = 0;
 
-    Room room = new Room(new SquareRoomWall(world, "textures/wall.png", new Vector2(-350, -350), new Vector2(700, 10)));
-    renderer.addDrawable(room);
+    RoomsManager roomManager = new RoomsManager();
+    renderer.addDrawable(roomManager);
 
-    RoomDoor door1 = new RoomDoor(world, "textures/door.png", new Vector2(500, 0), new Vector2(100, 10), false, true);
-    RoomDoor door2 = new RoomDoor(world, "textures/door.png", new Vector2(0, 0), new Vector2(100, 10), false, false);
+    GraphGenerator graphGenerator = new MstGraphGenerator(5);
 
-    door1.setDoorPair(door2);
-    door2.setDoorPair(door1);
+//    Graph graph = graphGenerator.generateGraph();
 
-    room.addDoor(door1);
-    room.addDoor(door2);
+    Graph graph = new Graph(2);
+
+    graph.addEdge(0, 1);
+    graph.addEdge(0, 1);
+
+    RoomConfiguration configuration = new RoomConfiguration(new Vector2(700, 700), 10);
+
+    float padding = 20;
+
+    configuration.addMirrorDoorConfiguration(
+            new DoorConfiguration(new Vector2(350, padding), false, true),
+            new DoorConfiguration(new Vector2(350, 700 - padding),false, false));
+
+    configuration.addMirrorDoorConfiguration(
+            new DoorConfiguration(new Vector2(padding, 350), true, true),
+            new DoorConfiguration(new Vector2(700 - padding, 350),true, false));
+
+    roomManager.createRoomsFromGraph(graph, world,"textures/wall.png", "textures/door.png", configuration);
   }
 
   public void input() {

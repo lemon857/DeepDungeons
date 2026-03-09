@@ -1,6 +1,9 @@
 package com.deepdungeons.game;
 
 import com.badlogic.gdx.ApplicationAdapter;
+import com.deepdungeons.game.generator.Graph;
+import com.deepdungeons.game.generator.GraphGenerator;
+import com.deepdungeons.game.generator.MstGraphGenerator;
 
 // ! WARNING !
 // IDK why, start coords on Pixmap located at Up-Left corner,
@@ -15,18 +18,18 @@ import com.badlogic.gdx.ApplicationAdapter;
 
 public class Main extends ApplicationAdapter {
 
-  private final double width_to_height_koef;
+  private final double width_to_height_coef;
 
   private Game game;
 
-  public Main(double width_to_height_koef) {
-    this.width_to_height_koef = width_to_height_koef;
+  public Main(double width_to_height_coef) {
+    this.width_to_height_coef = width_to_height_coef;
   }
 
   @Override
   public void create() {
     int width = 1400;
-    game = new Game(width, (int)(width * width_to_height_koef));
+    game = new Game(width, (int)(width * width_to_height_coef));
   }
 
   @Override
